@@ -29,7 +29,7 @@ check_status() {
 clear
 print_message "╔════════════════════════════════════════╗" "$BLUE"
 print_message "║    Hydra-Termux Installation Script   ║" "$BLUE"
-print_message "╚══════════════════════════��═════════════╝" "$BLUE"
+print_message "╚════════════════════════════════════════╝" "$BLUE"
 echo ""
 
 # Update package lists
@@ -82,7 +82,7 @@ chmod +x install.sh 2>/dev/null
 # Final message
 echo ""
 print_message "╔════════════════════════════════════════╗" "$GREEN"
-print_message "║  Installation Complete Successfully!   ║" "$GREEN"
+print_message "║   Installation Complete Successfully!  ║" "$GREEN"
 print_message "╚════════════════════════════════════════╝" "$GREEN"
 echo ""
 print_message "🚀 To start Hydra-Termux, run:" "$BLUE"
