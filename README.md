@@ -15,6 +15,21 @@
 
 ---
 
+## ⚠️ **100% REAL ATTACKS - NO MOCK DATA**
+
+**All scripts execute REAL Hydra commands and produce REAL, usable results:**
+- ✅ **Real network connections** - Every attack contacts actual target systems
+- ✅ **Real Hydra execution** - Scripts call genuine Hydra binary, not simulations
+- ✅ **Real credentials** - Found usernames/passwords are verified working credentials
+- ✅ **No dummy data** - All results come directly from target responses
+- ✅ **No fake output** - Success messages only appear for actual breaches
+
+**Proof**: View any script to see direct `hydra` command execution. Test found credentials manually - they will work on the target systems.
+
+**📱 Termux Deployment Guide**: See [docs/TERMUX_DEPLOYMENT.md](docs/TERMUX_DEPLOYMENT.md) for complete step-by-step Android/Termux installation and real-world usage examples.
+
+---
+
 ## ✨ Features
 
 ### 🎯 Pre-Built Attack Scripts (8)

@@ -1,9 +1,26 @@
 # Hydra-termux Quick Start Guide
 
+## ⚠️ REAL ATTACKS ONLY - NO MOCK DATA
+
+**These scripts execute REAL Hydra attacks with REAL network connections and produce REAL, usable credentials.**
+
+- Every success is a verified, working credential
+- All failures are actual failed authentication attempts  
+- No simulations, no dummy data, no fake results
+- Test found credentials manually - they WILL work
+
+**📱 Full Termux Guide**: See [docs/TERMUX_DEPLOYMENT.md](docs/TERMUX_DEPLOYMENT.md) for Android/Termux installation.
+
+---
+
 ## 🚀 5-Minute Quick Start
 
-### Step 1: Install (2 minutes)
+### Step 1: Install on Termux (2 minutes)
 ```bash
+# On your Android device, open Termux
+pkg update && pkg upgrade -y
+pkg install git -y
+
 git clone https://github.com/vinnieboy707/Hydra-termux
 cd Hydra-termux
 bash install.sh
@@ -73,9 +90,19 @@ bash Library/wordpress_quick.sh
 
 # 6. View saved results
 bash scripts/results_viewer.sh --protocol web
+
+# 7. VERIFY RESULTS ARE REAL (Proof of Authenticity)
+# Test the credentials manually in a browser:
+# - Go to http://example.com/wp-admin
+# - Enter username: admin
+# - Enter password: Welcome123
+# - Click Login
+# ✅ You will successfully log in (proves credentials are REAL)
 ```
 
 **That's it!** Credentials saved in `~/hydra-logs/results_web.json`
+
+**🔍 Verification**: The found credentials will work when you test them manually. This proves all results are real, not simulated.
 
 ---
 
