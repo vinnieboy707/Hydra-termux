@@ -1,0 +1,37 @@
+# Logs
+logs/
+*.log
+
+# Results and outputs
+results/
+*.csv
+*.json
+
+# Wordlists (downloaded)
+wordlists/
+
+# Backups
+*.bak
+*.backup
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Credentials and sensitive data
+*.key
+*.pem
+credentials.txt
+secrets.txt
