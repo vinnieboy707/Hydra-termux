@@ -1,0 +1,5 @@
+hydra
+git
+wget
+curl
+openssl
