@@ -140,8 +140,9 @@ run_attack() {
               $service "$LOGIN_PATH:$form_params:$FAILURE_STRING" 2>&1 | while IFS= read -r line; do
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
-                local login=$(echo "$line" | grep -oP 'login: \K[^ ]+')
-                local password=$(echo "$line" | grep -oP 'password: \K[^ ]+')
+                # Parse successful login (support credentials with spaces)
+                local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
+                local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
                 
                 save_result "http" "$TARGET" "$login" "$password" "$PORT"
                 log_success "Valid credentials found: $login:$password"
@@ -164,8 +165,9 @@ run_attack() {
               $service "$LOGIN_PATH" 2>&1 | while IFS= read -r line; do
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
-                local login=$(echo "$line" | grep -oP 'login: \K[^ ]+')
-                local password=$(echo "$line" | grep -oP 'password: \K[^ ]+')
+                # Parse successful login (support credentials with spaces)
+                local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
+                local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
                 
                 save_result "http" "$TARGET" "$login" "$password" "$PORT"
                 log_success "Valid credentials found: $login:$password"
