@@ -7,8 +7,10 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Source logger
+# Source logger and utilities
 source "$SCRIPT_DIR/logger.sh"
+source "$SCRIPT_DIR/vpn_check.sh"
+source "$SCRIPT_DIR/target_manager.sh"
 
 # Default configuration
 THREADS=16
@@ -16,6 +18,7 @@ TIMEOUT=30
 TARGET=""
 PORT=22
 RESUME_FILE="$PROJECT_ROOT/logs/ssh_resume.txt"
+SKIP_VPN_CHECK=false
 
 # Ensure logs directory exists
 mkdir -p "$PROJECT_ROOT/logs"
@@ -33,7 +36,7 @@ show_help() {
     echo "Usage: $0 -t TARGET [OPTIONS]"
     echo ""
     echo "Required:"
-    echo "  -t, --target      Target IP address or hostname"
+    echo "  -t, --target      Target IP, CIDR (e.g., 192.168.1.0/24), or target list file"
     echo ""
     echo "Optional:"
     echo "  -p, --port        SSH port (default: 22)"
@@ -43,10 +46,13 @@ show_help() {
     echo "  -o, --timeout     Connection timeout in seconds (default: 30)"
     echo "  -r, --resume      Resume from previous attack"
     echo "  -v, --verbose     Verbose output"
+    echo "  --skip-vpn        Skip VPN connectivity check (NOT recommended)"
     echo "  -h, --help        Show this help message"
     echo ""
     echo "Examples:"
     echo "  $0 -t 192.168.1.100"
+    echo "  $0 -t 192.168.1.0/24           # Scan entire subnet"
+    echo "  $0 -t targets.txt               # Scan from file"
     echo "  $0 -t 192.168.1.100 -p 2222 -w /path/to/passwords.txt"
     echo "  $0 -t example.com -u users.txt -T 32"
     echo ""
@@ -216,6 +222,10 @@ while [[ $# -gt 0 ]]; do
             VERBOSE=true
             shift
             ;;
+        --skip-vpn)
+            SKIP_VPN_CHECK=true
+            shift
+            ;;
         -h|--help)
             show_help
             exit 0
@@ -232,16 +242,62 @@ done
 print_banner "SSH Admin Attack"
 echo ""
 
-validate_input
-
-# Check resume
-if [ "$RESUME" = "true" ] && [ -f "$RESUME_FILE" ]; then
-    log_info "Resuming from previous attack..."
-    cat "$RESUME_FILE"
+# VPN Check (unless skipped)
+if [ "$SKIP_VPN_CHECK" = "false" ]; then
+    require_vpn "false"
+    echo ""
 fi
 
-# Run the attack
-run_attack
+validate_input
+
+# Check if multi-target input
+if [ -f "$TARGET" ] || is_cidr "$TARGET"; then
+    show_target_summary "$TARGET"
+    
+    log_info "Processing multiple targets..."
+    target_count=$(count_targets "$TARGET")
+    log_info "Total targets to attack: $target_count"
+    echo ""
+    
+    current=0
+    success_count=0
+    fail_count=0
+    
+    process_targets "$TARGET" | while read -r single_target; do
+        current=$((current + 1))
+        echo ""
+        log_info "[$current/$target_count] Attacking target: $single_target"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
+        # Temporarily set TARGET to single target
+        original_target="$TARGET"
+        TARGET="$single_target"
+        
+        if run_attack; then
+            success_count=$((success_count + 1))
+        else
+            fail_count=$((fail_count + 1))
+        fi
+        
+        TARGET="$original_target"
+    done
+    
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    log_info "Multi-target attack complete!"
+    log_info "Successful: $success_count | Failed: $fail_count | Total: $target_count"
+    
+else
+    # Single target attack
+    # Check resume
+    if [ "$RESUME" = "true" ] && [ -f "$RESUME_FILE" ]; then
+        log_info "Resuming from previous attack..."
+        cat "$RESUME_FILE"
+    fi
+    
+    # Run the attack
+    run_attack
+fi
 exit_code=$?
 
 # Cleanup
