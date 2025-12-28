@@ -3,3 +3,7 @@ git
 wget
 curl
 openssl
+nmap
+termux-api
+figlet
+jq
