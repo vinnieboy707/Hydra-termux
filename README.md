@@ -9,7 +9,7 @@
 
 **A powerful brute-force tool suite optimized for Termux on Android devices**
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
 
 </div>
 
@@ -50,6 +50,13 @@
 - Resume support for interrupted attacks
 - Configurable thread count
 - Connection timeout handling
+
+### 📚 Quick Library (NEW!)
+- **12 One-Line-Change Scripts** - Just edit TARGET and run!
+- **Platform Comparison Guide** - Understand differences between protocols
+- **Copy-Paste Ready** - Simplified scripts for instant use
+- **Real Results** - Fully functional, tested attack templates
+- See [Library.md](Library.md) for complete documentation
 
 ## 📋 Prerequisites
 
@@ -110,6 +117,34 @@ If you prefer manual installation:
 
 ## 🎯 Usage
 
+### 🚀 Quick Library (Simplest Way!)
+
+**Want the easiest method?** Use our one-line-change scripts:
+
+```bash
+# 1. Pick a script from Library/
+# 2. Edit ONE line (change TARGET)
+# 3. Run it!
+
+bash Library/ssh_quick.sh        # SSH attack
+bash Library/web_quick.sh        # Web admin attack
+bash Library/auto_attack_quick.sh # Full auto-attack
+```
+
+**Example:**
+```bash
+# Edit Library/ssh_quick.sh
+TARGET="192.168.1.100"  # <-- Change only this
+
+# Run it
+bash Library/ssh_quick.sh
+# Done! Results saved automatically
+```
+
+📖 **See [Library.md](Library.md)** for all 12 quick scripts and platform comparisons!
+
+---
+
 ### Starting the Tool
 
 ```bash
@@ -167,6 +202,8 @@ bash scripts/results_viewer.sh --export results.csv --format csv
 
 ## 📚 Documentation
 
+- **[Library.md](Library.md)** - 🔥 **NEW!** Quick-use scripts with platform comparisons
+- **[Library/README.md](Library/README.md)** - Quick reference for one-line-change scripts
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
 - **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
@@ -179,6 +216,21 @@ Hydra-termux/
 ├── hydra.sh                    # Main launcher with interactive menu
 ├── install.sh                  # Enhanced installation script
 ├── need.txt                    # Required packages list
+├── Library.md                  # 🔥 Complete script library documentation
+├── Library/                    # 🔥 Quick-use one-line-change scripts
+│   ├── README.md              # Quick reference guide
+│   ├── ssh_quick.sh           # SSH one-liner
+│   ├── ftp_quick.sh           # FTP one-liner
+│   ├── web_quick.sh           # Web one-liner
+│   ├── wordpress_quick.sh     # WordPress one-liner
+│   ├── rdp_quick.sh           # RDP one-liner
+│   ├── mysql_quick.sh         # MySQL one-liner
+│   ├── postgres_quick.sh      # PostgreSQL one-liner
+│   ├── smb_quick.sh           # SMB one-liner
+│   ├── auto_attack_quick.sh   # Auto-attack one-liner
+│   ├── network_quick.sh       # Network scan one-liner
+│   ├── email_quick.sh         # Email attack one-liner
+│   └── username_quick.sh      # Username attack one-liner
 ├── config/
 │   ├── hydra.conf             # Main configuration file
 │   ├── admin_usernames.txt    # Default admin usernames
