@@ -53,10 +53,17 @@ print_message "🔒 Security Check" "$CYAN"
 print_message "⚠️  IMPORTANT: Always use a VPN when performing security testing!" "$YELLOW"
 print_message "   Recommendation: Use ProtonVPN, NordVPN, or Tor" "$BLUE"
 echo ""
-read -p "Are you using a VPN? (y/n): " vpn_status
-if [ "$vpn_status" != "y" ]; then
-    print_message "⚠️  Warning: Proceeding without VPN is not recommended!" "$RED"
-    sleep 3
+
+# Check if running in interactive mode
+if [ -t 0 ]; then
+    read -p "Are you using a VPN? (y/n): " vpn_status
+    if [ "$vpn_status" != "y" ]; then
+        print_message "⚠️  Warning: Proceeding without VPN is not recommended!" "$RED"
+        sleep 3
+    fi
+else
+    print_message "ℹ️  Non-interactive mode detected, skipping VPN prompt" "$BLUE"
+    print_message "⚠️  Remember to use a VPN for security testing!" "$YELLOW"
 fi
 echo ""
 
@@ -154,12 +161,19 @@ print_message "   ✓ Attack scripts: $script_count installed" "$GREEN"
 # Offer to download wordlists
 echo ""
 print_message "📚 Wordlist Setup" "$CYAN"
-read -p "Download default wordlists now? (y/n): " download_wordlists
-if [ "$download_wordlists" = "y" ]; then
-    print_message "   Downloading wordlists..." "$BLUE"
-    bash scripts/download_wordlists.sh --all 2>/dev/null || print_message "   ⚠ Failed to download wordlists" "$YELLOW"
+
+# Check if running in interactive mode
+if [ -t 0 ]; then
+    read -p "Download default wordlists now? (y/n): " download_wordlists
+    if [ "$download_wordlists" = "y" ]; then
+        print_message "   Downloading wordlists..." "$BLUE"
+        bash scripts/download_wordlists.sh --all 2>/dev/null || print_message "   ⚠ Failed to download wordlists" "$YELLOW"
+    else
+        print_message "   Skipped. You can download later using option 9 in the main menu" "$YELLOW"
+    fi
 else
-    print_message "   Skipped. You can download later using option 9 in the main menu" "$YELLOW"
+    print_message "   Skipping wordlist download (non-interactive mode)" "$YELLOW"
+    print_message "   You can download later using: bash scripts/download_wordlists.sh --all" "$BLUE"
 fi
 
 # Final message

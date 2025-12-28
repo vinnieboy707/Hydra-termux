@@ -14,7 +14,7 @@ source "$SCRIPT_DIR/logger.sh"
 THREADS=16
 TARGET=""
 PORT=80
-PATH="/admin"
+LOGIN_PATH="/admin"
 METHOD="POST"
 FAILURE_STRING="incorrect|failed|invalid|wrong"
 
@@ -85,12 +85,12 @@ detect_admin_panel() {
         
         if [ "$status" = "200" ] || [ "$status" = "401" ] || [ "$status" = "403" ]; then
             log_success "Found admin panel: $path (HTTP $status)"
-            PATH="$path"
+            LOGIN_PATH="$path"
             return 0
         fi
     done
     
-    log_warning "No admin panel detected, using default: $PATH"
+    log_warning "No admin panel detected, using default: $LOGIN_PATH"
     return 1
 }
 
@@ -120,7 +120,7 @@ run_attack() {
     fi
     
     print_header "Starting Web Attack"
-    log_info "Target: ${PROTOCOL}://${TARGET}:${PORT}${PATH}"
+    log_info "Target: ${PROTOCOL}://${TARGET}:${PORT}${LOGIN_PATH}"
     log_info "Method: $METHOD"
     log_info "Threads: $THREADS"
     echo ""
@@ -137,7 +137,7 @@ run_attack() {
               -t $THREADS \
               -f \
               $TARGET \
-              $service "$PATH:$form_params:$FAILURE_STRING" 2>&1 | while IFS= read -r line; do
+              $service "$LOGIN_PATH:$form_params:$FAILURE_STRING" 2>&1 | while IFS= read -r line; do
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
                 local login=$(echo "$line" | grep -oP 'login: \K[^ ]+')
@@ -161,7 +161,7 @@ run_attack() {
               -t $THREADS \
               -f \
               $TARGET \
-              $service "$PATH" 2>&1 | while IFS= read -r line; do
+              $service "$LOGIN_PATH" 2>&1 | while IFS= read -r line; do
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
                 local login=$(echo "$line" | grep -oP 'login: \K[^ ]+')
@@ -206,7 +206,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -P|--path)
-            PATH="$2"
+            LOGIN_PATH="$2"
             shift 2
             ;;
         -m|--method)

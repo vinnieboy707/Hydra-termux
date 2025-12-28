@@ -98,30 +98,32 @@ save_result() {
     local port="$5"
     local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
     
-    # Create JSON entry
-    local json_entry=$(cat <<EOF
-{
-  "timestamp": "$timestamp",
-  "protocol": "$protocol",
-  "target": "$target",
-  "port": "$port",
-  "username": "$username",
-  "password": "$password"
-}
-EOF
-)
+    # Create JSON entry with proper escaping using jq
+    local json_entry
+    json_entry=$(jq -n \
+        --arg timestamp "$timestamp" \
+        --arg protocol "$protocol" \
+        --arg target "$target" \
+        --arg port "$port" \
+        --arg username "$username" \
+        --arg password "$password" \
+        '{timestamp: $timestamp, protocol: $protocol, target: $target, port: $port, username: $username, password: $password}')
     
     # Add to results file
     if [ -f "$RESULTS_FILE" ]; then
         local temp_file=$(mktemp)
-        jq ". += [$json_entry]" "$RESULTS_FILE" > "$temp_file" 2>/dev/null || {
+        jq --argjson entry "$json_entry" '. += [$entry]' "$RESULTS_FILE" > "$temp_file" 2>/dev/null || {
             # If jq fails, fall back to simple append
             echo "$json_entry" >> "$LOG_DIR/results_fallback.txt"
         }
         [ -f "$temp_file" ] && mv "$temp_file" "$RESULTS_FILE"
     fi
     
+    # Set restrictive permissions on results file (owner-only read/write)
+    chmod 600 "$RESULTS_FILE" 2>/dev/null
+    
     log_success "Credentials saved: $protocol://$username:$password@$target:$port"
+    log_warning "Results contain sensitive data - stored with restricted permissions"
 }
 
 # Export results to CSV

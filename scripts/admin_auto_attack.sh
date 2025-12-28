@@ -173,7 +173,7 @@ generate_report() {
     
     print_header "Generating Report"
     
-    cat > "$report_file" << 'EOF'
+    cat > "$report_file" << EOF
 <!DOCTYPE html>
 <html>
 <head>
@@ -214,12 +214,13 @@ EOF
         <h2>Attack Results</h2>
 EOF
     
-    # Add results from JSON file
+    # Add results from JSON file with HTML escaping
     local results_file="$PROJECT_ROOT/logs/results_$(date +%Y%m%d).json"
     if [ -f "$results_file" ]; then
         echo "<table><tr><th>Protocol</th><th>Username</th><th>Password</th><th>Port</th></tr>" >> "$report_file"
         
-        jq -r '.[] | "<tr><td>\(.protocol)</td><td>\(.username)</td><td>\(.password)</td><td>\(.port)</td></tr>"' "$results_file" >> "$report_file" 2>/dev/null || true
+        # Use jq to properly HTML-escape all fields
+        jq -r '.[] | "<tr><td>\(.protocol | @html)</td><td>\(.username | @html)</td><td>\(.password | @html)</td><td>\(.port | @html)</td></tr>"' "$results_file" >> "$report_file" 2>/dev/null || true
         
         echo "</table>" >> "$report_file"
     else

@@ -153,12 +153,15 @@ generate_patterns() {
     log_info "Base word: $base_word"
     
     # Common patterns
+    local current_year=$(date +%Y)
+    local next_year=$((current_year + 1))
+    
     echo "$base_word" >> "$output_file"
     echo "${base_word}123" >> "$output_file"
     echo "${base_word}@123" >> "$output_file"
     echo "${base_word}!" >> "$output_file"
-    echo "${base_word}2024" >> "$output_file"
-    echo "${base_word}2025" >> "$output_file"
+    echo "${base_word}${current_year}" >> "$output_file"
+    echo "${base_word}${next_year}" >> "$output_file"
     echo "123${base_word}" >> "$output_file"
     
     # Capitalization variants

