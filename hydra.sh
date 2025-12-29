@@ -11,10 +11,11 @@ if command -v realpath >/dev/null; then
     resolved_path="$(realpath "$SCRIPT_PATH" 2>/dev/null)"
 fi
 if [ -z "$resolved_path" ] && command -v readlink >/dev/null; then
-    resolved_path="$(readlink -f "$SCRIPT_PATH" 2>/dev/null)"
-    # Basic readlink resolves a single symlink level; used as last resort
-    if [ -z "$resolved_path" ]; then
-        resolved_path="$(readlink "$SCRIPT_PATH" 2>/dev/null)"
+    if resolved="$(readlink -f "$SCRIPT_PATH" 2>/dev/null)" && [ -n "$resolved" ]; then
+        resolved_path="$resolved"
+    elif resolved="$(readlink "$SCRIPT_PATH" 2>/dev/null)" && [ -n "$resolved" ]; then
+        # Fallback when -f is unavailable or fails; resolves a single symlink level
+        resolved_path="$resolved"
     fi
 fi
 [ -n "$resolved_path" ] && SCRIPT_PATH="$resolved_path"
