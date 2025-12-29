@@ -12,10 +12,10 @@ if command -v realpath >/dev/null; then
 fi
 if [ -z "$resolved_path" ] && command -v readlink >/dev/null; then
     resolved_path="$(readlink -f "$SCRIPT_PATH" 2>/dev/null)"
-fi
-if [ -z "$resolved_path" ] && command -v readlink >/dev/null; then
     # Basic readlink resolves a single symlink level; used as last resort
-    resolved_path="$(readlink "$SCRIPT_PATH" 2>/dev/null)"
+    if [ -z "$resolved_path" ]; then
+        resolved_path="$(readlink "$SCRIPT_PATH" 2>/dev/null)"
+    fi
 fi
 [ -n "$resolved_path" ] && SCRIPT_PATH="$resolved_path"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
