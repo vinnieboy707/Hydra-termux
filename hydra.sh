@@ -15,7 +15,15 @@ if [ -z "$resolved_path" ] && command -v readlink >/dev/null; then
         resolved_path="$resolved"
     elif resolved="$(readlink "$SCRIPT_PATH" 2>/dev/null)" && [ -n "$resolved" ]; then
         # Fallback when -f is unavailable or fails; resolves a single symlink level
-        resolved_path="$resolved"
+        # If the result is relative, resolve it relative to the symlink's directory
+        if [ "${resolved#/}" != "$resolved" ]; then
+            # Absolute path
+            resolved_path="$resolved"
+        else
+            # Relative path: interpret relative to the directory of SCRIPT_PATH
+            link_dir="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+            resolved_path="$link_dir/$resolved"
+        fi
     fi
 fi
 [ -n "$resolved_path" ] && SCRIPT_PATH="$resolved_path"
