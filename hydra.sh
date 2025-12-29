@@ -5,11 +5,15 @@
 
 # Get script directory (supports symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]}"
+# Resolve the real script path across environments (realpath > readlink -f > readlink)
+resolved_path=""
 if command -v realpath >/dev/null; then
-    SCRIPT_PATH="$(realpath "$SCRIPT_PATH" 2>/dev/null || echo "$SCRIPT_PATH")"
+    resolved_path="$(realpath "$SCRIPT_PATH" 2>/dev/null)"
 elif command -v readlink >/dev/null; then
-    SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH" 2>/dev/null || readlink "$SCRIPT_PATH" 2>/dev/null || echo "$SCRIPT_PATH")"
+    resolved_path="$(readlink -f "$SCRIPT_PATH" 2>/dev/null)"
+    [ -z "$resolved_path" ] && resolved_path="$(readlink "$SCRIPT_PATH" 2>/dev/null)"
 fi
+[ -n "$resolved_path" ] && SCRIPT_PATH="$resolved_path"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
 # Source logger
