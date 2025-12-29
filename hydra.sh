@@ -3,8 +3,34 @@
 # Hydra-Termux Ultimate Edition Main Launcher
 # Interactive menu system for all attack tools
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get script directory (supports symlinks)
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+# Resolve the real script path across environments (realpath > readlink -f > readlink)
+resolved_path=""
+if command -v realpath >/dev/null; then
+    resolved_path="$(realpath "$SCRIPT_PATH" 2>/dev/null)"
+fi
+if [ -z "$resolved_path" ] && command -v readlink >/dev/null; then
+    if resolved="$(readlink -f "$SCRIPT_PATH" 2>/dev/null)" && [ -n "$resolved" ]; then
+        resolved_path="$resolved"
+    elif resolved="$(readlink "$SCRIPT_PATH" 2>/dev/null)" && [ -n "$resolved" ]; then
+        # Fallback when -f is unavailable or fails; resolves a single symlink level
+        # If the result is relative, resolve it relative to the symlink's directory
+        if [ "${resolved#/}" != "$resolved" ]; then
+            # Absolute path
+            resolved_path="$resolved"
+        else
+            # Relative path: interpret relative to the directory of SCRIPT_PATH
+            link_dir="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+            resolved_path="$link_dir/$resolved"
+        fi
+    fi
+fi
+[ -n "$resolved_path" ] && SCRIPT_PATH="$resolved_path"
+if ! SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" 2>/dev/null && pwd)"; then
+    echo "Error: Unable to determine script directory from SCRIPT_PATH='$SCRIPT_PATH'." >&2
+    exit 1
+fi
 
 # Source logger
 source "$SCRIPT_DIR/scripts/logger.sh"
