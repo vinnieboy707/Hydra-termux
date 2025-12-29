@@ -27,7 +27,10 @@ if [ -z "$resolved_path" ] && command -v readlink >/dev/null; then
     fi
 fi
 [ -n "$resolved_path" ] && SCRIPT_PATH="$resolved_path"
-SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+if ! SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" 2>/dev/null && pwd)"; then
+    echo "Error: Unable to determine script directory from SCRIPT_PATH='$SCRIPT_PATH'." >&2
+    exit 1
+fi
 
 # Source logger
 source "$SCRIPT_DIR/scripts/logger.sh"
