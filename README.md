@@ -9,7 +9,9 @@
 
 **A powerful brute-force tool suite optimized for Termux on Android devices**
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
+**🚀 NEW: Full-Stack Web Application** - Professional web interface with real-time monitoring, attack orchestration, and comprehensive management features. See [fullstack-app/README.md](fullstack-app/README.md)
+
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
 
 </div>
 
@@ -72,6 +74,17 @@
 - **Copy-Paste Ready** - Simplified scripts for instant use
 - **Real Results** - Fully functional, tested attack templates
 - See [Library.md](Library.md) for complete documentation
+
+### 🌐 Full-Stack Web Application (NEW!)
+- **Modern Web Interface** - Professional React-based UI with dark theme
+- **Real-time Monitoring** - Live attack progress via WebSocket
+- **Attack Orchestration** - Queue and manage multiple concurrent attacks
+- **RESTful API** - Complete backend API with JWT authentication
+- **Dashboard & Analytics** - Visualize statistics and track success rates
+- **Target Management** - Organize and categorize target systems
+- **Results Database** - SQLite persistence for all discovered credentials
+- **Wordlist Integration** - Import and manage wordlists through UI
+- See [fullstack-app/README.md](fullstack-app/README.md) for setup and usage
 
 ## 📋 Prerequisites
 
@@ -157,6 +170,44 @@ bash Library/ssh_quick.sh
 ```
 
 📖 **See [Library.md](Library.md)** for all 12 quick scripts and platform comparisons!
+
+---
+
+## 🌐 Full-Stack Web Application (NEW!)
+
+For a modern web interface with advanced features, use the full-stack application:
+
+```bash
+# Navigate to the full-stack app directory
+cd fullstack-app
+
+# Run the startup script
+bash start.sh
+
+# Or start manually:
+# Terminal 1 - Backend API
+cd backend && npm start
+
+# Terminal 2 - Frontend UI  
+cd frontend && npm start
+```
+
+**Access the web interface:**
+- Frontend: http://localhost:3001
+- Backend API: http://localhost:3000
+- Default login: admin / admin (change immediately!)
+
+**Features:**
+- 🎨 Modern dark-themed UI optimized for security professionals
+- 📊 Real-time dashboard with attack statistics
+- ⚔️ Launch and monitor attacks through web interface
+- 🎯 Manage targets with categorization and tagging
+- ✅ View and export discovered credentials
+- 📚 Wordlist management and import
+- 🔐 Secure JWT authentication
+- 📡 WebSocket for live updates
+
+**Full documentation:** [fullstack-app/README.md](fullstack-app/README.md)
 
 ---
 
