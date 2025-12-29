@@ -5,8 +5,10 @@
 
 # Get script directory (supports symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]}"
-if command -v readlink >/dev/null; then
-    SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH" 2>/dev/null || echo "$SCRIPT_PATH")"
+if command -v realpath >/dev/null; then
+    SCRIPT_PATH="$(realpath "$SCRIPT_PATH" 2>/dev/null || echo "$SCRIPT_PATH")"
+elif command -v readlink >/dev/null; then
+    SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH" 2>/dev/null || readlink "$SCRIPT_PATH" 2>/dev/null || echo "$SCRIPT_PATH")"
 fi
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
