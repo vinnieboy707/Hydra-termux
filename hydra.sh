@@ -3,8 +3,12 @@
 # Hydra-Termux Ultimate Edition Main Launcher
 # Interactive menu system for all attack tools
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get script directory (supports symlinks)
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if command -v readlink >/dev/null; then
+    SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH" 2>/dev/null || echo "$SCRIPT_PATH")"
+fi
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
 # Source logger
 source "$SCRIPT_DIR/scripts/logger.sh"

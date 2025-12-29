@@ -337,6 +337,10 @@ cd Hydra-termux
 ls -la
 ```
 
+### "Script not found" after choosing a menu option
+- Update to the latest version (symlink-safe launcher)
+- Ensure `hydra.sh` and the `scripts/` folder stay together (run from the project directory)
+
 ### No results showing
 Check if attacks were successful:
 ```bash
