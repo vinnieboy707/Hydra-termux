@@ -11,6 +11,7 @@ if command -v realpath >/dev/null; then
     resolved_path="$(realpath "$SCRIPT_PATH" 2>/dev/null)"
 elif command -v readlink >/dev/null; then
     resolved_path="$(readlink -f "$SCRIPT_PATH" 2>/dev/null)"
+    # Some platforms lack -f; fall back to basic readlink output
     [ -z "$resolved_path" ] && resolved_path="$(readlink "$SCRIPT_PATH" 2>/dev/null)"
 fi
 [ -n "$resolved_path" ] && SCRIPT_PATH="$resolved_path"
