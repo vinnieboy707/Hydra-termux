@@ -459,7 +459,7 @@ function loadProtocol(protocolKey) {
             <button class="back-button" onclick="location.reload()">← Back to Protocols</button>
             <div class="config-container">
                 <div class="alert alert-warning">
-                    <strong>⚠️ Error:</strong> Protocol configuration not found for "${protocolKey}".
+                    <strong>⚠️ Error:</strong> Protocol configuration not found for "${escapeHtml(protocolKey)}".
                     Please go back and select a valid protocol.
                 </div>
             </div>
