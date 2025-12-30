@@ -11,7 +11,7 @@ class AttackService {
       this.scriptsPath,
       path.resolve(process.cwd(), 'scripts')
     ];
-    this.scriptBasePaths = this.scriptBasePaths.filter((p, idx, arr) => arr.indexOf(p) === idx);
+    this.scriptBasePaths = [...new Set(this.scriptBasePaths)];
     this.scriptCache = new Map();
   }
 
@@ -60,7 +60,7 @@ class AttackService {
       let scriptPath = this.scriptCache.get(scriptName);
       if (scriptPath && !fs.existsSync(scriptPath)) {
         this.scriptCache.delete(scriptName);
-        scriptPath = undefined;
+        scriptPath = null;
       }
       if (!scriptPath) {
         for (const base of this.scriptBasePaths) {
