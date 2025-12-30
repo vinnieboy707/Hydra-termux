@@ -69,8 +69,8 @@ DB_PATH=../database.sqlite
 PORT=3000
 NODE_ENV=production
 
-# Security
-JWT_SECRET=change_this_to_a_secure_random_string_in_production
+# Security - Generate secure JWT secret
+JWT_SECRET=$(openssl rand -hex 32 2>/dev/null || node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 
 # Paths
 SCRIPTS_PATH=../../scripts
@@ -148,9 +148,10 @@ echo ""
 
 # Generate secure password if not provided
 if [ -z "$ADMIN_PASS" ]; then
-    ADMIN_PASS=$(openssl rand -base64 16 2>/dev/null || cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&*' | fold -w 16 | head -n 1)
+    # Use Node.js crypto for secure password generation
+    ADMIN_PASS=$(node -e "console.log(require('crypto').randomBytes(16).toString('base64').slice(0,16))" 2>/dev/null || openssl rand -base64 16)
     echo -e "${YELLOW}Generated secure password: ${ADMIN_PASS}${NC}"
-    echo -e "${RED}⚠️  SAVE THIS PASSWORD NOW!${NC}"
+    echo -e "${RED}⚠️  SAVE THIS PASSWORD NOW! Write it down or save to password manager.${NC}"
 fi
 
 # Create initialization script

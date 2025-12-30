@@ -19,6 +19,18 @@ router.post('/register', async (req, res) => {
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
+    
+    // Check password complexity
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
+      return res.status(400).json({ 
+        error: 'Password must contain uppercase, lowercase, number, and special character' 
+      });
+    }
 
     // Check if user exists
     const existing = await get('SELECT id FROM users WHERE username = ?', [username]);
@@ -44,8 +56,8 @@ router.post('/register', async (req, res) => {
       userId: result.id,
       user: {
         username,
-        email,
-        role: userRole
+        email
+        // Role intentionally omitted from response for security
       }
     });
   } catch (error) {

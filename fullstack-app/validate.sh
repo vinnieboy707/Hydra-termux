@@ -145,7 +145,7 @@ for file in backend/services/*.js; do
 done
 
 # Frontend files
-for file in frontend/src/*.js frontend/src/**/*.js; do
+for file in $(find frontend/src -name "*.js" -type f 2>/dev/null || echo ""); do
     if [ -f "$file" ]; then
         filename=$(echo "$file" | sed 's|frontend/src/||')
         check "Syntax: frontend/$filename" "node --check $file"
