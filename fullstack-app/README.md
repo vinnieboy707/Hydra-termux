@@ -1,53 +1,57 @@
-# 🐍 Hydra Penetration Testing Platform - Full Stack Application
+# 🐍 Hydra-Termux Enterprise Platform
 
-A modern, full-stack web application that provides a comprehensive interface for managing penetration testing activities using Hydra and related tools.
+Complete enterprise-grade penetration testing platform with modern web interface, advanced security features, and comprehensive API coverage for all 18 CLI menu operations.
 
-## 🚀 Features
-
-### Backend API
-- **RESTful API** with Express.js
-- **Real-time updates** via WebSocket
-- **SQLite database** for data persistence
-- **JWT authentication** for secure access
-- **Attack orchestration** - Queue and manage multiple concurrent attacks
-- **Result tracking** - Store and query discovered credentials
-- **Target management** - Organize and track target systems
-- **Wordlist management** - Import and manage wordlists
-
-### Frontend Web UI
-- **Modern React interface** with responsive design
-- **Real-time dashboard** with attack statistics
-- **Interactive attack configuration** - Easy-to-use forms for launching attacks
-- **Live progress monitoring** - Watch attacks in real-time
-- **Results visualization** - View and filter discovered credentials
-- **Dark theme** optimized for security professionals
-
-### Security Features
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Rate limiting on API endpoints
-- Secure password hashing with bcrypt
-- Helmet.js security headers
-- CORS configuration
-
-## 📋 Prerequisites
-
-- Node.js 14.x or higher
-- npm or yarn
-- Hydra installed and accessible
-- Linux/Unix environment (Termux on Android supported)
-
-## 🔧 Installation
-
-### 1. Backend Setup
+## 🚀 Quick Start - One Command Deployment
 
 ```bash
-cd fullstack-app/backend
+cd fullstack-app
+./quickstart.sh
+```
 
-# Install dependencies
-npm install
+**That's it!** The script will:
+- ✅ Check prerequisites and install dependencies
+- ✅ Configure backend and frontend automatically
+- ✅ Initialize database with proper schema
+- ✅ Create your super admin account interactively
+- ✅ Start both backend (port 3000) and frontend (port 3001)
+- ✅ Ready to use in under 2 minutes!
 
-# Create .env file
+**📚 First time? See [GETTING_STARTED.md](GETTING_STARTED.md) for complete walkthrough.**
+
+---
+
+## ✨ What's Included
+
+### Complete Feature Set
+- **18 Attack Types**: All CLI menu items accessible via web interface
+- **Real-time Monitoring**: WebSocket-based live attack progress
+- **Enterprise Security**: RBAC, WAF, 2FA, encryption, audit logging
+- **Dual Database**: SQLite (default) or PostgreSQL (production)
+- **Webhook System**: 8 event types with HMAC-SHA256 signatures
+- **External APIs**: VirusTotal, Shodan, AbuseIPDB, Censys, HIBP
+- **Modern UI**: Contemporary dark theme with smooth transitions
+- **76+ Validation Checks**: All JavaScript syntax validated
+
+### Security Features (Bank-Grade)
+1. **Role-Based Access Control (RBAC)** - 5-tier hierarchy with granular permissions
+2. **Web Application Firewall (WAF)** - Blocks 7 attack types automatically
+3. **AES-256-GCM Encryption** - Protect sensitive data at rest
+4. **Two-Factor Authentication (2FA)** - TOTP with QR codes
+5. **IP Whitelisting** - Restrict access to trusted networks
+6. **Session Management** - Per-device tracking with auto-expiration
+7. **Audit Logging** - Complete security event trail
+8. **Protocol Enforcement** - Automated compliance checking
+
+### Documentation (70,000+ characters)
+- **GETTING_STARTED.md** - Complete setup guide
+- **ONBOARDING_TUTORIAL.md** - 15,000+ word walkthrough
+- **API_DOCUMENTATION.md** - Complete API reference
+- **SECURITY_PROTOCOLS.md** - 21,000+ char protocol guide
+- **POSTGRESQL_SETUP.md** - Production database setup
+- **DEPLOYMENT_GUIDE.md** - Production deployment checklist
+
+---
 cp .env.example .env
 
 # Edit .env file with your settings

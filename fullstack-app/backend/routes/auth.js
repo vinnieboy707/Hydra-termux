@@ -9,10 +9,15 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 // Register new user
 router.post('/register', async (req, res) => {
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email, role } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password required' });
+    }
+
+    // Validate password strength
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
 
     // Check if user exists
@@ -24,15 +29,24 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Validate and set role (default to 'user')
+    const validRoles = ['super_admin', 'admin', 'analyst', 'auditor', 'viewer', 'user'];
+    const userRole = validRoles.includes(role) ? role : 'user';
+
     // Insert user
     const result = await run(
       'INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',
-      [username, hashedPassword, email, 'user']
+      [username, hashedPassword, email, userRole]
     );
 
     res.status(201).json({
       message: 'User registered successfully',
-      userId: result.id
+      userId: result.id,
+      user: {
+        username,
+        email,
+        role: userRole
+      }
     });
   } catch (error) {
     console.error('Registration error:', error);
