@@ -7,11 +7,11 @@ class AttackService {
   constructor() {
     this.runningAttacks = new Map();
     this.scriptsPath = process.env.SCRIPTS_PATH || path.resolve(__dirname, '../../../scripts');
-    this.scriptBasePaths = [
+    this.scriptBasePaths = Array.from(new Set([
       this.scriptsPath,
       path.resolve(process.cwd(), 'scripts'),
       path.resolve(__dirname, '..', '..', '..', 'scripts')
-    ];
+    ]));
   }
 
   async queueAttack(attackData) {
@@ -56,9 +56,14 @@ class AttackService {
       }
 
       // Resolve script path with fallbacks (supports running backend outside repo root)
-      const scriptPath = this.scriptBasePaths
-        .map(base => path.join(base, scriptName))
-        .find(fs.existsSync);
+      let scriptPath;
+      for (const base of this.scriptBasePaths) {
+        const candidate = path.join(base, scriptName);
+        if (fs.existsSync(candidate)) {
+          scriptPath = candidate;
+          break;
+        }
+      }
       if (!scriptPath) {
         throw new Error(`Script not found: ${scriptName}`);
       }
