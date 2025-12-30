@@ -191,16 +191,47 @@ If you want to connect to a remote PostgreSQL server:
 
 ### 1. Configure PostgreSQL for Remote Access
 
+⚠️ **Security Warning:** Exposing PostgreSQL to the internet is dangerous. Only use for trusted networks.
+
 Edit `postgresql.conf`:
 ```ini
-listen_addresses = '*'  # or specific IP
+# For production, specify exact IPs instead of '*'
+listen_addresses = 'localhost,192.168.1.100'  # Specific IPs only
+# Or for development on private network:
+# listen_addresses = '*'
 ```
 
-Edit `pg_hba.conf` to allow remote connections:
+Edit `pg_hba.conf` to allow remote connections **from specific IPs only**:
 ```
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
-host    hydra_termux    hydra_user      0.0.0.0/0              md5
+# ⚠️ NEVER use 0.0.0.0/0 in production - specify exact IPs/subnets
+# Example for specific subnet:
+host    hydra_termux    hydra_user      192.168.1.0/24         scram-sha-256
+
+# For VPN or private network:
+host    hydra_termux    hydra_user      10.0.0.0/8             scram-sha-256
+
+# ❌ AVOID in production (allows any IP):
+# host    hydra_termux    hydra_user      0.0.0.0/0              md5
 ```
+
+**Additional Security Measures:**
+1. Use firewall rules to restrict port 5432:
+   ```bash
+   sudo ufw allow from 192.168.1.0/24 to any port 5432
+   ```
+
+2. Enable SSL/TLS encryption:
+   ```ini
+   # In postgresql.conf
+   ssl = on
+   ssl_cert_file = '/path/to/server.crt'
+   ssl_key_file = '/path/to/server.key'
+   ```
+
+3. Use strong authentication (scram-sha-256 instead of md5)
+
+4. Regular security audits and updates
 
 Restart PostgreSQL:
 ```bash

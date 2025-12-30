@@ -1,5 +1,4 @@
 const { Pool } = require('pg');
-const path = require('path');
 
 // PostgreSQL connection configuration
 const pool = new Pool({
@@ -192,7 +191,16 @@ const pg_helpers = {
       let index = 0;
       const pgSql = sql.replace(/\?/g, () => `$${++index}`);
       
-      const result = await client.query(pgSql, params);
+      // For INSERT statements, add RETURNING id to get the inserted ID
+      let finalSql = pgSql;
+      if (pgSql.trim().toUpperCase().startsWith('INSERT')) {
+        // Check if RETURNING clause already exists
+        if (!pgSql.toUpperCase().includes('RETURNING')) {
+          finalSql = pgSql.trim().replace(/;?\s*$/, ' RETURNING id');
+        }
+      }
+      
+      const result = await client.query(finalSql, params);
       return { 
         id: result.rows[0]?.id, 
         changes: result.rowCount 

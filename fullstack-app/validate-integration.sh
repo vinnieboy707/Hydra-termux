@@ -25,7 +25,7 @@ check_file() {
 }
 
 check_syntax() {
-    if node -c "$1" 2>/dev/null; then
+    if node --check "$1" 2>/dev/null; then
         echo "✓ $1 (syntax valid)"
         ((SUCCESS++))
     else

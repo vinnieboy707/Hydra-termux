@@ -37,6 +37,32 @@ router.put('/', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Configuration content is required' });
     }
     
+    // Validate configuration format - ensure it's a string and not too large
+    if (typeof config !== 'string') {
+      return res.status(400).json({ error: 'Configuration must be a string' });
+    }
+    
+    if (config.length > 1000000) { // 1MB limit
+      return res.status(400).json({ error: 'Configuration file too large (max 1MB)' });
+    }
+    
+    // Basic validation - check for suspicious patterns that could be malicious
+    const suspiciousPatterns = [
+      /\$\(/g,           // Command substitution
+      /`/g,              // Backticks for command execution
+      /;\s*\w+\s*>/g,    // Command chaining with output redirection
+      /\|\s*\w+/g,       // Piping to commands (relaxed to allow config syntax)
+    ];
+    
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(config)) {
+        return res.status(400).json({ 
+          error: 'Configuration contains potentially unsafe patterns',
+          hint: 'Configuration should only contain key-value pairs and comments'
+        });
+      }
+    }
+    
     const configPath = process.env.CONFIG_PATH || path.join(__dirname, '../../../config/hydra.conf');
     
     // Backup existing config

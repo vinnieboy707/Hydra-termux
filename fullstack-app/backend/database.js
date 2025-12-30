@@ -12,14 +12,17 @@ if (DB_TYPE === 'postgres') {
   console.log('Using PostgreSQL database');
   const pgDb = require('./database-pg');
   
-  // Initialize PostgreSQL
-  pgDb.initPostgresDatabase()
+  // Initialize PostgreSQL and keep the promise so we can wait on it
+  const pgInitPromise = pgDb.initPostgresDatabase();
+  
+  pgInitPromise
     .then(() => console.log('PostgreSQL initialized'))
     .catch(err => console.error('PostgreSQL init error:', err));
   
-  run = pgDb.run;
-  get = pgDb.get;
-  all = pgDb.all;
+  // Wrap helpers so they only execute after initialization completes
+  run = (...args) => pgInitPromise.then(() => pgDb.run(...args));
+  get = (...args) => pgInitPromise.then(() => pgDb.get(...args));
+  all = (...args) => pgInitPromise.then(() => pgDb.all(...args));
   db = pgDb.pool;
 } else {
   // Use SQLite (default)

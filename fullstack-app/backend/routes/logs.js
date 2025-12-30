@@ -83,7 +83,7 @@ router.get('/files/:filename', authMiddleware, async (req, res) => {
     const { tail = 1000 } = req.query;
     
     // Validate filename to prevent path traversal
-    if (filename.includes('..') || filename.includes('/')) {
+    if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
       return res.status(400).json({ error: 'Invalid filename' });
     }
     
@@ -121,7 +121,7 @@ router.delete('/cleanup', authMiddleware, async (req, res) => {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
     
-    const result = await all(
+    const result = await run(
       `DELETE FROM attack_logs 
        WHERE timestamp < ? 
        AND attack_id IN (SELECT id FROM attacks WHERE user_id = ?)`,
