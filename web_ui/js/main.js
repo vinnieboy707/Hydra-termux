@@ -725,11 +725,6 @@ function fallbackCopyToClipboard(text, button) {
         document.body.removeChild(textArea);
     }
 }
-        }, 2000);
-    }).catch(err => {
-        alert('Failed to copy. Please select and copy manually.');
-    });
-}
 
 // Reset form
 function resetForm() {
