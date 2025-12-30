@@ -524,7 +524,7 @@ function showVariationForm(protocolKey, variationIndex) {
                 ${variation.parameters.map(param => generateParameterField(param)).join('')}
                 
                 <div class="button-group">
-                    <button type="button" class="btn btn-primary" onclick="generateScript('${protocolKey}', ${variationIndex})">
+                    <button type="button" class="btn btn-primary" data-protocol-key="${escapeHtml(protocolKey)}" onclick="generateScript(this.dataset.protocolKey, ${variationIndex})">
                         🚀 Generate Script
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="resetForm()">
