@@ -50,11 +50,16 @@ class AttackService {
         throw new Error(`Unknown attack type: ${attack_type}`);
       }
 
-      const scriptPath = path.join(this.scriptsPath, scriptName);
+      // Resolve script path with fallbacks (supports running backend outside repo root)
+      const candidates = [
+        path.join(this.scriptsPath, scriptName),
+        path.join(process.cwd(), 'scripts', scriptName),
+        path.join(__dirname, '..', '..', '..', 'scripts', scriptName)
+      ];
 
-      // Check if script exists
-      if (!fs.existsSync(scriptPath)) {
-        throw new Error(`Script not found: ${scriptPath}`);
+      const scriptPath = candidates.find(fs.existsSync);
+      if (!scriptPath) {
+        throw new Error(`Script not found: ${scriptName}`);
       }
 
       // Build command arguments
