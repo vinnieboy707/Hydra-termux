@@ -5,7 +5,8 @@ logs/
 # Results and outputs
 results/
 *.csv
-*.json
+results/*.json
+logs/*.json
 
 # Wordlists (downloaded)
 wordlists/
