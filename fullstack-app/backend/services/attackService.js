@@ -7,10 +7,10 @@ class AttackService {
   constructor() {
     this.runningAttacks = new Map();
     this.scriptsPath = process.env.SCRIPTS_PATH || path.resolve(__dirname, '../../../scripts');
-    this.scriptBasePaths = Array.from(new Set([
+    this.scriptBasePaths = [
       this.scriptsPath,
       path.resolve(process.cwd(), 'scripts')
-    ]));
+    ];
   }
 
   async queueAttack(attackData) {
@@ -64,7 +64,7 @@ class AttackService {
         }
       }
       if (!scriptPath) {
-        throw new Error(`Script not found: ${scriptName}`);
+        throw new Error(`Script not found: ${scriptName}. Searched in: ${this.scriptBasePaths.join(', ')}`);
       }
 
       // Build command arguments
