@@ -9,8 +9,7 @@ class AttackService {
     this.scriptsPath = process.env.SCRIPTS_PATH || path.resolve(__dirname, '../../../scripts');
     this.scriptBasePaths = Array.from(new Set([
       this.scriptsPath,
-      path.resolve(process.cwd(), 'scripts'),
-      path.resolve(__dirname, '..', '..', '..', 'scripts')
+      path.resolve(process.cwd(), 'scripts')
     ]));
   }
 
