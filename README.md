@@ -32,6 +32,16 @@
 
 ## ✨ Features
 
+### 🌐 Web Configuration Interface (NEW!)
+- **Modern Browser UI** - Beautiful, mobile-friendly web interface
+- **Visual Protocol Selection** - Click cards to configure attacks
+- **Interactive Forms** - Fill parameters with help text and examples
+- **Resource Links** - External links to learn about each parameter
+- **Script Generation** - One-click command generation
+- **Copy Button** - Instant clipboard copy for easy execution
+- **Multiple Variations** - Each protocol has multiple attack types
+- See [web_ui/README.md](web_ui/README.md) for complete guide
+
 ### 🎯 Pre-Built Attack Scripts (8)
 - **SSH Admin Attack** - Multi-wordlist SSH brute-force with resume support
 - **FTP Admin Attack** - FTP service attack with connection handling
@@ -49,7 +59,7 @@
 - **Results Viewer** - Filter, export, and manage attack results
 
 ### 📊 Advanced Features
-- Interactive menu system with 18 options
+- Interactive menu system with 19 options
 - Real-time progress feedback
 - Comprehensive logging with timestamps
 - JSON results tracking
@@ -131,6 +141,39 @@ If you prefer manual installation:
    ```
 
 ## 🎯 Usage
+
+### 🌐 Web Interface (Recommended for Beginners!)
+
+**The easiest way to get started!** Use the visual web interface:
+
+```bash
+# Launch Hydra-Termux
+./hydra.sh
+
+# Select option 19: Launch Web Configuration UI
+# Or run directly:
+bash scripts/web_ui_launcher.sh
+```
+
+Then open your browser to `http://localhost:8080` and:
+1. 🖱️ Click on a protocol card (SSH, FTP, etc.)
+2. 📝 Choose an attack variation
+3. ✍️ Fill in the required parameters with helpful examples
+4. 🚀 Click "Generate Script"
+5. 📋 Click "Copy" to copy the command
+6. ▶️ Paste in Termux and execute!
+
+**Benefits:**
+- ✅ Visual protocol selection
+- ✅ Interactive forms with help text
+- ✅ Example values for every field
+- ✅ Links to learn more about parameters
+- ✅ One-click script generation
+- ✅ Mobile-friendly design
+
+📖 **See [web_ui/README.md](web_ui/README.md)** for complete web interface guide!
+
+---
 
 ### 🚀 Quick Library (Simplest Way!)
 
@@ -217,7 +260,8 @@ bash scripts/results_viewer.sh --export results.csv --format csv
 
 ## 📚 Documentation
 
-- **[Library.md](Library.md)** - 🔥 **NEW!** Quick-use scripts with platform comparisons
+- **[web_ui/README.md](web_ui/README.md)** - 🌐 **NEW!** Web interface complete guide
+- **[Library.md](Library.md)** - 🔥 Quick-use scripts with platform comparisons
 - **[Library/README.md](Library/README.md)** - Quick reference for one-line-change scripts
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
 - **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios
@@ -231,6 +275,13 @@ Hydra-termux/
 ├── hydra.sh                    # Main launcher with interactive menu
 ├── install.sh                  # Enhanced installation script
 ├── need.txt                    # Required packages list
+├── web_ui/                     # 🌐 NEW! Web configuration interface
+│   ├── README.md              # Web UI documentation
+│   ├── index.html             # Main page with protocol cards
+│   ├── css/
+│   │   └── style.css          # Responsive styles and themes
+│   └── js/
+│       └── main.js            # Protocol configurations and logic
 ├── Library.md                  # 🔥 Complete script library documentation
 ├── Library/                    # 🔥 Quick-use one-line-change scripts
 │   ├── README.md              # Quick reference guide
@@ -252,6 +303,7 @@ Hydra-termux/
 │   └── admin_passwords.txt    # Default admin passwords
 ├── scripts/
 │   ├── logger.sh              # Logging utility (sourced by all scripts)
+│   ├── web_ui_launcher.sh     # 🌐 NEW! Web interface launcher
 │   ├── ssh_admin_attack.sh    # SSH brute-force script
 │   ├── ftp_admin_attack.sh    # FTP brute-force script
 │   ├── web_admin_attack.sh    # Web admin panel attack
