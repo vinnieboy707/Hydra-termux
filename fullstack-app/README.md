@@ -76,6 +76,8 @@ npm start
 
 The frontend will open at `http://localhost:3001`
 
+**Note:** The frontend is configured with a proxy to forward API requests to `http://localhost:3000` (backend). This is the standard React development setup where the frontend dev server runs on port 3001 and proxies API calls to the backend on port 3000.
+
 ## 🎯 Usage
 
 ### First Time Setup

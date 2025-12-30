@@ -206,8 +206,6 @@ router.get('/:id/deliveries', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
-
 // Helper function to trigger webhooks (can be called from other routes)
 async function triggerWebhooks(userId, event, data) {
   try {
@@ -273,4 +271,5 @@ async function triggerWebhooks(userId, event, data) {
   }
 }
 
+module.exports = router;
 module.exports.triggerWebhooks = triggerWebhooks;
