@@ -189,10 +189,8 @@ const pg_helpers = {
     const client = await pool.connect();
     try {
       // Convert SQLite-style placeholders (?) to PostgreSQL-style ($1, $2, etc.)
-      const pgSql = sql.replace(/\?/g, (match, offset, string) => {
-        const index = string.substring(0, offset).split('?').length;
-        return `$${index}`;
-      });
+      let index = 0;
+      const pgSql = sql.replace(/\?/g, () => `$${++index}`);
       
       const result = await client.query(pgSql, params);
       return { 
@@ -208,10 +206,8 @@ const pg_helpers = {
     const client = await pool.connect();
     try {
       // Convert SQLite-style placeholders (?) to PostgreSQL-style ($1, $2, etc.)
-      const pgSql = sql.replace(/\?/g, (match, offset, string) => {
-        const index = string.substring(0, offset).split('?').length;
-        return `$${index}`;
-      });
+      let index = 0;
+      const pgSql = sql.replace(/\?/g, () => `$${++index}`);
       
       const result = await client.query(pgSql, params);
       return result.rows[0] || null;
@@ -224,10 +220,8 @@ const pg_helpers = {
     const client = await pool.connect();
     try {
       // Convert SQLite-style placeholders (?) to PostgreSQL-style ($1, $2, etc.)
-      const pgSql = sql.replace(/\?/g, (match, offset, string) => {
-        const index = string.substring(0, offset).split('?').length;
-        return `$${index}`;
-      });
+      let index = 0;
+      const pgSql = sql.replace(/\?/g, () => `$${++index}`);
       
       const result = await client.query(pgSql, params);
       return result.rows;

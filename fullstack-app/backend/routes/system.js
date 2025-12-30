@@ -53,19 +53,40 @@ router.get('/update/check', authMiddleware, async (req, res) => {
       // Fetch latest changes
       await execPromise('git fetch origin', { cwd: projectRoot });
       
-      // Get current and remote hash
+      // Get current hash
       const { stdout: localHash } = await execPromise('git rev-parse HEAD', { cwd: projectRoot });
-      const { stdout: remoteHash } = await execPromise('git rev-parse origin/main 2>/dev/null || git rev-parse origin/master', { cwd: projectRoot });
+      
+      // Determine default branch and get remote hash
+      let remoteHash;
+      try {
+        const { stdout: mainHash } = await execPromise('git rev-parse origin/main', { cwd: projectRoot });
+        remoteHash = mainHash;
+      } catch {
+        try {
+          const { stdout: masterHash } = await execPromise('git rev-parse origin/master', { cwd: projectRoot });
+          remoteHash = masterHash;
+        } catch {
+          throw new Error('Could not find default branch (main or master)');
+        }
+      }
       
       const upToDate = localHash.trim() === remoteHash.trim();
       
       let changeCount = 0;
       if (!upToDate) {
-        const { stdout: changes } = await execPromise(
-          `git rev-list HEAD..origin/main --count 2>/dev/null || git rev-list HEAD..origin/master --count`,
-          { cwd: projectRoot }
-        );
-        changeCount = parseInt(changes.trim()) || 0;
+        try {
+          const { stdout: changes } = await execPromise(
+            `git rev-list HEAD..origin/main --count`,
+            { cwd: projectRoot }
+          );
+          changeCount = parseInt(changes.trim()) || 0;
+        } catch {
+          const { stdout: changes } = await execPromise(
+            `git rev-list HEAD..origin/master --count`,
+            { cwd: projectRoot }
+          );
+          changeCount = parseInt(changes.trim()) || 0;
+        }
       }
       
       res.json({
@@ -92,8 +113,16 @@ router.post('/update/apply', authMiddleware, adminMiddleware, async (req, res) =
     const projectRoot = path.join(__dirname, '../../..');
     
     try {
+      // Determine default branch
+      let branch = 'main';
+      try {
+        await execPromise('git rev-parse origin/main', { cwd: projectRoot });
+      } catch {
+        branch = 'master';
+      }
+      
       // Pull latest changes
-      const { stdout, stderr } = await execPromise('git pull origin main 2>&1 || git pull origin master 2>&1', { 
+      const { stdout, stderr } = await execPromise(`git pull origin ${branch}`, { 
         cwd: projectRoot 
       });
       
