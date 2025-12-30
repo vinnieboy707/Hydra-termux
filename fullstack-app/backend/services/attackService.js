@@ -11,6 +11,8 @@ class AttackService {
       this.scriptsPath,
       path.resolve(process.cwd(), 'scripts')
     ];
+    this.scriptBasePaths = this.scriptBasePaths.filter((p, idx, arr) => arr.indexOf(p) === idx);
+    this.scriptCache = new Map();
   }
 
   async queueAttack(attackData) {
@@ -55,12 +57,19 @@ class AttackService {
       }
 
       // Resolve script path with fallbacks (supports running backend outside repo root)
-      let scriptPath;
-      for (const base of this.scriptBasePaths) {
-        const candidate = path.join(base, scriptName);
-        if (fs.existsSync(candidate)) {
-          scriptPath = candidate;
-          break;
+      let scriptPath = this.scriptCache.get(scriptName);
+      if (scriptPath && !fs.existsSync(scriptPath)) {
+        this.scriptCache.delete(scriptName);
+        scriptPath = undefined;
+      }
+      if (!scriptPath) {
+        for (const base of this.scriptBasePaths) {
+          const candidate = path.join(base, scriptName);
+          if (fs.existsSync(candidate)) {
+            scriptPath = candidate;
+            this.scriptCache.set(scriptName, candidate);
+            break;
+          }
         }
       }
       if (!scriptPath) {
