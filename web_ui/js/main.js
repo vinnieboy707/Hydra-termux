@@ -1,3 +1,10 @@
+// HTML escape function for security
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Protocol configurations and variations
 const protocolConfigs = {
     ssh: {
@@ -446,7 +453,19 @@ const protocolConfigs = {
 // Load protocol configuration page
 function loadProtocol(protocolKey) {
     const config = protocolConfigs[protocolKey];
-    if (!config) return;
+    if (!config) {
+        const main = document.querySelector('main');
+        main.innerHTML = `
+            <button class="back-button" onclick="location.reload()">← Back to Protocols</button>
+            <div class="config-container">
+                <div class="alert alert-warning">
+                    <strong>⚠️ Error:</strong> Protocol configuration not found for "${protocolKey}".
+                    Please go back and select a valid protocol.
+                </div>
+            </div>
+        `;
+        return;
+    }
 
     const main = document.querySelector('main');
     main.innerHTML = `
@@ -454,9 +473,9 @@ function loadProtocol(protocolKey) {
         
         <div class="config-container">
             <div style="text-align: center; margin-bottom: 30px;">
-                <div style="font-size: 4em; margin-bottom: 10px;">${config.icon}</div>
-                <h1>${config.name} Configuration</h1>
-                <p style="color: #aaa; font-size: 1.1em; margin-top: 10px;">${config.description}</p>
+                <div style="font-size: 4em; margin-bottom: 10px;">${escapeHtml(config.icon)}</div>
+                <h1>${escapeHtml(config.name)} Configuration</h1>
+                <p style="color: #aaa; font-size: 1.1em; margin-top: 10px;">${escapeHtml(config.description)}</p>
             </div>
 
             <div class="alert alert-info">
@@ -468,9 +487,9 @@ function loadProtocol(protocolKey) {
                 <h2 style="color: #00ff88; margin-bottom: 20px;">Available Variations</h2>
                 ${config.variations.map((variation, index) => `
                     <div class="variation-card">
-                        <h3>${variation.name}</h3>
-                        <p>${variation.description}</p>
-                        <button onclick="showVariationForm('${protocolKey}', ${index})">
+                        <h3>${escapeHtml(variation.name)}</h3>
+                        <p>${escapeHtml(variation.description)}</p>
+                        <button onclick="showVariationForm('${escapeHtml(protocolKey)}', ${index})">
                             Configure & Generate →
                         </button>
                     </div>
@@ -487,13 +506,13 @@ function showVariationForm(protocolKey, variationIndex) {
 
     const main = document.querySelector('main');
     main.innerHTML = `
-        <button class="back-button" onclick="loadProtocol('${protocolKey}')">← Back to ${config.name}</button>
+        <button class="back-button" onclick="loadProtocol('${escapeHtml(protocolKey)}')">← Back to ${escapeHtml(config.name)}</button>
         
         <div class="config-container">
             <div style="text-align: center; margin-bottom: 30px;">
-                <div style="font-size: 3em; margin-bottom: 10px;">${config.icon}</div>
-                <h1>${variation.name}</h1>
-                <p style="color: #aaa; font-size: 1.1em;">${variation.description}</p>
+                <div style="font-size: 3em; margin-bottom: 10px;">${escapeHtml(config.icon)}</div>
+                <h1>${escapeHtml(variation.name)}</h1>
+                <p style="color: #aaa; font-size: 1.1em;">${escapeHtml(variation.description)}</p>
             </div>
 
             <div class="alert alert-warning">
@@ -577,7 +596,7 @@ function generateParameterField(param) {
             ${inputHtml}
             <span class="help-text">${param.help}</span>
             <div class="example">
-                <strong>Example:</strong> ${param.example || param.default || 'See documentation'}
+                <strong>Example:</strong> ${param.example || param.default || 'No specific example provided'}
             </div>
             ${param.resource ? `
                 <a href="${param.resource.url}" class="resource-link" target="_blank">
@@ -609,7 +628,14 @@ function generateScript(protocolKey, variationIndex) {
         
         if (param.type === 'checkbox') {
             if (element.checked) {
-                command += ` -r`; // Resume flag for scan
+                // Use the parameter-specific flag if defined, otherwise use the parameter name
+                const flagMap = {
+                    'scan': '-r',
+                    'resume': '-r',
+                    'verbose': '-v'
+                };
+                const flag = flagMap[param.name] || `--${param.name}`;
+                command += ` ${flag}`;
             }
         } else {
             value = element.value.trim();
@@ -649,13 +675,56 @@ function copyScript() {
     const scriptText = document.getElementById('generatedScript').textContent;
     const button = document.querySelector('.copy-button');
     
-    navigator.clipboard.writeText(scriptText).then(() => {
-        button.textContent = '✅ Copied!';
-        button.classList.add('copied');
-        
-        setTimeout(() => {
-            button.textContent = '📋 Copy';
-            button.classList.remove('copied');
+    // Try modern clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(scriptText).then(() => {
+            button.textContent = '✅ Copied!';
+            button.classList.add('copied');
+            
+            setTimeout(() => {
+                button.textContent = '📋 Copy';
+                button.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            // Fallback to textarea method
+            fallbackCopyToClipboard(scriptText, button);
+        });
+    } else {
+        // Fallback for browsers without clipboard API
+        fallbackCopyToClipboard(scriptText, button);
+    }
+}
+
+// Fallback clipboard copy method
+function fallbackCopyToClipboard(text, button) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            button.textContent = '✅ Copied!';
+            button.classList.add('copied');
+            
+            setTimeout(() => {
+                button.textContent = '📋 Copy';
+                button.classList.remove('copied');
+            }, 2000);
+        } else {
+            alert('Copy failed. Please select and copy manually.');
+        }
+    } catch (err) {
+        alert('Copy not supported. Please select and copy manually.');
+    } finally {
+        document.body.removeChild(textArea);
+    }
+}
         }, 2000);
     }).catch(err => {
         alert('Failed to copy. Please select and copy manually.');
