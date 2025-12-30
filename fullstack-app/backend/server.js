@@ -19,6 +19,10 @@ const resultRoutes = require('./routes/results');
 const wordlistRoutes = require('./routes/wordlists');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
+const configRoutes = require('./routes/config');
+const logsRoutes = require('./routes/logs');
+const systemRoutes = require('./routes/system');
+const webhookRoutes = require('./routes/webhooks');
 
 // Middleware
 app.use(helmet());
@@ -41,6 +45,10 @@ app.use('/api/targets', targetRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/wordlists', wordlistRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/config', configRoutes);
+app.use('/api/logs', logsRoutes);
+app.use('/api/system', systemRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -185,7 +185,7 @@ fullstack-app/
 - `POST /api/auth/login` - Login
 - `GET /api/auth/verify` - Verify token
 
-### Attacks
+### Attacks (Menu Items 1-8)
 - `GET /api/attacks` - List all attacks
 - `GET /api/attacks/:id` - Get attack details
 - `POST /api/attacks` - Create new attack
@@ -193,25 +193,125 @@ fullstack-app/
 - `DELETE /api/attacks/:id` - Delete attack
 - `GET /api/attacks/types/list` - Get available attack types
 
-### Targets
+### Targets (Menu Item 11)
 - `GET /api/targets` - List all targets
 - `GET /api/targets/:id` - Get target details
 - `POST /api/targets` - Create new target
 - `PUT /api/targets/:id` - Update target
 - `DELETE /api/targets/:id` - Delete target
 
-### Results
+### Results (Menu Items 12, 15)
 - `GET /api/results` - List all results
 - `GET /api/results/attack/:attackId` - Get results for specific attack
 - `GET /api/results/stats` - Get result statistics
 - `GET /api/results/export` - Export results
 
-### Wordlists
+### Wordlists (Menu Item 9)
 - `GET /api/wordlists` - List all wordlists
 - `POST /api/wordlists/scan` - Scan wordlist directory
 
 ### Dashboard
 - `GET /api/dashboard/stats` - Get dashboard statistics
+
+### Configuration (Menu Item 13)
+- `GET /api/config` - Get configuration
+- `PUT /api/config` - Update configuration
+- `GET /api/config/schema` - Get configuration schema
+
+### Logs (Menu Item 14)
+- `GET /api/logs` - Get database logs
+- `GET /api/logs/files` - Get log files
+- `GET /api/logs/files/:filename` - Get log file content
+- `DELETE /api/logs/cleanup` - Cleanup old logs
+
+### System (Menu Items 16, 17, 18)
+- `GET /api/system/info` - Get system information
+- `GET /api/system/update/check` - Check for updates
+- `POST /api/system/update/apply` - Apply update
+- `GET /api/system/help` - Get help documentation
+- `GET /api/system/about` - Get about information
+
+### Webhooks (NEW!)
+- `GET /api/webhooks` - List all webhooks
+- `GET /api/webhooks/:id` - Get webhook details
+- `POST /api/webhooks` - Create new webhook
+- `PUT /api/webhooks/:id` - Update webhook
+- `DELETE /api/webhooks/:id` - Delete webhook
+- `POST /api/webhooks/:id/test` - Test webhook
+- `GET /api/webhooks/:id/deliveries` - Get webhook delivery logs
+
+**📚 Full API Documentation:** See [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
+
+## 🗄️ Database Support
+
+The backend now supports **both SQLite and PostgreSQL**:
+
+### SQLite (Default)
+- Lightweight and zero-configuration
+- Perfect for development and single-user setups
+- File-based, portable database
+- Set `DB_TYPE=sqlite` in `.env`
+
+### PostgreSQL (Production-Ready)
+- Better performance and concurrent access
+- Industry standard for web applications
+- Advanced features and scalability
+- Network accessible database
+- Set `DB_TYPE=postgres` in `.env`
+
+**📚 PostgreSQL Setup Guide:** See [POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md)
+
+## 🪝 Webhook Integration (NEW!)
+
+Configure webhooks to receive real-time notifications about attacks and events:
+
+### Supported Events
+- `attack.started` - Attack has started
+- `attack.completed` - Attack completed successfully
+- `attack.failed` - Attack failed with error
+- `attack.stopped` - Attack stopped by user
+- `credentials.found` - New credentials discovered
+- `target.created` - New target added
+- `target.updated` - Target information updated
+- `target.deleted` - Target removed
+
+### Example Webhook Payload
+```json
+{
+  "event": "credentials.found",
+  "timestamp": "2024-01-01T12:00:00.000Z",
+  "data": {
+    "attack_id": 123,
+    "target_host": "192.168.1.100",
+    "protocol": "ssh",
+    "username": "admin",
+    "password": "password123"
+  }
+}
+```
+
+### Security
+- HMAC-SHA256 signature verification
+- Secret keys for each webhook
+- Delivery logs and retry mechanism
+
+## 📋 Menu Items to API Mapping
+
+All 18 menu items from `hydra.sh` are now accessible via API:
+
+| Menu # | Feature | API Endpoint |
+|--------|---------|--------------|
+| 1-8 | Attack Scripts | `POST /api/attacks` |
+| 9 | Download Wordlists | `POST /api/wordlists/scan` |
+| 10 | Generate Wordlist | Script-based |
+| 11 | Scan Target | `POST /api/targets` |
+| 12 | View Results | `GET /api/results` |
+| 13 | View Configuration | `GET /api/config` |
+| 14 | View Logs | `GET /api/logs` |
+| 15 | Export Results | `GET /api/results/export` |
+| 16 | Update System | `GET/POST /api/system/update/*` |
+| 17 | Help | `GET /api/system/help` |
+| 18 | About | `GET /api/system/about` |
 
 ## 🐛 Troubleshooting
 
