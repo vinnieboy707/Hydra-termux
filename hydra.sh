@@ -65,6 +65,9 @@ EOF
 show_menu() {
     print_message "╔════════════════════ MAIN MENU ════════════════════════╗" "$BLUE"
     echo ""
+    print_message "  🌐 WEB INTERFACE:" "$CYAN"
+    echo "  19) Launch Web Configuration UI (Recommended!)"
+    echo ""
     print_message "  ATTACK SCRIPTS:" "$MAGENTA"
     echo "  1)  SSH Admin Attack"
     echo "  2)  FTP Admin Attack"
@@ -275,6 +278,39 @@ show_help() {
     read -p "Press Enter to continue..."
 }
 
+# Function to launch web UI
+launch_web_ui() {
+    print_banner "Web Configuration Interface"
+    echo ""
+    
+    print_message "🌐 Starting Web UI..." "$CYAN"
+    echo ""
+    log_info "This will open a browser-based configuration interface"
+    log_info "You can configure attacks with an easy-to-use form"
+    echo ""
+    print_message "Features:" "$GREEN"
+    echo "  ✓ Visual protocol selection"
+    echo "  ✓ Interactive parameter forms"
+    echo "  ✓ Built-in help and examples"
+    echo "  ✓ Resource links for learning"
+    echo "  ✓ One-click script generation"
+    echo "  ✓ Copy button for easy use"
+    echo ""
+    
+    if [ ! -f "$SCRIPT_DIR/scripts/web_ui_launcher.sh" ]; then
+        log_error "Web UI launcher not found"
+        read -p "Press Enter to continue..."
+        return 1
+    fi
+    
+    bash "$SCRIPT_DIR/scripts/web_ui_launcher.sh"
+    
+    # This will keep running until Ctrl+C
+    echo ""
+    log_info "Web UI stopped"
+    read -p "Press Enter to continue..."
+}
+
 # Function to show about
 show_about() {
     print_banner "About & Credits"
@@ -292,6 +328,7 @@ show_about() {
     echo "  ✓ Target scanning"
     echo "  ✓ Results tracking"
     echo "  ✓ Comprehensive logging"
+    echo "  ✓ Web-based configuration UI"
     echo ""
     print_message "Credits:" "$CYAN"
     echo "  Original: cyrushar/Hydra-Termux"
@@ -318,9 +355,12 @@ main() {
         show_banner
         show_menu
         
-        read -p "Enter your choice [0-18]: " choice
+        read -p "Enter your choice [0-19]: " choice
         
         case $choice in
+            19)
+                launch_web_ui
+                ;;
             1)
                 run_attack_script "ssh_admin_attack.sh" "SSH Admin Attack"
                 ;;
@@ -383,7 +423,7 @@ main() {
                 exit 0
                 ;;
             *)
-                log_error "Invalid choice. Please select 0-18."
+                log_error "Invalid choice. Please select 0-19."
                 sleep 2
                 ;;
         esac

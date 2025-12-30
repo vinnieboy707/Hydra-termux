@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydra-Termux Configuration</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="banner">
+                <pre class="ascii-art">
+╔═══════════════════════════════════════════╗
+║   ██╗  ██╗██╗   ██╗██████╗ ██████╗  █████╗ 
+║   ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
+║   ███████║ ╚████╔╝ ██║  ██║██████╔╝███████║
+║   ██╔══██║  ╚██╔╝  ██║  ██║██╔══██╗██╔══██║
+║   ██║  ██║   ██║   ██████╔╝██║  ██║██║  ██║
+║   ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+╚═══════════════════════════════════════════╝
+                </pre>
+                <h1>Protocol Configuration</h1>
+                <p class="subtitle">Configure and generate attack scripts</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="protocol-grid">
+                <div class="protocol-card" onclick="loadProtocol('ssh')">
+                    <div class="protocol-icon">🔐</div>
+                    <h2>SSH</h2>
+                    <p>Secure Shell Protocol</p>
+                    <span class="badge">Port 22</span>
+                </div>
+
+                <div class="protocol-card" onclick="loadProtocol('ftp')">
+                    <div class="protocol-icon">📁</div>
+                    <h2>FTP</h2>
+                    <p>File Transfer Protocol</p>
+                    <span class="badge">Port 21</span>
+                </div>
+
+                <div class="protocol-card" onclick="loadProtocol('web')">
+                    <div class="protocol-icon">🌐</div>
+                    <h2>Web/HTTP</h2>
+                    <p>Web Admin Panels</p>
+                    <span class="badge">Port 80/443</span>
+                </div>
+
+                <div class="protocol-card" onclick="loadProtocol('rdp')">
+                    <div class="protocol-icon">🖥️</div>
+                    <h2>RDP</h2>
+                    <p>Remote Desktop Protocol</p>
+                    <span class="badge">Port 3389</span>
+                </div>
+
+                <div class="protocol-card" onclick="loadProtocol('mysql')">
+                    <div class="protocol-icon">🗄️</div>
+                    <h2>MySQL</h2>
+                    <p>MySQL Database</p>
+                    <span class="badge">Port 3306</span>
+                </div>
+
+                <div class="protocol-card" onclick="loadProtocol('postgres')">
+                    <div class="protocol-icon">🐘</div>
+                    <h2>PostgreSQL</h2>
+                    <p>PostgreSQL Database</p>
+                    <span class="badge">Port 5432</span>
+                </div>
+
+                <div class="protocol-card" onclick="loadProtocol('smb')">
+                    <div class="protocol-icon">🗂️</div>
+                    <h2>SMB</h2>
+                    <p>Server Message Block</p>
+                    <span class="badge">Port 445</span>
+                </div>
+
+                <div class="protocol-card" onclick="loadProtocol('auto')">
+                    <div class="protocol-icon">⚡</div>
+                    <h2>Auto Attack</h2>
+                    <p>Multi-Protocol Scanner</p>
+                    <span class="badge">Multiple</span>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>⚠️ Use only on authorized systems | Hydra-Termux v2.0.0</p>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
