@@ -189,7 +189,133 @@ parse_results() {
         print_header "Suggested Next Steps"
         log_info "Run auto attack: bash scripts/admin_auto_attack.sh -t $TARGET"
         log_info "View results: bash scripts/results_viewer.sh --all"
+        
+        # Recommend scripts based on detected services
+        echo ""
+        recommend_scripts "$scan_file"
     fi
+}
+
+# Function to map services to Library scripts
+recommend_scripts() {
+    local scan_file="$1"
+    
+    print_header "Available Scripts for Detected Services"
+    echo ""
+    log_info "Based on the scan, the following scripts can be used:"
+    echo ""
+    
+    # Detect services and recommend scripts
+    local services_found=()
+    local scripts_to_recommend=()
+    
+    # Define service to script mappings
+    declare -A service_map=(
+        ["ssh"]="ssh_quick.sh|SSH Admin Attack - Brute-force SSH login credentials using common admin usernames and passwords"
+        ["ftp"]="ftp_quick.sh|FTP Admin Attack - Brute-force FTP server credentials for file access"
+        ["telnet"]="telnet_quick.sh|Telnet Attack - Brute-force telnet login for remote shell access"
+        ["smtp"]="smtp_quick.sh|SMTP Attack - Test email server credentials for mail relay access"
+        ["http"]="web_quick.sh|Web Admin Attack - Brute-force web admin panels (auto-detects login pages)"
+        ["https"]="web_quick.sh|Web Admin Attack - Brute-force web admin panels over HTTPS (auto-detects login pages)"
+        ["mysql"]="mysql_quick.sh|MySQL Attack - Brute-force MySQL database credentials for data access"
+        ["postgresql"]="postgres_quick.sh|PostgreSQL Attack - Brute-force PostgreSQL database credentials"
+        ["ms-sql"]="mssql_quick.sh|MS-SQL Attack - Brute-force Microsoft SQL Server credentials"
+        ["microsoft-ds"]="smb_quick.sh|SMB Attack - Brute-force Windows file sharing credentials"
+        ["netbios-ssn"]="smb_quick.sh|SMB Attack - Brute-force Windows NetBIOS/SMB credentials"
+        ["ms-wbt-server"]="rdp_quick.sh|RDP Attack - Brute-force Windows Remote Desktop Protocol credentials"
+        ["vnc"]="vnc_quick.sh|VNC Attack - Brute-force VNC remote desktop credentials"
+        ["imap"]="imap_quick.sh|IMAP Attack - Brute-force IMAP email account credentials"
+        ["pop3"]="pop3_quick.sh|POP3 Attack - Brute-force POP3 email account credentials"
+        ["ldap"]="ldap_quick.sh|LDAP Attack - Brute-force LDAP directory service credentials"
+        ["mongodb"]="mongodb_quick.sh|MongoDB Attack - Brute-force MongoDB database credentials"
+        ["redis"]="redis_quick.sh|Redis Attack - Brute-force Redis in-memory database credentials"
+        ["rtsp"]="rtsp_camera.sh|RTSP Camera Attack - Brute-force IP camera/streaming device credentials"
+        ["snmp"]="snmp_quick.sh|SNMP Attack - Brute-force SNMP community strings for network device access"
+    )
+    
+    # Additional nmap scripts and multi-service options
+    declare -A utility_scripts=(
+        ["any"]="nmap_vuln_scan.sh|Vulnerability Scan - Scan target for known CVEs and security vulnerabilities"
+        ["any"]="nmap_os_detection.sh|OS Detection - Detect operating system and version information"
+        ["any"]="ssl_analyzer.sh|SSL/TLS Analysis - Analyze SSL/TLS certificates and cipher suites"
+        ["any"]="auto_attack_quick.sh|Auto Attack All Services - Automatically detect and attack all available services"
+    )
+    
+    # Parse scan results and detect services
+    if [ "$OUTPUT_FORMAT" = "xml" ]; then
+        # Parse XML format
+        while read -r port; do
+            local service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
+            if [ -n "$service" ]; then
+                services_found+=("$service:$port")
+            fi
+        done < <(grep -oP 'portid="\K[0-9]+' "$scan_file" 2>/dev/null)
+    else
+        # Parse normal text format
+        while read -r line; do
+            local port=$(echo "$line" | awk '{print $1}' | cut -d'/' -f1)
+            local service=$(echo "$line" | awk '{print $3}')
+            if [ -n "$service" ]; then
+                services_found+=("$service:$port")
+            fi
+        done < <(grep "^[0-9]*/.*open" "$scan_file" 2>/dev/null)
+    fi
+    
+    # Recommend scripts for detected services
+    local count=0
+    declare -A recommended_scripts
+    
+    for service_port in "${services_found[@]}"; do
+        local service=$(echo "$service_port" | cut -d':' -f1)
+        local port=$(echo "$service_port" | cut -d':' -f2)
+        
+        # Check if we have a script for this service
+        if [ -n "${service_map[$service]}" ]; then
+            local script=$(echo "${service_map[$service]}" | cut -d'|' -f1)
+            local desc=$(echo "${service_map[$service]}" | cut -d'|' -f2)
+            
+            # Avoid duplicate recommendations
+            if [ -z "${recommended_scripts[$script]}" ]; then
+                recommended_scripts["$script"]="$desc (Port: $port)"
+                count=$((count + 1))
+            fi
+        fi
+    done
+    
+    # Display recommended scripts
+    if [ $count -gt 0 ]; then
+        printf "${CYAN}%-25s${NC} ${YELLOW}%-60s${NC}\n" "SCRIPT" "DESCRIPTION"
+        printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..90})"
+        
+        for script in "${!recommended_scripts[@]}"; do
+            local desc="${recommended_scripts[$script]}"
+            printf "${GREEN}%-25s${NC} %s\n" "$script" "$desc"
+        done
+        
+        echo ""
+        log_info "To use a script, run: ${CYAN}bash Library/<script_name>${NC}"
+        log_warning "Remember to edit the TARGET variable in the script first!"
+    else
+        log_warning "No specific script recommendations for detected services"
+    fi
+    
+    # Always show utility scripts
+    echo ""
+    print_header "General Purpose Scripts"
+    echo ""
+    printf "${CYAN}%-25s${NC} ${YELLOW}%-60s${NC}\n" "SCRIPT" "DESCRIPTION"
+    printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..90})"
+    
+    printf "${GREEN}%-25s${NC} %s\n" "auto_attack_quick.sh" "Auto Attack All Services - Automatically detect and attack all available services"
+    printf "${GREEN}%-25s${NC} %s\n" "nmap_vuln_scan.sh" "Vulnerability Scan - Scan target for known CVEs and security vulnerabilities"
+    printf "${GREEN}%-25s${NC} %s\n" "nmap_os_detection.sh" "OS Detection - Detect operating system and version information"
+    printf "${GREEN}%-25s${NC} %s\n" "ssl_analyzer.sh" "SSL/TLS Analysis - Analyze SSL/TLS certificates and cipher suites"
+    printf "${GREEN}%-25s${NC} %s\n" "nmap_full_scan.sh" "Full Port Scan - Comprehensive scan of all 65535 ports"
+    printf "${GREEN}%-25s${NC} %s\n" "nmap_stealth_scan.sh" "Stealth Scan - Low-profile SYN scan to avoid detection"
+    
+    echo ""
+    log_info "To use a script, run: ${CYAN}bash Library/<script_name>${NC}"
+    log_warning "Remember to edit the TARGET variable in the script first!"
 }
 
 # Parse command line arguments
