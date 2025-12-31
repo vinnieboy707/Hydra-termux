@@ -25,12 +25,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage,
+  limits: {
+    fileSize: 100 * 1024 * 1024 // 100MB max file size
+  },
   fileFilter: (req, file, cb) => {
-    if (file.originalname.endsWith('.txt')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only .txt files are allowed'));
+    // Only allow .txt files
+    if (!file.originalname.endsWith('.txt')) {
+      return cb(new Error('Only .txt files are allowed'));
     }
+    // Additional mime type check
+    if (file.mimetype !== 'text/plain' && file.mimetype !== 'application/octet-stream') {
+      return cb(new Error('Invalid file type'));
+    }
+    cb(null, true);
   }
 });
 

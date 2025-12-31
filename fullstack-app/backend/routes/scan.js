@@ -45,16 +45,23 @@ router.post('/target', authMiddleware, async (req, res) => {
 });
 
 function detectTargetType(target) {
-  // Email detection
-  if (target.includes('@') && target.includes('.')) {
+  // Email detection with proper validation
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (emailRegex.test(target)) {
     return 'email';
   }
-  // IP address detection
-  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(target)) {
-    return 'ip';
+  // IP address detection with octet validation
+  const ipRegex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+  const ipMatch = target.match(ipRegex);
+  if (ipMatch) {
+    // Validate each octet is 0-255
+    const octets = ipMatch.slice(1).map(Number);
+    if (octets.every(octet => octet >= 0 && octet <= 255)) {
+      return 'ip';
+    }
   }
   // Domain/hostname detection
-  if (target.includes('.')) {
+  if (target.includes('.') && /^[a-zA-Z0-9.-]+$/.test(target)) {
     return 'domain';
   }
   return 'unknown';
@@ -117,6 +124,7 @@ async function scanNetwork(target, scanType) {
     
     let output = '';
     let errorOutput = '';
+    let scanCompleted = false;
     
     nmap.stdout.on('data', (data) => {
       output += data.toString();
@@ -127,6 +135,7 @@ async function scanNetwork(target, scanType) {
     });
 
     nmap.on('close', (code) => {
+      scanCompleted = true;
       if (code !== 0 && code !== null) {
         // If nmap is not available or fails, return simulated results
         console.log('Nmap not available, using simulated scan results');
@@ -140,16 +149,24 @@ async function scanNetwork(target, scanType) {
     });
 
     nmap.on('error', (error) => {
+      scanCompleted = true;
       // Nmap not installed, return simulated results
       console.log('Nmap not found, using simulated scan results');
       resolve(getSimulatedScanResults(target));
     });
 
-    // Timeout after 2 minutes
-    setTimeout(() => {
-      nmap.kill();
-      resolve(getSimulatedScanResults(target));
+    // Timeout after 2 minutes and clean up
+    const timeout = setTimeout(() => {
+      if (!scanCompleted) {
+        nmap.kill();
+        resolve(getSimulatedScanResults(target));
+      }
     }, 120000);
+    
+    // Clear timeout if scan completes
+    nmap.on('close', () => {
+      clearTimeout(timeout);
+    });
   });
 }
 

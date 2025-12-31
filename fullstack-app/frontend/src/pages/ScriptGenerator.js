@@ -210,9 +210,15 @@ function ScriptGenerator() {
     let cmd = `bash scripts/ssh_admin_attack.sh -t ${target}`;
     if (port) cmd += ` -p ${port}`;
     if (username) cmd += ` -l ${username}`;
-    if (userlist) cmd += ` -u ${getWordlistPath(userlist)}`;
+    if (userlist) {
+      const path = getWordlistPath(userlist);
+      if (path) cmd += ` -u ${path}`;
+    }
     if (password) cmd += ` -P ${password}`;
-    if (passlist) cmd += ` -w ${getWordlistPath(passlist)}`;
+    if (passlist) {
+      const path = getWordlistPath(passlist);
+      if (path) cmd += ` -w ${path}`;
+    }
     if (threads) cmd += ` -T ${threads}`;
     if (verbose) cmd += ` -v`;
     
@@ -347,8 +353,9 @@ ${cmd}`;
   };
 
   const getWordlistPath = (wordlistId) => {
+    if (!wordlistId) return null;
     const wordlist = wordlists.find(w => w.id === parseInt(wordlistId));
-    return wordlist ? wordlist.path : '';
+    return wordlist ? wordlist.path : null;
   };
 
   const copyToClipboard = () => {

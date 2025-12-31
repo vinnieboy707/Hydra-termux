@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../services/api';
+import { formatBytes } from '../utils/helpers';
 
 function WordlistGenerator() {
   const [generatorType, setGeneratorType] = useState('combine');
@@ -111,7 +112,7 @@ function WordlistGenerator() {
           className="form-input"
           value={formData.baseWords}
           onChange={(e) => setFormData({ ...formData, baseWords: e.target.value })}
-          placeholder="password&#10;admin&#10;user&#10;login"
+          placeholder="password\nadmin\nuser\nlogin"
           rows={5}
           style={{ fontFamily: 'monospace' }}
         />
@@ -203,7 +204,7 @@ function WordlistGenerator() {
           className="form-input"
           value={formData.customEntries}
           onChange={(e) => setFormData({ ...formData, customEntries: e.target.value })}
-          placeholder="password123&#10;admin2024&#10;Welcome!123"
+          placeholder="password123\nadmin2024\nWelcome!123"
           rows={10}
           style={{ fontFamily: 'monospace' }}
         />
@@ -360,14 +361,6 @@ function WordlistGenerator() {
       </div>
     </div>
   );
-}
-
-function formatBytes(bytes) {
-  if (!bytes) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 export default WordlistGenerator;

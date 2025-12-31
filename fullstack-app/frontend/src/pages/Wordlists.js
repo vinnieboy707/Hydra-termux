@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
+import { formatBytes } from '../utils/helpers';
 
 function Wordlists() {
   const [wordlists, setWordlists] = useState([]);
@@ -256,14 +257,6 @@ function Wordlists() {
       )}
     </div>
   );
-}
-
-function formatBytes(bytes) {
-  if (!bytes) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 export default Wordlists;

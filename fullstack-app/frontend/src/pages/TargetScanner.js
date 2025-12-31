@@ -9,16 +9,23 @@ function TargetScanner() {
   const [error, setError] = useState('');
 
   const detectTargetType = (target) => {
-    // Email detection
-    if (target.includes('@') && target.includes('.')) {
+    // Email detection with proper validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (emailRegex.test(target)) {
       return 'email';
     }
-    // IP address detection
-    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(target)) {
-      return 'ip';
+    // IP address detection with octet validation
+    const ipRegex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+    const ipMatch = target.match(ipRegex);
+    if (ipMatch) {
+      // Validate each octet is 0-255
+      const octets = ipMatch.slice(1).map(Number);
+      if (octets.every(octet => octet >= 0 && octet <= 255)) {
+        return 'ip';
+      }
     }
     // Domain/hostname detection
-    if (target.includes('.')) {
+    if (target.includes('.') && /^[a-zA-Z0-9.-]+$/.test(target)) {
       return 'domain';
     }
     return 'unknown';
