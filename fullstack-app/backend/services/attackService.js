@@ -6,7 +6,13 @@ const { run, get } = require('../database');
 class AttackService {
   constructor() {
     this.runningAttacks = new Map();
-    this.scriptsPath = process.env.SCRIPTS_PATH || path.join(__dirname, '../../../scripts');
+    this.scriptsPath = process.env.SCRIPTS_PATH || path.resolve(__dirname, '../../../scripts');
+    this.scriptBasePaths = [
+      this.scriptsPath,
+      path.resolve(process.cwd(), 'scripts')
+    ];
+    this.scriptBasePaths = [...new Set(this.scriptBasePaths.map(p => path.normalize(p)))];
+    this.scriptCache = new Map();
   }
 
   async queueAttack(attackData) {
@@ -50,11 +56,24 @@ class AttackService {
         throw new Error(`Unknown attack type: ${attack_type}`);
       }
 
-      const scriptPath = path.join(this.scriptsPath, scriptName);
-
-      // Check if script exists
-      if (!fs.existsSync(scriptPath)) {
-        throw new Error(`Script not found: ${scriptPath}`);
+      // Resolve script path with fallbacks (supports running backend outside repo root)
+      let scriptPath = this.scriptCache.get(scriptName);
+      if (scriptPath && !fs.existsSync(scriptPath)) {
+        this.scriptCache.delete(scriptName);
+        scriptPath = null;
+      }
+      if (!scriptPath) {
+        for (const base of this.scriptBasePaths) {
+          const candidate = path.join(base, scriptName);
+          if (fs.existsSync(candidate)) {
+            scriptPath = candidate;
+            this.scriptCache.set(scriptName, candidate);
+            break;
+          }
+        }
+      }
+      if (!scriptPath) {
+        throw new Error(`Script not found: ${scriptName}. Searched in: ${this.scriptBasePaths.join(', ')}`);
       }
 
       // Build command arguments
