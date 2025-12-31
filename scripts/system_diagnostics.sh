@@ -227,7 +227,7 @@ else
 fi
 
 # Count attack scripts
-attack_scripts=$(ls "$SCRIPT_DIR"/*_attack.sh 2>/dev/null | wc -l)
+attack_scripts=$(find "$SCRIPT_DIR" -name "*_attack.sh" -type f 2>/dev/null | wc -l)
 if [ "$attack_scripts" -ge 7 ]; then
     log_ok "Attack scripts: $attack_scripts found"
 else

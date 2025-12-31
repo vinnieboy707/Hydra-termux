@@ -97,7 +97,7 @@ else
 fi
 
 # Count attack scripts
-script_count=$(ls "$SCRIPT_DIR"/*_attack.sh 2>/dev/null | wc -l)
+script_count=$(find "$SCRIPT_DIR" -name "*_attack.sh" -type f 2>/dev/null | wc -l)
 if [ "$script_count" -ge 7 ]; then
     print_message "  ✅ Attack scripts - $script_count found" "$GREEN"
 else
