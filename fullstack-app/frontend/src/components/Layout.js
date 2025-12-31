@@ -8,10 +8,13 @@ function Layout({ children }) {
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: '📊' },
-    { path: '/attacks', label: 'Attacks', icon: '⚔️' },
+    { path: '/script-generator', label: 'Script Generator', icon: '⚔️' },
+    { path: '/attacks', label: 'Attacks', icon: '🔥' },
+    { path: '/scanner', label: 'Target Scanner', icon: '🔍' },
     { path: '/targets', label: 'Targets', icon: '🎯' },
     { path: '/results', label: 'Results', icon: '✅' },
     { path: '/wordlists', label: 'Wordlists', icon: '📚' },
+    { path: '/wordlist-generator', label: 'Wordlist Generator', icon: '🔧' },
   ];
 
   return (

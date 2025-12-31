@@ -89,14 +89,17 @@
 
 ### 🌐 Full-Stack Web Application (NEW!)
 - **Modern Web Interface** - Professional React-based UI with dark theme
+- **Script Generator** - Generate attack commands with forms (Options 1-8)
+- **Target Scanner** - Scan IPs, domains, emails with protocol detection (Option 11)
+- **Wordlist Management** - Upload, view, and manage wordlists (Option 9)
+- **Custom Wordlist Generator** - Create targeted wordlists (Option 10)
 - **Real-time Monitoring** - Live attack progress via WebSocket
 - **Attack Orchestration** - Queue and manage multiple concurrent attacks
 - **RESTful API** - Complete backend API with JWT authentication
 - **Dashboard & Analytics** - Visualize statistics and track success rates
 - **Target Management** - Organize and categorize target systems
 - **Results Database** - SQLite persistence for all discovered credentials
-- **Wordlist Integration** - Import and manage wordlists through UI
-- See [fullstack-app/README.md](fullstack-app/README.md) for setup and usage
+- See [fullstack-app/README.md](fullstack-app/README.md) and [docs/WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md) for complete guide
 
 ## 📋 Prerequisites
 
@@ -280,7 +283,9 @@ bash scripts/results_viewer.sh --export results.csv --format csv
 
 ## 📚 Documentation
 
-- **[Library.md](Library.md)** - 🔥 **NEW!** Quick-use scripts with platform comparisons
+- **[WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md)** - 🌟 **NEW!** Complete web interface feature guide
+- **[CLI_WEB_MAPPING.md](docs/CLI_WEB_MAPPING.md)** - 🌟 **NEW!** Quick reference for CLI to web mapping
+- **[Library.md](Library.md)** - 🔥 Quick-use scripts with platform comparisons
 - **[Library/README.md](Library/README.md)** - Quick reference for one-line-change scripts
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
 - **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios

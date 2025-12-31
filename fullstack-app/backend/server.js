@@ -24,6 +24,7 @@ const logsRoutes = require('./routes/logs');
 const systemRoutes = require('./routes/system');
 const webhookRoutes = require('./routes/webhooks');
 const securityRoutes = require('./routes/security');
+const scanRoutes = require('./routes/scan');
 
 // Middleware
 app.use(helmet());
@@ -51,6 +52,7 @@ app.use('/api/logs', logsRoutes);
 app.use('/api/system', systemRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/security', securityRoutes);
+app.use('/api/scan', scanRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
