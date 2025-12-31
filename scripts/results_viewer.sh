@@ -115,7 +115,7 @@ filter_by_protocol() {
     fi
     
     local count=0
-    local temp_output=$(mktemp)
+    local temp_output=$(mktemp /tmp/results_filter.XXXXXX)
     
     for file in $results_files; do
         jq -r --arg proto "$protocol" '.[] | select(.protocol == $proto) | "\(.timestamp)|\(.target)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null >> "$temp_output"
@@ -155,7 +155,7 @@ filter_by_target() {
     fi
     
     local count=0
-    local temp_output=$(mktemp)
+    local temp_output=$(mktemp /tmp/results_filter.XXXXXX)
     
     for file in $results_files; do
         jq -r --arg tgt "$target" '.[] | select(.target == $tgt) | "\(.timestamp)|\(.protocol)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null >> "$temp_output"

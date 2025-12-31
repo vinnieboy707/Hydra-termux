@@ -207,7 +207,6 @@ recommend_scripts() {
     
     # Detect services and recommend scripts
     local services_found=()
-    local scripts_to_recommend=()
     
     # Define service to script mappings
     declare -A service_map=(
@@ -231,14 +230,6 @@ recommend_scripts() {
         ["redis"]="redis_quick.sh|Redis Attack - Brute-force Redis in-memory database credentials"
         ["rtsp"]="rtsp_camera.sh|RTSP Camera Attack - Brute-force IP camera/streaming device credentials"
         ["snmp"]="snmp_quick.sh|SNMP Attack - Brute-force SNMP community strings for network device access"
-    )
-    
-    # Additional nmap scripts and multi-service options
-    declare -A utility_scripts=(
-        ["any"]="nmap_vuln_scan.sh|Vulnerability Scan - Scan target for known CVEs and security vulnerabilities"
-        ["any"]="nmap_os_detection.sh|OS Detection - Detect operating system and version information"
-        ["any"]="ssl_analyzer.sh|SSL/TLS Analysis - Analyze SSL/TLS certificates and cipher suites"
-        ["any"]="auto_attack_quick.sh|Auto Attack All Services - Automatically detect and attack all available services"
     )
     
     # Parse scan results and detect services
