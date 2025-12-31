@@ -7,6 +7,7 @@ import Attacks from './pages/Attacks';
 import Targets from './pages/Targets';
 import Results from './pages/Results';
 import Wordlists from './pages/Wordlists';
+import Webhooks from './pages/Webhooks';
 import ScriptGenerator from './pages/ScriptGenerator';
 import WordlistGenerator from './pages/WordlistGenerator';
 import TargetScanner from './pages/TargetScanner';
@@ -41,6 +42,7 @@ function App() {
                     <Route path="/targets" element={<Targets />} />
                     <Route path="/results" element={<Results />} />
                     <Route path="/wordlists" element={<Wordlists />} />
+                    <Route path="/webhooks" element={<Webhooks />} />
                     <Route path="/wordlist-generator" element={<WordlistGenerator />} />
                     <Route path="/scanner" element={<TargetScanner />} />
                   </Routes>
