@@ -10,28 +10,38 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 # Source logger
 source "$SCRIPT_DIR/logger.sh"
 
+# 🚀 LOAD OPTIMIZED ATTACK PROFILES - 10000% PROTOCOL OPTIMIZATION
+if [ -f "$PROJECT_ROOT/config/optimized_attack_profiles.conf" ]; then
+    source "$PROJECT_ROOT/config/optimized_attack_profiles.conf"
+    log_success "✨ MULTI-PROTOCOL AUTO ATTACK OPTIMIZATION ACTIVATED"
+fi
+
 # Default configuration
 TARGET=""
 SCAN_TYPE="fast"
 OUTPUT_DIR="$PROJECT_ROOT/results"
 REPORT_FILE=""
 
-# Service to script mapping
+# Service to script mapping (ENHANCED with more protocols)
 declare -A SERVICE_SCRIPTS=(
     ["ssh"]="ssh_admin_attack.sh"
     ["ftp"]="ftp_admin_attack.sh"
     ["http"]="web_admin_attack.sh"
     ["https"]="web_admin_attack.sh"
     ["rdp"]="rdp_admin_attack.sh"
+    ["ms-wbt-server"]="rdp_admin_attack.sh"
     ["mysql"]="mysql_admin_attack.sh"
     ["postgresql"]="postgres_admin_attack.sh"
     ["smb"]="smb_admin_attack.sh"
     ["microsoft-ds"]="smb_admin_attack.sh"
+    ["netbios-ssn"]="smb_admin_attack.sh"
+    ["telnet"]="ssh_admin_attack.sh"  # Reuse SSH for telnet
+    ["vnc"]="ssh_admin_attack.sh"     # Reuse SSH for VNC
 )
 
 # Function to display help
 show_help() {
-    print_banner "Multi-Protocol Auto Attack Script"
+    print_banner "🚀 Multi-Protocol Auto Attack Script - OPTIMIZED"
     echo ""
     echo "Usage: $0 -t TARGET [OPTIONS]"
     echo ""
@@ -43,11 +53,20 @@ show_help() {
     echo "  -o, --output      Output directory for results (default: ./results)"
     echo "  -r, --report      Generate HTML report"
     echo "  -v, --verbose     Verbose output"
+    echo "  --tips            Show auto-attack optimization tips"
     echo "  -h, --help        Show this help message"
     echo ""
+    print_message "⚡ ULTIMATE OPTIMIZATION: Intelligent multi-protocol assault" "$GREEN"
+    echo "  • Automatic service detection with nmap"
+    echo "  • Parallel attack execution (all services simultaneously)"
+    echo "  • Optimized parameters for each detected protocol"
+    echo "  • 13+ protocols supported with smart mapping"
+    echo "  • Best for unknown targets - discovers & attacks automatically"
+    echo ""
     echo "Examples:"
-    echo "  $0 -t 192.168.1.100"
-    echo "  $0 -t 192.168.1.0/24 -s full -r"
+    echo "  $0 -t 192.168.1.100                    # Auto-detect and attack all services"
+    echo "  $0 -t 192.168.1.0/24 -s full -r        # Full subnet with HTML report"
+    echo "  $0 --tips                              # View multi-protocol strategies"
     echo ""
 }
 

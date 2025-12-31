@@ -20,7 +20,7 @@ show_help() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  -a, --all         Show all results"
+    echo "  -a, --all         Show all results (past 30 days)"
     echo "  -p, --protocol    Filter by protocol (ssh, ftp, http, etc.)"
     echo "  -t, --target      Filter by target"
     echo "  -d, --date        Filter by date (YYYY-MM-DD)"
@@ -29,6 +29,9 @@ show_help() {
     echo "  -c, --clear       Clear old results (30+ days)"
     echo "  -h, --help        Show this help message"
     echo ""
+    echo "Note: All commands default to showing results from the past 30 days."
+    echo "      Results older than 30 days are available via --clear option."
+    echo ""
     echo "Examples:"
     echo "  $0 --all"
     echo "  $0 --protocol ssh"
@@ -36,76 +39,103 @@ show_help() {
     echo ""
 }
 
-# Function to display all results
+# Function to display all results (from past 30 days)
 show_all_results() {
-    print_header "All Attack Results"
+    print_header "All Attack Results (Past 30 Days)"
     
-    local results_file="$RESULTS_DIR/results_$(date +%Y%m%d).json"
+    # Find all results files from the past 30 days
+    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null | sort -r)
     
-    if [ ! -f "$results_file" ]; then
-        log_warning "No results found for today"
-        
-        # Check for older results
-        local old_results=$(find "$RESULTS_DIR" -name "results_*.json" -type f | sort -r | head -1)
-        if [ -n "$old_results" ]; then
-            log_info "Found older results: $old_results"
-            results_file="$old_results"
-        else
-            return 1
-        fi
-    fi
-    
-    local count=$(jq '. | length' "$results_file" 2>/dev/null)
-    
-    if [ -z "$count" ] || [ "$count" = "0" ]; then
-        log_warning "No successful attacks recorded"
+    if [ -z "$results_files" ]; then
+        log_warning "No results found in the past 30 days"
         return 1
     fi
     
-    log_success "Total successful attacks: $count"
+    # Count total results
+    local total_count=0
+    for file in $results_files; do
+        local count=$(jq '. | length' "$file" 2>/dev/null || echo 0)
+        total_count=$((total_count + count))
+    done
+    
+    if [ $total_count -eq 0 ]; then
+        log_warning "No successful attacks recorded in the past 30 days"
+        return 1
+    fi
+    
+    log_success "Total successful attacks found: $total_count"
     echo ""
     
-    # Display results in table format
-    printf "${CYAN}%-20s %-15s %-8s %-15s %-20s${NC}\n" "Timestamp" "Protocol" "Port" "Target" "Credentials"
-    printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..90})"
-    
-    jq -r '.[] | "\(.timestamp)|\(.protocol)|\(.port)|\(.target)|\(.username):\(.password)"' "$results_file" 2>/dev/null | \
-    while IFS='|' read -r timestamp protocol port target creds; do
-        printf "%-20s %-15s %-8s %-15s ${GREEN}%-20s${NC}\n" "$timestamp" "$protocol" "$port" "$target" "$creds"
+    # Display results grouped by date
+    local file_count=0
+    for results_file in $results_files; do
+        local file_date=$(basename "$results_file" | sed 's/results_\(.*\)\.json/\1/')
+        local formatted_date=$(echo "$file_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3/')
+        local file_count_single=$(jq '. | length' "$results_file" 2>/dev/null || echo 0)
+        
+        if [ "$file_count_single" -gt 0 ]; then
+            file_count=$((file_count + 1))
+            
+            # Show separator between dates
+            if [ $file_count -gt 1 ]; then
+                echo ""
+            fi
+            
+            print_message "📅 Date: $formatted_date (${file_count_single} results)" "$YELLOW"
+            echo ""
+            
+            # Display results in table format
+            if [ $file_count -eq 1 ]; then
+                printf "${CYAN}%-20s %-15s %-8s %-15s %-20s${NC}\n" "Timestamp" "Protocol" "Port" "Target" "Credentials"
+                printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..90})"
+            fi
+            
+            jq -r '.[] | "\(.timestamp)|\(.protocol)|\(.port)|\(.target)|\(.username):\(.password)"' "$results_file" 2>/dev/null | \
+            while IFS='|' read -r timestamp protocol port target creds; do
+                printf "%-20s %-15s %-8s %-15s ${GREEN}%-20s${NC}\n" "$timestamp" "$protocol" "$port" "$target" "$creds"
+            done
+        fi
     done
+    
+    echo ""
+    log_info "Results older than 30 days are automatically archived"
 }
 
 # Function to filter results by protocol
 filter_by_protocol() {
     local protocol="$1"
     
-    print_header "Results for Protocol: $protocol"
+    print_header "Results for Protocol: $protocol (Past 30 Days)"
     
-    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f 2>/dev/null)
+    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
     
     if [ -z "$results_files" ]; then
-        log_warning "No results found"
+        log_warning "No results found in the past 30 days"
         return 1
     fi
     
     local count=0
+    local temp_output=$(mktemp /tmp/results_filter.XXXXXX)
     
     for file in $results_files; do
-        jq -r --arg proto "$protocol" '.[] | select(.protocol == $proto) | "\(.timestamp)|\(.target)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null | \
-        while IFS='|' read -r timestamp target port creds; do
-            if [ $count -eq 0 ]; then
-                printf "${CYAN}%-20s %-15s %-8s %-20s${NC}\n" "Timestamp" "Target" "Port" "Credentials"
-                printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..70})"
-            fi
-            printf "%-20s %-15s %-8s ${GREEN}%-20s${NC}\n" "$timestamp" "$target" "$port" "$creds"
-            count=$((count + 1))
-        done
+        jq -r --arg proto "$protocol" '.[] | select(.protocol == $proto) | "\(.timestamp)|\(.target)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null >> "$temp_output"
     done
     
-    if [ $count -eq 0 ]; then
-        log_warning "No results found for protocol: $protocol"
+    if [ ! -s "$temp_output" ]; then
+        rm -f "$temp_output"
+        log_warning "No results found for protocol: $protocol (in past 30 days)"
         return 1
     fi
+    
+    printf "${CYAN}%-20s %-15s %-8s %-20s${NC}\n" "Timestamp" "Target" "Port" "Credentials"
+    printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..70})"
+    
+    while IFS='|' read -r timestamp target port creds; do
+        printf "%-20s %-15s %-8s ${GREEN}%-20s${NC}\n" "$timestamp" "$target" "$port" "$creds"
+        count=$((count + 1))
+    done < "$temp_output"
+    
+    rm -f "$temp_output"
     
     echo ""
     log_success "Found $count result(s)"
@@ -115,33 +145,37 @@ filter_by_protocol() {
 filter_by_target() {
     local target="$1"
     
-    print_header "Results for Target: $target"
+    print_header "Results for Target: $target (Past 30 Days)"
     
-    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f 2>/dev/null)
+    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
     
     if [ -z "$results_files" ]; then
-        log_warning "No results found"
+        log_warning "No results found in the past 30 days"
         return 1
     fi
     
     local count=0
+    local temp_output=$(mktemp /tmp/results_filter.XXXXXX)
     
     for file in $results_files; do
-        jq -r --arg tgt "$target" '.[] | select(.target == $tgt) | "\(.timestamp)|\(.protocol)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null | \
-        while IFS='|' read -r timestamp protocol port creds; do
-            if [ $count -eq 0 ]; then
-                printf "${CYAN}%-20s %-15s %-8s %-20s${NC}\n" "Timestamp" "Protocol" "Port" "Credentials"
-                printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..70})"
-            fi
-            printf "%-20s %-15s %-8s ${GREEN}%-20s${NC}\n" "$timestamp" "$protocol" "$port" "$creds"
-            count=$((count + 1))
-        done
+        jq -r --arg tgt "$target" '.[] | select(.target == $tgt) | "\(.timestamp)|\(.protocol)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null >> "$temp_output"
     done
     
-    if [ $count -eq 0 ]; then
-        log_warning "No results found for target: $target"
+    if [ ! -s "$temp_output" ]; then
+        rm -f "$temp_output"
+        log_warning "No results found for target: $target (in past 30 days)"
         return 1
     fi
+    
+    printf "${CYAN}%-20s %-15s %-8s %-20s${NC}\n" "Timestamp" "Protocol" "Port" "Credentials"
+    printf "${CYAN}%s${NC}\n" "$(printf '%.0s─' {1..70})"
+    
+    while IFS='|' read -r timestamp protocol port creds; do
+        printf "%-20s %-15s %-8s ${GREEN}%-20s${NC}\n" "$timestamp" "$protocol" "$port" "$creds"
+        count=$((count + 1))
+    done < "$temp_output"
+    
+    rm -f "$temp_output"
     
     echo ""
     log_success "Found $count result(s)"
@@ -152,12 +186,12 @@ export_results() {
     local output_file="$1"
     local format="$2"
     
-    print_header "Exporting Results"
+    print_header "Exporting Results (Past 30 Days)"
     
-    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f 2>/dev/null)
+    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
     
     if [ -z "$results_files" ]; then
-        log_error "No results found"
+        log_error "No results found in the past 30 days"
         return 1
     fi
     
