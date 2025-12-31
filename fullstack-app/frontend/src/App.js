@@ -7,6 +7,9 @@ import Attacks from './pages/Attacks';
 import Targets from './pages/Targets';
 import Results from './pages/Results';
 import Wordlists from './pages/Wordlists';
+import ScriptGenerator from './pages/ScriptGenerator';
+import WordlistGenerator from './pages/WordlistGenerator';
+import TargetScanner from './pages/TargetScanner';
 import Layout from './components/Layout';
 import './App.css';
 
@@ -34,9 +37,12 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/attacks/*" element={<Attacks />} />
+                    <Route path="/script-generator" element={<ScriptGenerator />} />
                     <Route path="/targets" element={<Targets />} />
                     <Route path="/results" element={<Results />} />
                     <Route path="/wordlists" element={<Wordlists />} />
+                    <Route path="/wordlist-generator" element={<WordlistGenerator />} />
+                    <Route path="/scanner" element={<TargetScanner />} />
                   </Routes>
                 </Layout>
               </PrivateRoute>
