@@ -42,7 +42,7 @@ echo ""
 # Check if running on Termux
 if [ ! -d "/data/data/com.termux" ]; then
     print_message "⚠️  Warning: This tool is optimized for Termux on Android" "$YELLOW"
-    read -p "Continue anyway? (y/n): " continue_install
+    read -r -p "Continue anyway? (y/n): " continue_install
     if [ "$continue_install" != "y" ]; then
         exit 0
     fi
@@ -56,7 +56,7 @@ echo ""
 
 # Check if running in interactive mode
 if [ -t 0 ]; then
-    read -p "Are you using a VPN? (y/n): " vpn_status
+    read -r -p "Are you using a VPN? (y/n): " vpn_status
     if [ "$vpn_status" != "y" ]; then
         print_message "⚠️  Warning: Proceeding without VPN is not recommended!" "$RED"
         sleep 3
@@ -133,7 +133,15 @@ if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
     echo ""
     
     # Check if hydra failed (critical)
-    if [[ " ${FAILED_PACKAGES[@]} " =~ " hydra " ]]; then
+    hydra_failed=false
+    for pkg in "${FAILED_PACKAGES[@]}"; do
+        if [ "$pkg" = "hydra" ]; then
+            hydra_failed=true
+            break
+        fi
+    done
+    
+    if [ "$hydra_failed" = true ]; then
         print_message "🚨 CRITICAL: Hydra installation FAILED!" "$RED"
         echo ""
         print_message "Hydra is the CORE dependency. Without it, nothing will work." "$YELLOW"
@@ -207,8 +215,8 @@ else
     print_message "   ✗ Main launcher: Not found" "$RED"
 fi
 
-# Count attack scripts
-script_count=$(ls scripts/*_attack.sh 2>/dev/null | wc -l)
+# Count attack scripts  
+script_count=$(find scripts -name "*_attack.sh" -type f 2>/dev/null | wc -l)
 print_message "   ✓ Attack scripts: $script_count installed" "$GREEN"
 
 # Offer to download wordlists
@@ -217,7 +225,7 @@ print_message "📚 Wordlist Setup" "$CYAN"
 
 # Check if running in interactive mode
 if [ -t 0 ]; then
-    read -p "Download default wordlists now? (y/n): " download_wordlists
+    read -r -p "Download default wordlists now? (y/n): " download_wordlists
     if [ "$download_wordlists" = "y" ]; then
         print_message "   Downloading wordlists..." "$BLUE"
         bash scripts/download_wordlists.sh --all 2>/dev/null || print_message "   ⚠ Failed to download wordlists" "$YELLOW"
@@ -259,7 +267,6 @@ if [ "$HYDRA_OK" = true ]; then
     print_message "   • Keep Termux running in foreground" "$BLUE"
     echo ""
     exit 0
-    exit 0
 else
     print_message "╔═══════════════════════════════════════════════════════╗" "$RED"
     print_message "║     Installation Completed with ERRORS! ⚠️            ║" "$RED"
@@ -287,7 +294,3 @@ else
     echo ""
     exit 1
 fi
-print_message "   • Use WiFi for better performance" "$BLUE"
-print_message "   • Close other apps to free memory" "$BLUE"
-print_message "   • Keep Termux running in foreground" "$BLUE"
-echo ""

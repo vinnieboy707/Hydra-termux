@@ -53,7 +53,7 @@ echo "  5) System is slow / Out of memory"
 echo "  6) Not sure / Just run full diagnostics"
 echo "  7) Show me all available help tools"
 echo ""
-read -p "Enter your choice [1-7]: " problem_choice
+read -r -p "Enter your choice [1-7]: " problem_choice
 
 echo ""
 print_message "════════════════════════════════════════════════════════════" "$BLUE"

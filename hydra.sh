@@ -106,15 +106,15 @@ run_attack_script() {
     
     if [ ! -f "$SCRIPT_DIR/scripts/$script" ]; then
         log_error "Script not found: $script"
-        read -p "Press Enter to continue..."
+        read -r -p "Press Enter to continue..."
         return 1
     fi
     
-    read -p "Enter target IP/hostname: " target
+    read -r -p "Enter target IP/hostname: " target
     
     if [ -z "$target" ]; then
         log_error "Target is required"
-        read -p "Press Enter to continue..."
+        read -r -p "Press Enter to continue..."
         return 1
     fi
     
@@ -126,7 +126,7 @@ run_attack_script() {
     
     echo ""
     log_info "Attack completed. Check logs for results."
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to run utility script
@@ -139,14 +139,14 @@ run_utility() {
     
     if [ ! -f "$SCRIPT_DIR/scripts/$script" ]; then
         log_error "Script not found: $script"
-        read -p "Press Enter to continue..."
+        read -r -p "Press Enter to continue..."
         return 1
     fi
     
     bash "$SCRIPT_DIR/scripts/$script" "$@"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to view configuration
@@ -161,7 +161,7 @@ view_config() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to view logs
@@ -180,7 +180,7 @@ view_logs() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to export results
@@ -193,7 +193,7 @@ export_results() {
     echo "  2) CSV"
     echo "  3) JSON"
     echo ""
-    read -p "Enter choice [1-3]: " format_choice
+    read -r -p "Enter choice [1-3]: " format_choice
     
     local format="txt"
     case $format_choice in
@@ -202,7 +202,7 @@ export_results() {
         3) format="json" ;;
         *) 
             log_error "Invalid choice"
-            read -p "Press Enter to continue..."
+            read -r -p "Press Enter to continue..."
             return 1
             ;;
     esac
@@ -212,7 +212,7 @@ export_results() {
     bash "$SCRIPT_DIR/scripts/results_viewer.sh" --export "$output_file" --format "$format"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to update tool
@@ -242,7 +242,7 @@ update_tool() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to show help
@@ -272,7 +272,7 @@ show_help() {
     echo "  Examples: docs/EXAMPLES.md"
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to show about
@@ -303,7 +303,7 @@ show_about() {
     echo "The developers assume NO liability for misuse."
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Main program loop
@@ -355,7 +355,7 @@ main() {
         show_banner
         show_menu
         
-        read -p "Enter your choice [0-18]: " choice
+        read -r -p "Enter your choice [0-18]: " choice
         
         case $choice in
             1)

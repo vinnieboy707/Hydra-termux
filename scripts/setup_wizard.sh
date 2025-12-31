@@ -47,7 +47,7 @@ echo ""
 if command -v hydra &> /dev/null; then
     print_message "✅ Hydra is already installed!" "$GREEN"
     echo ""
-    read -p "Do you want to re-run setup anyway? (y/n): " rerun
+    read -r -p "Do you want to re-run setup anyway? (y/n): " rerun
     if [ "$rerun" != "y" ]; then
         print_message "Setup cancelled. Run ./hydra.sh to start using the tool." "$CYAN"
         exit 0
@@ -98,7 +98,7 @@ else
 fi
 
 echo ""
-read -p "Press Enter to continue to installation..."
+read -r -p "Press Enter to continue to installation..."
 clear
 
 # Step 2: Installation
@@ -109,7 +109,7 @@ if command -v hydra &> /dev/null; then
     print_message "✅ Hydra is already installed!" "$GREEN"
     hydra -h 2>&1 | head -1
     echo ""
-    read -p "Skip installation? (Y/n): " skip_install
+    read -r -p "Skip installation? (Y/n): " skip_install
     
     if [ "$skip_install" = "n" ] || [ "$skip_install" = "N" ]; then
         skip_install="no"
@@ -131,7 +131,7 @@ if [ "$skip_install" = "no" ]; then
     echo "  2) Run auto-fix script (tries multiple methods)"
     echo "  3) Manual installation (I'll do it myself)"
     echo ""
-    read -p "Enter choice [1-3]: " install_choice
+    read -r -p "Enter choice [1-3]: " install_choice
     
     case $install_choice in
         1)
@@ -159,7 +159,7 @@ if [ "$skip_install" = "no" ]; then
             fi
             
             echo ""
-            read -p "After installing manually, press Enter to continue..."
+            read -r -p "After installing manually, press Enter to continue..."
             ;;
         *)
             print_message "Invalid choice. Skipping installation." "$RED"
@@ -168,7 +168,7 @@ if [ "$skip_install" = "no" ]; then
 fi
 
 echo ""
-read -p "Press Enter to continue to verification..."
+read -r -p "Press Enter to continue to verification..."
 clear
 
 # Step 3: Verification
@@ -228,7 +228,7 @@ if command -v hydra &> /dev/null; then
     
     print_message "Ready to start? Launch now:" "$CYAN"
     echo ""
-    read -p "Run ./hydra.sh now? (Y/n): " run_now
+    read -r -p "Run ./hydra.sh now? (Y/n): " run_now
     
     if [ "$run_now" != "n" ] && [ "$run_now" != "N" ]; then
         echo ""

@@ -417,12 +417,21 @@ fi
 print_message "╔════════════════════════════════════════════════════════════╗" "$CYAN"
 print_message "║                    HEALTH REPORT                           ║" "$CYAN"
 print_message "╠════════════════════════════════════════════════════════════╣" "$CYAN"
+
+# Calculate padding safely to avoid negative values
+status_len=${#STATUS}
+if [ "$status_len" -gt 20 ]; then
+    status_padding=0
+else
+    status_padding=$((29 - status_len))
+fi
+
 printf "${CYAN}║${NC}  System Health Score: ${GRADE_COLOR}%3d/100 (Grade: %s - %s)${NC}%*s${CYAN}║${NC}\n" \
-    $HEALTH_SCORE "$GRADE" "$STATUS" $((29 - ${#STATUS})) ""
+    "$HEALTH_SCORE" "$GRADE" "$STATUS" "$status_padding" ""
 printf "${CYAN}║${NC}  Critical Issues:     ${RED}%-2d${NC}%*s${CYAN}║${NC}\n" \
-    $ISSUES_FOUND $((42)) ""
+    "$ISSUES_FOUND" 42 ""
 printf "${CYAN}║${NC}  Warnings:            ${YELLOW}%-2d${NC}%*s${CYAN}║${NC}\n" \
-    $WARNINGS_FOUND $((42)) ""
+    "$WARNINGS_FOUND" 42 ""
 print_message "╚════════════════════════════════════════════════════════════╝" "$CYAN"
 echo ""
 
