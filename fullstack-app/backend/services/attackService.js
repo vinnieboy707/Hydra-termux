@@ -11,7 +11,7 @@ class AttackService {
       this.scriptsPath,
       path.resolve(process.cwd(), 'scripts')
     ];
-    this.scriptBasePaths = [...new Set(this.scriptBasePaths)];
+    this.scriptBasePaths = [...new Set(this.scriptBasePaths.map(p => path.normalize(p)))];
     this.scriptCache = new Map();
   }
 
