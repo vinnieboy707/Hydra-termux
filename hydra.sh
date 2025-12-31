@@ -313,6 +313,43 @@ main() {
         log_warning "This tool is optimized for Termux on Android"
     fi
     
+    # Check critical dependencies before starting
+    if ! command -v hydra &> /dev/null; then
+        clear
+        show_banner
+        echo ""
+        log_error "CRITICAL: Hydra is not installed!"
+        echo ""
+        print_message "═══ PROBLEM ═══" "$RED"
+        echo "Hydra is the CORE brute-force tool that all attacks depend on."
+        echo "Without hydra installed, NO attacks will work."
+        echo ""
+        print_message "═══ HOW TO FIX ═══" "$CYAN"
+        echo ""
+        
+        if [ -d "/data/data/com.termux" ]; then
+            print_message "On Termux, install hydra with:" "$BLUE"
+            print_message "  pkg update && pkg install hydra -y" "$GREEN"
+        else
+            print_message "Install hydra:" "$BLUE"
+            print_message "  Debian/Ubuntu: sudo apt install hydra -y" "$GREEN"
+            print_message "  Fedora/RHEL: sudo dnf install hydra -y" "$GREEN"
+            print_message "  Arch Linux: sudo pacman -S hydra" "$GREEN"
+            print_message "  macOS: brew install hydra" "$GREEN"
+        fi
+        
+        echo ""
+        print_message "Or run the automated installer:" "$BLUE"
+        print_message "  bash install.sh" "$GREEN"
+        echo ""
+        print_message "After installing, run dependency check:" "$BLUE"
+        print_message "  bash scripts/check_dependencies.sh" "$GREEN"
+        echo ""
+        print_message "════════════════════════════════════════════════════════════" "$BLUE"
+        echo ""
+        exit 1
+    fi
+    
     # Main menu loop
     while true; do
         show_banner
