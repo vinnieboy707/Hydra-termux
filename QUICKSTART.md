@@ -1,5 +1,15 @@
 # Hydra-termux Quick Start Guide
 
+## 🆘 **HAVING PROBLEMS? RUN THIS FIRST:**
+
+```bash
+./fix-hydra.sh
+```
+
+This ONE command diagnoses and fixes 99% of issues automatically!
+
+---
+
 ## ⚠️ REAL ATTACKS ONLY - NO MOCK DATA
 
 **These scripts execute REAL Hydra attacks with REAL network connections and produce REAL, usable credentials.**
@@ -15,6 +25,20 @@
 
 ## 🚀 5-Minute Quick Start
 
+### Step 0: If Anything Goes Wrong (30 seconds)
+
+**Use the interactive help system:**
+```bash
+./fix-hydra.sh
+# or
+bash scripts/help.sh
+```
+
+**Run system diagnostics:**
+```bash
+bash scripts/system_diagnostics.sh
+```
+
 ### Step 1: Install on Termux (2 minutes)
 ```bash
 # On your Android device, open Termux
@@ -24,6 +48,11 @@ pkg install git -y
 git clone https://github.com/vinnieboy707/Hydra-termux
 cd Hydra-termux
 bash install.sh
+```
+
+**If installation fails:**
+```bash
+bash scripts/auto_fix.sh  # Auto-repairs installation
 ```
 
 ### Step 2: Choose Your Attack (30 seconds)
@@ -343,35 +372,85 @@ Unauthorized access = Federal crime = Prison time
 
 ---
 
-## 🆘 Troubleshooting
+## 🆘 Troubleshooting - NEW DIAGNOSTIC TOOLS!
 
-| Problem | Solution |
-|---------|----------|
-| "VPN not detected" | Run: `bash scripts/vpn_check.sh` or add `--skip-vpn` |
-| "Hydra not found" | Run: `bash install.sh` |
-| "Permission denied" | Run: `chmod +x Library/*.sh scripts/*.sh` |
-| "No results" | Try: Bigger wordlist, fewer threads, add delay |
-| Script won't run | Check: VPN, target reachable, syntax errors |
+### 🎯 Quick Diagnosis & Fix
+
+**ONE COMMAND to fix everything:**
+```bash
+./fix-hydra.sh
+```
+
+**Interactive help center:**
+```bash
+bash scripts/help.sh
+```
+
+**System health check (A-F grade):**
+```bash
+bash scripts/system_diagnostics.sh
+```
+
+**Auto-repair tool:**
+```bash
+bash scripts/auto_fix.sh
+```
+
+**Quick dependency check:**
+```bash
+bash scripts/check_dependencies.sh
+```
+
+### Common Problems & Solutions
+
+| Problem | Quick Solution | Detailed Solution |
+|---------|---------------|-------------------|
+| "Hydra not found" | `./fix-hydra.sh` → option 1 | `bash scripts/auto_fix.sh` |
+| "Permission denied" | `./fix-hydra.sh` → option 2 | `chmod +x *.sh scripts/*.sh` |
+| "VPN not detected" | Add `--skip-vpn` flag | `bash scripts/vpn_check.sh` |
+| "No results" | Run diagnostics | `bash scripts/system_diagnostics.sh` |
+| Script won't run | Check permissions | `./fix-hydra.sh` |
+| Installation failed | Auto-fix | `bash scripts/auto_fix.sh` |
+| Unknown issue | Interactive help | `bash scripts/help.sh` |
+
+### 📚 Complete Troubleshooting Guide
+
+For detailed solutions to any problem:
+```bash
+cat docs/TROUBLESHOOTING.md
+# 10,000+ word comprehensive guide!
+```
 
 ---
 
 ## 💡 Pro Tips
 
 1. **Start VPN first**: Always connect before attacking
-2. **Use small wordlists first**: Test with 100 passwords before trying 14M
-3. **Reduce threads for stealth**: `-T 4` instead of `-T 32`
-4. **Check results often**: `bash scripts/results_viewer.sh`
-5. **Save your target lists**: Reuse `targets.txt` files
-6. **Generate custom wordlists**: `bash scripts/wordlist_generator.sh`
-7. **Combine protocols**: Use `combo_*` scripts for complete audits
+2. **Use diagnostic tools**: Run `./fix-hydra.sh` if anything fails
+3. **Check system health**: `bash scripts/system_diagnostics.sh` before major attacks
+4. **Use small wordlists first**: Test with 100 passwords before trying 14M
+5. **Reduce threads for stealth**: `-T 4` instead of `-T 32`
+6. **Check results often**: `bash scripts/results_viewer.sh`
+7. **Save your target lists**: Reuse `targets.txt` files
+8. **Generate custom wordlists**: `bash scripts/wordlist_generator.sh`
+9. **Combine protocols**: Use `combo_*` scripts for complete audits
+10. **Run first-time setup**: `bash scripts/setup_wizard.sh` for guided installation
 
 ---
 
 ## 📞 Need Help?
 
+### New Diagnostic Tools (Start Here!)
+1. **Interactive help**: `./fix-hydra.sh` or `bash scripts/help.sh`
+2. **System diagnostics**: `bash scripts/system_diagnostics.sh`
+3. **Auto-repair**: `bash scripts/auto_fix.sh`
+4. **Setup wizard**: `bash scripts/setup_wizard.sh`
+
+### Documentation
 1. **Help flag**: `bash script.sh --help`
-2. **Full tutorial**: `docs/STEP_BY_STEP_TUTORIAL.md`
-3. **Protocol guide**: `Library/PROTOCOL_GUIDE.md`
+2. **Full troubleshooting**: `docs/TROUBLESHOOTING.md` (10,000+ words!)
+3. **Full tutorial**: `docs/STEP_BY_STEP_TUTORIAL.md`
+4. **Protocol guide**: `Library/PROTOCOL_GUIDE.md`
 4. **Usage docs**: `docs/USAGE.md`
 5. **Examples**: `docs/EXAMPLES.md`
 

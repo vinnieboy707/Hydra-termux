@@ -106,15 +106,15 @@ run_attack_script() {
     
     if [ ! -f "$SCRIPT_DIR/scripts/$script" ]; then
         log_error "Script not found: $script"
-        read -p "Press Enter to continue..."
+        read -r -p "Press Enter to continue..."
         return 1
     fi
     
-    read -p "Enter target IP/hostname: " target
+    read -r -p "Enter target IP/hostname: " target
     
     if [ -z "$target" ]; then
         log_error "Target is required"
-        read -p "Press Enter to continue..."
+        read -r -p "Press Enter to continue..."
         return 1
     fi
     
@@ -126,7 +126,7 @@ run_attack_script() {
     
     echo ""
     log_info "Attack completed. Check logs for results."
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to run utility script
@@ -139,14 +139,14 @@ run_utility() {
     
     if [ ! -f "$SCRIPT_DIR/scripts/$script" ]; then
         log_error "Script not found: $script"
-        read -p "Press Enter to continue..."
+        read -r -p "Press Enter to continue..."
         return 1
     fi
     
     bash "$SCRIPT_DIR/scripts/$script" "$@"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to view configuration
@@ -161,7 +161,7 @@ view_config() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to view logs
@@ -169,7 +169,8 @@ view_logs() {
     print_banner "Recent Logs"
     echo ""
     
-    local log_file="$SCRIPT_DIR/logs/hydra_$(date +%Y%m%d).log"
+    local log_file
+    log_file="$SCRIPT_DIR/logs/hydra_$(date +%Y%m%d).log"
     
     if [ -f "$log_file" ]; then
         log_info "Showing last 50 lines..."
@@ -180,7 +181,7 @@ view_logs() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to export results
@@ -193,7 +194,7 @@ export_results() {
     echo "  2) CSV"
     echo "  3) JSON"
     echo ""
-    read -p "Enter choice [1-3]: " format_choice
+    read -r -p "Enter choice [1-3]: " format_choice
     
     local format="txt"
     case $format_choice in
@@ -202,17 +203,18 @@ export_results() {
         3) format="json" ;;
         *) 
             log_error "Invalid choice"
-            read -p "Press Enter to continue..."
+            read -r -p "Press Enter to continue..."
             return 1
             ;;
     esac
     
-    local output_file="$SCRIPT_DIR/results/export_$(date +%Y%m%d_%H%M%S).$format"
+    local output_file
+    output_file="$SCRIPT_DIR/results/export_$(date +%Y%m%d_%H%M%S).$format"
     
     bash "$SCRIPT_DIR/scripts/results_viewer.sh" --export "$output_file" --format "$format"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to update tool
@@ -222,13 +224,15 @@ update_tool() {
     
     log_info "Checking for updates..."
     
-    cd "$SCRIPT_DIR"
+    cd "$SCRIPT_DIR" || return
     
     if [ -d ".git" ]; then
         git fetch origin
         
-        local local_hash=$(git rev-parse HEAD)
-        local remote_hash=$(git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
+        local local_hash
+        local remote_hash
+        local_hash=$(git rev-parse HEAD)
+        remote_hash=$(git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
         
         if [ "$local_hash" = "$remote_hash" ]; then
             log_success "Already up to date!"
@@ -242,7 +246,7 @@ update_tool() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to show help
@@ -272,7 +276,7 @@ show_help() {
     echo "  Examples: docs/EXAMPLES.md"
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to show about
@@ -303,7 +307,7 @@ show_about() {
     echo "The developers assume NO liability for misuse."
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Main program loop
@@ -313,12 +317,49 @@ main() {
         log_warning "This tool is optimized for Termux on Android"
     fi
     
+    # Check critical dependencies before starting
+    if ! command -v hydra &> /dev/null; then
+        clear
+        show_banner
+        echo ""
+        log_error "CRITICAL: Hydra is not installed!"
+        echo ""
+        print_message "═══ PROBLEM ═══" "$RED"
+        echo "Hydra is the CORE brute-force tool that all attacks depend on."
+        echo "Without hydra installed, NO attacks will work."
+        echo ""
+        print_message "═══ HOW TO FIX ═══" "$CYAN"
+        echo ""
+        
+        if [ -d "/data/data/com.termux" ]; then
+            print_message "On Termux, install hydra with:" "$BLUE"
+            print_message "  pkg update && pkg install hydra -y" "$GREEN"
+        else
+            print_message "Install hydra:" "$BLUE"
+            print_message "  Debian/Ubuntu: sudo apt install hydra -y" "$GREEN"
+            print_message "  Fedora/RHEL: sudo dnf install hydra -y" "$GREEN"
+            print_message "  Arch Linux: sudo pacman -S hydra" "$GREEN"
+            print_message "  macOS: brew install hydra" "$GREEN"
+        fi
+        
+        echo ""
+        print_message "Or run the automated installer:" "$BLUE"
+        print_message "  bash install.sh" "$GREEN"
+        echo ""
+        print_message "After installing, run dependency check:" "$BLUE"
+        print_message "  bash scripts/check_dependencies.sh" "$GREEN"
+        echo ""
+        print_message "════════════════════════════════════════════════════════════" "$BLUE"
+        echo ""
+        exit 1
+    fi
+    
     # Main menu loop
     while true; do
         show_banner
         show_menu
         
-        read -p "Enter your choice [0-18]: " choice
+        read -r -p "Enter your choice [0-18]: " choice
         
         case $choice in
             1)

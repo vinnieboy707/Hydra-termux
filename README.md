@@ -17,6 +17,28 @@
 
 ---
 
+## 🆘 **HAVING PROBLEMS? RUN THIS FIRST:**
+
+```bash
+# One command to diagnose and fix 99% of issues:
+./fix-hydra.sh
+```
+
+This interactive tool will:
+- ✅ Identify what's wrong with your installation
+- ✅ Automatically fix common issues (like missing hydra)
+- ✅ Provide step-by-step solutions for your specific problem
+- ✅ Guide you to working setup in minutes
+
+**Alternative diagnostic commands:**
+```bash
+bash scripts/system_diagnostics.sh   # Full health check with A-F grade
+bash scripts/auto_fix.sh             # Auto-install hydra
+bash scripts/check_dependencies.sh    # Quick dependency check
+```
+
+---
+
 ## ⚠️ **100% REAL ATTACKS - NO MOCK DATA**
 
 **All scripts execute REAL Hydra commands and produce REAL, usable results:**
@@ -113,7 +135,28 @@ Before you begin, ensure you have:
 
 ## 🚀 Quick Installation
 
-Just run these commands in Termux:
+### 🎯 Method 1: Setup Wizard (Recommended for Beginners)
+
+**The easiest way! Interactive guide through setup:**
+
+```bash
+# Clone the repository
+git clone https://github.com/vinnieboy707/Hydra-termux.git
+cd Hydra-termux
+
+# Run the setup wizard (guides you through everything)
+bash scripts/setup_wizard.sh
+```
+
+The wizard will:
+- ✅ Check your system compatibility
+- ✅ Install hydra and dependencies automatically
+- ✅ Verify everything is working
+- ✅ Guide you to your first attack
+
+### 🔧 Method 2: Automatic Installation
+
+**Fast automated setup:**
 
 ```bash
 # Clone the repository
@@ -131,6 +174,21 @@ The installer will:
 - ✓ Set permissions automatically
 - ✓ Optionally download wordlists
 - ✓ Verify installation
+
+### 🆘 Installation Problems?
+
+**If installation fails or hydra doesn't work:**
+
+```bash
+# Try automatic repair:
+bash scripts/auto_fix.sh
+
+# Or run diagnostics to see what's wrong:
+bash scripts/system_diagnostics.sh
+
+# Or check what's missing:
+bash scripts/check_dependencies.sh
+```
 
 ## 📦 Manual Installation
 
@@ -382,14 +440,114 @@ Hydra supports these protocols through the attack scripts:
 
 ## 🔍 Troubleshooting
 
+### 🚨 **HYDRA NOT WORKING? RUN THIS ONE COMMAND:**
+
+```bash
+./fix-hydra.sh
+```
+
+This interactive help tool will:
+- Diagnose your specific issue
+- Provide tailored solutions
+- Auto-fix common problems
+- Guide you step-by-step
+
+**Or use specific diagnostic tools:**
+
+```bash
+# Full system health check (recommended):
+bash scripts/system_diagnostics.sh
+
+# Automatic hydra installation:
+bash scripts/auto_fix.sh
+
+# Quick dependency check:
+bash scripts/check_dependencies.sh
+
+# Interactive help center:
+bash scripts/help.sh
+```
+
+### ❌ **"Command not found: hydra"** (CRITICAL)
+
+This is the **#1 most common issue**. Without hydra, **NOTHING will work**.
+
+**Fastest Fix:**
+```bash
+./fix-hydra.sh
+# Select option 1 when prompted
+```
+
+**Manual Fix:**
+```bash
+# On Termux:
+pkg update && pkg install hydra -y
+
+# On Debian/Ubuntu:
+sudo apt update && sudo apt install hydra -y
+
+# Or use automatic fixer:
+bash scripts/auto_fix.sh
+```
+
+**Verify it worked:**
+```bash
+hydra -h
+# Should show hydra help message
+```
+
+**Still not working?** See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for detailed solutions.
+
+### 🔧 **Quick Fixes for Common Issues**
+
+| Problem | Quick Fix |
+|---------|-----------|
+| "Permission denied" | `chmod +x hydra.sh install.sh scripts/*.sh` |
+| "Package not found" | `pkg update && pkg upgrade` |
+| Scripts won't run | `cd Hydra-termux` (ensure you're in project directory) |
+| No results showing | `cat logs/hydra_$(date +%Y%m%d).log` |
+| Out of memory | Close other apps, use `-T 4` (fewer threads) |
+| "jq: not found" | `pkg install jq -y` (required for results) |
+| Very slow | Use WiFi, reduce threads: `-T 8` |
+
+### 🆘 **Still Having Issues?**
+
+**Run these diagnostic commands in order:**
+
+1. **System Health Check:**
+   ```bash
+   bash scripts/system_diagnostics.sh
+   ```
+   Shows detailed system status with health score
+
+2. **Automatic Repair:**
+   ```bash
+   bash scripts/auto_fix.sh
+   ```
+   Attempts to automatically install hydra
+
+3. **Dependency Check:**
+   ```bash
+   bash scripts/check_dependencies.sh
+   ```
+   Lists what's missing with installation instructions
+
+4. **Read Full Guide:**
+   ```bash
+   cat docs/TROUBLESHOOTING.md
+   # Or open in browser/editor
+   ```
+
+### 📚 **Detailed Troubleshooting Documentation**
+
+For comprehensive troubleshooting, see:
+- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - Complete troubleshooting guide
+- **[docs/TERMUX_DEPLOYMENT.md](docs/TERMUX_DEPLOYMENT.md)** - Termux-specific issues
+- **[GitHub Issues](https://github.com/vinnieboy707/Hydra-termux/issues)** - Community help
+
 ### "Permission denied" error
 ```bash
 chmod +x hydra.sh install.sh scripts/*.sh
-```
-
-### "Command not found: hydra"
-```bash
-pkg install hydra -y
 ```
 
 ### "Package not found" error
