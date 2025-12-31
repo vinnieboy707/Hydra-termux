@@ -17,6 +17,28 @@
 
 ---
 
+## 🆘 **HAVING PROBLEMS? RUN THIS FIRST:**
+
+```bash
+# One command to diagnose and fix 99% of issues:
+./fix-hydra.sh
+```
+
+This interactive tool will:
+- ✅ Identify what's wrong with your installation
+- ✅ Automatically fix common issues (like missing hydra)
+- ✅ Provide step-by-step solutions for your specific problem
+- ✅ Guide you to working setup in minutes
+
+**Alternative diagnostic commands:**
+```bash
+bash scripts/system_diagnostics.sh   # Full health check with A-F grade
+bash scripts/auto_fix.sh             # Auto-install hydra
+bash scripts/check_dependencies.sh    # Quick dependency check
+```
+
+---
+
 ## ⚠️ **100% REAL ATTACKS - NO MOCK DATA**
 
 **All scripts execute REAL Hydra commands and produce REAL, usable results:**
@@ -418,26 +440,45 @@ Hydra supports these protocols through the attack scripts:
 
 ## 🔍 Troubleshooting
 
-### 🚨 **HYDRA NOT WORKING? START HERE!**
-
-**Most common issue: Hydra is not installed**
+### 🚨 **HYDRA NOT WORKING? RUN THIS ONE COMMAND:**
 
 ```bash
-# Quick diagnosis - run this first:
+./fix-hydra.sh
+```
+
+This interactive help tool will:
+- Diagnose your specific issue
+- Provide tailored solutions
+- Auto-fix common problems
+- Guide you step-by-step
+
+**Or use specific diagnostic tools:**
+
+```bash
+# Full system health check (recommended):
 bash scripts/system_diagnostics.sh
 
-# Automatic fix - tries to install hydra:
+# Automatic hydra installation:
 bash scripts/auto_fix.sh
 
-# Manual check:
+# Quick dependency check:
 bash scripts/check_dependencies.sh
+
+# Interactive help center:
+bash scripts/help.sh
 ```
 
 ### ❌ **"Command not found: hydra"** (CRITICAL)
 
 This is the **#1 most common issue**. Without hydra, **NOTHING will work**.
 
-**Quick Fix:**
+**Fastest Fix:**
+```bash
+./fix-hydra.sh
+# Select option 1 when prompted
+```
+
+**Manual Fix:**
 ```bash
 # On Termux:
 pkg update && pkg install hydra -y
