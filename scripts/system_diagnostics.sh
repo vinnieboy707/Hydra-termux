@@ -365,7 +365,7 @@ fi
 
 # Check git status (if git repo)
 if [ -d "$PROJECT_ROOT/.git" ]; then
-    cd "$PROJECT_ROOT"
+    cd "$PROJECT_ROOT" || log_warning "Could not change to project root"
     
     # Check for uncommitted changes
     if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
@@ -375,7 +375,7 @@ if [ -d "$PROJECT_ROOT/.git" ]; then
     # Check if on latest version
     git fetch --quiet 2>/dev/null || true
     LOCAL=$(git rev-parse @ 2>/dev/null)
-    REMOTE=$(git rev-parse @{u} 2>/dev/null)
+    REMOTE=$(git rev-parse '@{u}' 2>/dev/null)
     
     if [ "$LOCAL" = "$REMOTE" ]; then
         log_ok "Git: Up to date"

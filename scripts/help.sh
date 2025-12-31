@@ -97,19 +97,35 @@ case $problem_choice in
         SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
         PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
         
-        cd "$PROJECT_ROOT"
+        cd "$PROJECT_ROOT" || { print_message "❌ Failed to change directory" "$RED"; return; }
         
         print_message "  • Making hydra.sh executable..." "$BLUE"
-        chmod +x hydra.sh 2>/dev/null && print_message "    ✅ Done" "$GREEN" || print_message "    ❌ Failed" "$RED"
+        if chmod +x hydra.sh 2>/dev/null; then
+            print_message "    ✅ Done" "$GREEN"
+        else
+            print_message "    ❌ Failed" "$RED"
+        fi
         
         print_message "  • Making install.sh executable..." "$BLUE"
-        chmod +x install.sh 2>/dev/null && print_message "    ✅ Done" "$GREEN" || print_message "    ❌ Failed" "$RED"
+        if chmod +x install.sh 2>/dev/null; then
+            print_message "    ✅ Done" "$GREEN"
+        else
+            print_message "    ❌ Failed" "$RED"
+        fi
         
         print_message "  • Making all scripts executable..." "$BLUE"
-        chmod +x scripts/*.sh 2>/dev/null && print_message "    ✅ Done" "$GREEN" || print_message "    ❌ Failed" "$RED"
+        if chmod +x scripts/*.sh 2>/dev/null; then
+            print_message "    ✅ Done" "$GREEN"
+        else
+            print_message "    ❌ Failed" "$RED"
+        fi
         
         print_message "  • Making Library scripts executable..." "$BLUE"
-        chmod +x Library/*.sh 2>/dev/null && print_message "    ✅ Done" "$GREEN" || print_message "    ❌ Failed" "$RED"
+        if chmod +x Library/*.sh 2>/dev/null; then
+            print_message "    ✅ Done" "$GREEN"
+        else
+            print_message "    ❌ Failed" "$RED"
+        fi
         
         echo ""
         print_message "✅ Permissions fixed!" "$GREEN"

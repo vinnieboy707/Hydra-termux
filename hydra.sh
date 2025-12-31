@@ -169,7 +169,8 @@ view_logs() {
     print_banner "Recent Logs"
     echo ""
     
-    local log_file="$SCRIPT_DIR/logs/hydra_$(date +%Y%m%d).log"
+    local log_file
+    log_file="$SCRIPT_DIR/logs/hydra_$(date +%Y%m%d).log"
     
     if [ -f "$log_file" ]; then
         log_info "Showing last 50 lines..."
@@ -207,7 +208,8 @@ export_results() {
             ;;
     esac
     
-    local output_file="$SCRIPT_DIR/results/export_$(date +%Y%m%d_%H%M%S).$format"
+    local output_file
+    output_file="$SCRIPT_DIR/results/export_$(date +%Y%m%d_%H%M%S).$format"
     
     bash "$SCRIPT_DIR/scripts/results_viewer.sh" --export "$output_file" --format "$format"
     
@@ -222,13 +224,15 @@ update_tool() {
     
     log_info "Checking for updates..."
     
-    cd "$SCRIPT_DIR"
+    cd "$SCRIPT_DIR" || return
     
     if [ -d ".git" ]; then
         git fetch origin
         
-        local local_hash=$(git rev-parse HEAD)
-        local remote_hash=$(git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
+        local local_hash
+        local remote_hash
+        local_hash=$(git rev-parse HEAD)
+        remote_hash=$(git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
         
         if [ "$local_hash" = "$remote_hash" ]; then
             log_success "Already up to date!"

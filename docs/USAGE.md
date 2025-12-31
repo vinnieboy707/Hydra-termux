@@ -2,27 +2,52 @@
 
 Complete guide for using Hydra-Termux Ultimate Edition.
 
+## 🆘 **HAVING PROBLEMS?**
+
+**Run this first:**
+```bash
+./fix-hydra.sh
+```
+
+One command to diagnose and fix 99% of issues!
+
+---
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
+- [Diagnostic Tools](#diagnostic-tools-new)
 - [Attack Scripts](#attack-scripts)
 - [Utility Scripts](#utility-scripts)
 - [Configuration](#configuration)
 - [Advanced Usage](#advanced-usage)
 - [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
 
 ## Getting Started
 
-### First Run
+### First-Time Setup
 
-After installation, start the tool:
+**Option 1: Interactive Setup Wizard (Recommended)**
+```bash
+bash scripts/setup_wizard.sh
+```
+Guides you through complete setup step-by-step.
 
+**Option 2: Manual Start**
 ```bash
 cd Hydra-termux
 ./hydra.sh
 ```
 
-You'll see an interactive menu with 18 options.
+### Verify Installation
+
+**Check if everything is working:**
+```bash
+bash scripts/system_diagnostics.sh
+```
+
+Shows system health score (A-F) and identifies any issues.
 
 ### Download Wordlists
 
@@ -35,6 +60,94 @@ Before running attacks, download wordlists:
    ```
 
 This downloads common password lists from SecLists.
+
+---
+
+## Diagnostic Tools (NEW!)
+
+### 1. fix-hydra.sh - One-Command Fix
+
+**Fastest way to solve any problem:**
+```bash
+./fix-hydra.sh
+```
+
+Interactive menu helps you:
+- Auto-install hydra
+- Fix permissions
+- Run diagnostics
+- View troubleshooting
+
+### 2. help.sh - Interactive Help Center
+
+**Get problem-specific solutions:**
+```bash
+bash scripts/help.sh
+```
+
+Choose your issue from menu:
+1. Hydra not installed
+2. Scripts won't run
+3. Attacks fail
+4. Installation problems
+5. Performance issues
+6. Run full diagnostics
+7. Show all help tools
+
+### 3. system_diagnostics.sh - Health Check
+
+**Comprehensive system analysis:**
+```bash
+bash scripts/system_diagnostics.sh
+```
+
+Provides:
+- Health score (0-100, A-F grade)
+- Detailed issue detection
+- Specific recommendations
+- Performance analysis
+- Security assessment
+
+### 4. auto_fix.sh - Automatic Repair
+
+**Tries 5 different methods to install hydra:**
+```bash
+bash scripts/auto_fix.sh
+```
+
+Attempts:
+1. Package manager installation
+2. Alternative package names
+3. Source compilation
+4. Pre-built binaries
+5. Manual troubleshooting
+
+### 5. check_dependencies.sh - Quick Check
+
+**Fast dependency verification:**
+```bash
+bash scripts/check_dependencies.sh
+```
+
+Lists:
+- ✅ Installed tools
+- ❌ Missing required tools
+- ⚠️ Missing optional tools
+- 🔧 How to fix each issue
+
+### 6. setup_wizard.sh - Guided Setup
+
+**Interactive first-time installation:**
+```bash
+bash scripts/setup_wizard.sh
+```
+
+Steps:
+1. System compatibility check
+2. Automatic installation
+3. Verification & testing
+
+---
 
 ## Attack Scripts
 
@@ -530,3 +643,49 @@ See main README.md troubleshooting section.
 - [EXAMPLES.md](EXAMPLES.md) - Real-world examples
 - [README.md](../README.md) - Main documentation
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - Contributing guide
+
+
+---
+
+## Troubleshooting
+
+### Quick Diagnostic Commands
+
+**Having any issues? Start here:**
+
+```bash
+# ONE command to fix most issues:
+./fix-hydra.sh
+
+# Full system health check:
+bash scripts/system_diagnostics.sh
+
+# Auto-repair installation:
+bash scripts/auto_fix.sh
+
+# Interactive help:
+bash scripts/help.sh
+
+# Quick dependency check:
+bash scripts/check_dependencies.sh
+```
+
+### Common Issues
+
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed solutions to:
+- Hydra not installed
+- Permission errors
+- Installation failures
+- Attack failures
+- Performance issues
+- Network connectivity
+- And much more...
+
+### Getting Help
+
+1. Run `./fix-hydra.sh` - solves 99% of issues
+2. Read `docs/TROUBLESHOOTING.md` - comprehensive 10,000+ word guide
+3. Open GitHub issue with diagnostic output
+
+---
+

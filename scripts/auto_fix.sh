@@ -9,7 +9,6 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
-MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Function to print colored messages
@@ -191,18 +190,18 @@ print_message "📥 Cloning THC-Hydra from GitHub..." "$BLUE"
 # Create temporary directory
 TEMP_DIR="/tmp/hydra-build-$$"
 mkdir -p "$TEMP_DIR"
-cd "$TEMP_DIR"
+cd "$TEMP_DIR" || exit 1
 
 if git clone https://github.com/vanhauser-thc/thc-hydra.git 2>&1 | grep -i "Cloning\|Receiving\|done"; then
     echo ""
-    cd thc-hydra
+    cd thc-hydra || exit 1
     
     print_message "🔧 Configuring build..." "$BLUE"
     if ./configure 2>&1 | grep -i "checking\|found" | tail -10; then
         echo ""
         print_message "🔨 Compiling (this may take 2-5 minutes)..." "$BLUE"
         
-        if make -j$(nproc 2>/dev/null || echo 2) 2>&1 | grep -i "CC\|LD\|built"; then
+        if make -j"$(nproc 2>/dev/null || echo 2)" 2>&1 | grep -i "CC\|LD\|built"; then
             echo ""
             print_message "📦 Installing hydra..." "$BLUE"
             
