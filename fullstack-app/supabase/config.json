@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "attack-webhook": {
+      "verify_jwt": false
+    },
+    "cleanup-sessions": {
+      "verify_jwt": false  
+    },
+    "send-notification": {
+      "verify_jwt": false
+    }
+  }
+}
