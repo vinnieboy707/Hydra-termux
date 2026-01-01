@@ -15,6 +15,25 @@ CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
+# Function to generate secure JWT secret
+generate_jwt_secret() {
+    local secret
+    if secret=$(openssl rand -hex 32 2>/dev/null); then
+        echo "$secret"
+    elif command -v node &> /dev/null; then
+        secret=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))" 2>/dev/null)
+        if [ -n "$secret" ]; then
+            echo "$secret"
+        else
+            log_error "Failed to generate JWT secret with Node.js crypto"
+            return 1
+        fi
+    else
+        log_error "Cannot generate JWT secret - neither openssl nor node available"
+        return 1
+    fi
+}
+
 # Logging functions
 log_info() {
     echo -e "${CYAN}[INFO]${NC} $1"
@@ -117,7 +136,9 @@ else
     # Try to build from source
     if [ ! -d "/tmp/thc-hydra" ]; then
         log_info "Cloning THC-Hydra from source..."
-        git clone https://github.com/vanhauser-thc/thc-hydra /tmp/thc-hydra || true
+        if ! git clone https://github.com/vanhauser-thc/thc-hydra /tmp/thc-hydra 2>&1; then
+            log_error "Failed to clone Hydra repository"
+        fi
     fi
     
     if [ -d "/tmp/thc-hydra" ]; then
@@ -126,8 +147,17 @@ else
         sudo apt-get install -y libssl-dev libssh-dev libidn11-dev libpcre3-dev \
              libgtk2.0-dev libmysqlclient-dev libpq-dev libsvn-dev \
              firebird-dev libmemcached-dev libgpg-error-dev \
-             libgcrypt20-dev libgcrypt11-dev 2>/dev/null || true
-        ./configure && make && sudo make install || log_warning "Source build failed"
+             libgcrypt20-dev libgcrypt11-dev 2>/dev/null || log_warning "Some build dependencies failed to install"
+        
+        if ! ./configure; then
+            log_error "Hydra configure failed"
+        elif ! make; then
+            log_error "Hydra build failed"
+        elif ! sudo make install; then
+            log_error "Hydra installation failed"
+        else
+            log_success "Hydra built and installed from source"
+        fi
         cd -
     fi
 fi
@@ -182,11 +212,29 @@ done
 # Set script permissions
 log_section "Setting Script Permissions"
 log_info "Making scripts executable..."
-chmod +x hydra.sh 2>/dev/null && log_success "hydra.sh is executable"
-chmod +x install.sh 2>/dev/null && log_success "install.sh is executable"
-chmod +x fix-hydra.sh 2>/dev/null && log_success "fix-hydra.sh is executable"
-chmod +x scripts/*.sh 2>/dev/null && log_success "All scripts in scripts/ are executable"
-chmod +x Library/*.sh 2>/dev/null && log_success "All quick scripts in Library/ are executable"
+
+# Check and set permissions for main scripts
+for script in hydra.sh install.sh fix-hydra.sh; do
+    if [ -f "$script" ]; then
+        chmod +x "$script" && log_success "$script is executable"
+    else
+        log_warning "$script not found"
+    fi
+done
+
+# Set permissions for scripts directory
+if [ -d "scripts" ]; then
+    chmod +x scripts/*.sh 2>/dev/null && log_success "All scripts in scripts/ are executable" || log_warning "No shell scripts found in scripts/"
+else
+    log_warning "scripts/ directory not found"
+fi
+
+# Set permissions for Library directory
+if [ -d "Library" ]; then
+    chmod +x Library/*.sh 2>/dev/null && log_success "All quick scripts in Library/ are executable" || log_warning "No shell scripts found in Library/"
+else
+    log_warning "Library/ directory not found"
+fi
 
 # Setup Full-Stack Application
 log_section "Full-Stack Application Setup"
@@ -211,7 +259,12 @@ if [ -d "fullstack-app/backend" ]; then
         if [ -f ".env.example" ]; then
             cp .env.example .env
             # Generate a secure JWT secret
-            JWT_SECRET=$(openssl rand -hex 32 2>/dev/null || node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+            JWT_SECRET=$(generate_jwt_secret)
+            if [ -z "$JWT_SECRET" ]; then
+                log_error "Failed to generate JWT secret"
+                cd ../..
+                exit 1
+            fi
             # Update the JWT_SECRET in the file
             if grep -q "JWT_SECRET=" .env; then
                 sed -i "s|JWT_SECRET=.*|JWT_SECRET=${JWT_SECRET}|g" .env
@@ -238,7 +291,12 @@ CONFIG_PATH=../../config
 TOTP_ISSUER=Hydra-Termux
 ENV_EOF
             # Generate a secure JWT secret
-            JWT_SECRET=$(openssl rand -hex 32 2>/dev/null || node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+            JWT_SECRET=$(generate_jwt_secret)
+            if [ -z "$JWT_SECRET" ]; then
+                log_error "Failed to generate JWT secret"
+                cd ../..
+                exit 1
+            fi
             echo "JWT_SECRET=${JWT_SECRET}" >> .env
             log_success "Backend .env created with generated JWT secret"
         fi
