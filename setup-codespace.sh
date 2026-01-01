@@ -208,7 +208,19 @@ if [ -d "fullstack-app/backend" ]; then
     # Create .env file if it doesn't exist
     if [ ! -f ".env" ]; then
         log_info "Creating backend .env file..."
-        cat > .env << 'ENV_EOF'
+        if [ -f ".env.example" ]; then
+            cp .env.example .env
+            # Generate a secure JWT secret
+            JWT_SECRET=$(openssl rand -hex 32 2>/dev/null || node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+            # Update the JWT_SECRET in the file
+            if grep -q "JWT_SECRET=" .env; then
+                sed -i "s|JWT_SECRET=.*|JWT_SECRET=${JWT_SECRET}|g" .env
+            else
+                echo "JWT_SECRET=${JWT_SECRET}" >> .env
+            fi
+            log_success "Backend .env created from .env.example with generated JWT secret"
+        else
+            cat > .env << 'ENV_EOF'
 # Database Configuration
 DB_TYPE=sqlite
 DB_PATH=../database.sqlite
@@ -217,9 +229,6 @@ DB_PATH=../database.sqlite
 PORT=3000
 NODE_ENV=development
 
-# Security - JWT Secret (auto-generated)
-JWT_SECRET=$(openssl rand -hex 32)
-
 # Paths
 SCRIPTS_PATH=../../scripts
 LOGS_PATH=../../logs
@@ -227,11 +236,12 @@ CONFIG_PATH=../../config
 
 # 2FA Configuration
 TOTP_ISSUER=Hydra-Termux
-
-# Development Settings
-DEBUG=true
 ENV_EOF
-        log_success "Backend .env created"
+            # Generate a secure JWT secret
+            JWT_SECRET=$(openssl rand -hex 32 2>/dev/null || node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+            echo "JWT_SECRET=${JWT_SECRET}" >> .env
+            log_success "Backend .env created with generated JWT secret"
+        fi
     else
         log_info "Backend .env already exists"
     fi
@@ -258,9 +268,14 @@ if [ -d "fullstack-app/frontend" ]; then
     # Create .env file if it doesn't exist
     if [ ! -f ".env" ]; then
         log_info "Creating frontend .env file..."
-        echo "PORT=3001" > .env
-        echo "REACT_APP_API_URL=http://localhost:3000" >> .env
-        log_success "Frontend .env created"
+        if [ -f ".env.example" ]; then
+            cp .env.example .env
+            log_success "Frontend .env created from .env.example"
+        else
+            echo "PORT=3001" > .env
+            echo "REACT_APP_API_URL=http://localhost:3000" >> .env
+            log_success "Frontend .env created"
+        fi
     else
         log_info "Frontend .env already exists"
     fi
