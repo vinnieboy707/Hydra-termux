@@ -45,3 +45,6 @@ fullstack-app/frontend/node_modules/
 fullstack-app/frontend/build/
 fullstack-app/frontend/.env.local
 fullstack-app/frontend/.env.production.local
+
+# Codespace setup
+.codespace-setup-complete

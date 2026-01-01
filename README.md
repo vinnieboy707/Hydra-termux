@@ -135,6 +135,25 @@ Before you begin, ensure you have:
 
 ## 🚀 Quick Installation
 
+### ☁️ Method 0: GitHub Codespaces (Fastest - Cloud-Based)
+
+**The ultimate one-click setup! No local installation needed:**
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=vinnieboy707/Hydra-termux)
+
+Just click the button above or:
+1. Click **Code** → **Codespaces** → **Create codespace on main**
+2. Wait for automatic setup (2-3 minutes)
+3. Start using immediately: `./hydra.sh` or `cd fullstack-app && bash start.sh`
+
+**Perfect for:**
+- ✅ Quick testing without local setup
+- ✅ Development from any device (even tablets!)
+- ✅ Pre-configured environment with all dependencies
+- ✅ Automatic port forwarding for web interface
+
+See [CODESPACE_QUICKSTART.md](CODESPACE_QUICKSTART.md) for details.
+
 ### 🎯 Method 1: Setup Wizard (Recommended for Beginners)
 
 **The easiest way! Interactive guide through setup:**
