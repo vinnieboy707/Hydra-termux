@@ -83,7 +83,6 @@ sleep 1
 log_section "Environment Detection"
 if [ -n "$CODESPACES" ]; then
     log_success "GitHub Codespaces environment detected"
-    CODESPACE_NAME="$CODESPACE_NAME"
 else
     log_warning "Not running in Codespaces, but continuing setup..."
 fi
@@ -224,14 +223,22 @@ done
 
 # Set permissions for scripts directory
 if [ -d "scripts" ]; then
-    chmod +x scripts/*.sh 2>/dev/null && log_success "All scripts in scripts/ are executable" || log_warning "No shell scripts found in scripts/"
+    if chmod +x scripts/*.sh 2>/dev/null; then
+        log_success "All scripts in scripts/ are executable"
+    else
+        log_warning "No shell scripts found in scripts/"
+    fi
 else
     log_warning "scripts/ directory not found"
 fi
 
 # Set permissions for Library directory
 if [ -d "Library" ]; then
-    chmod +x Library/*.sh 2>/dev/null && log_success "All quick scripts in Library/ are executable" || log_warning "No shell scripts found in Library/"
+    if chmod +x Library/*.sh 2>/dev/null; then
+        log_success "All quick scripts in Library/ are executable"
+    else
+        log_warning "No shell scripts found in Library/"
+    fi
 else
     log_warning "Library/ directory not found"
 fi
