@@ -43,6 +43,7 @@ fullstack-app/backend/.env
 fullstack-app/backend/database.sqlite
 fullstack-app/frontend/node_modules/
 fullstack-app/frontend/build/
+fullstack-app/frontend/.env
 fullstack-app/frontend/.env.local
 fullstack-app/frontend/.env.production.local
 
