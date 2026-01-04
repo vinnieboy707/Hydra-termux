@@ -1,5 +1,22 @@
 # Hydra-termux Quick Start Guide
 
+## 🚨 **CRITICAL - READ BEFORE USING:**
+
+**⚠️ AUTHORIZED USE ONLY** - This tool is for **authorized security testing** and **educational purposes** ONLY.
+
+**🚫 NEVER:**
+- Target individuals using personal information (SSN, birthday, address, phone)
+- Attack systems without explicit written authorization
+- Use for harassment, stalking, or personal gain
+
+**📖 READ FIRST:**
+- [ETHICS.md](ETHICS.md) - **REQUIRED** reading before use
+- [RESPONSIBLE_USE_GUIDELINES.md](RESPONSIBLE_USE_GUIDELINES.md) - Professional practices
+
+**⚖️ Unauthorized access = Federal crime = 5-20 years prison**
+
+---
+
 ## 🆘 **HAVING PROBLEMS? RUN THIS FIRST:**
 
 ```bash
@@ -354,21 +371,27 @@ bash scripts/ssh_admin_attack.sh -t TARGET -T 32 -v --help
 
 ---
 
-## ⚠️ LEGAL WARNING
+## ⚠️ ETHICS & LEGAL REQUIREMENTS
+
+**READ BEFORE ANY USE:**
+- **[ETHICS.md](ETHICS.md)** - Complete ethical guidelines (**REQUIRED**)
+- **[RESPONSIBLE_USE_GUIDELINES.md](RESPONSIBLE_USE_GUIDELINES.md)** - Professional best practices
 
 **ONLY USE ON**:
 - ✅ Your own systems
-- ✅ Authorized targets (with written permission)
-- ✅ Legal penetration testing
+- ✅ Authorized targets (with written authorization contract)
+- ✅ Legal penetration testing engagements
 
 **NEVER USE ON**:
+- ❌ Individuals using personal information
 - ❌ Systems without authorization
-- ❌ Other people's websites
+- ❌ Other people's websites or accounts
 - ❌ Any unauthorized targets
 
+**⚖️ Consequences:**
 Unauthorized access = Federal crime = Prison time
 
-**Get authorization first. Always.**
+**Get written authorization first. Always.**
 
 ---
 

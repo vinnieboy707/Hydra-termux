@@ -2,6 +2,23 @@
 
 Complete library of all attack scripts with platform definitions, differences, and ready-to-use simple versions.
 
+## 🚨 **CRITICAL - ETHICS & LEGAL NOTICE**
+
+**⚠️ AUTHORIZED USE ONLY** - Read [ETHICS.md](ETHICS.md) before proceeding.
+
+**🚫 ABSOLUTELY FORBIDDEN:**
+- **NEVER target individuals using personal information** (SSN, birthday, address, phone)
+- **NEVER attack systems without written authorization**
+- **NEVER use for harassment, stalking, or personal gain**
+
+**⚖️ Unauthorized access = Federal crime = 5-20 years prison + $250,000+ fines**
+
+**📖 REQUIRED READING:**
+- [ETHICS.md](ETHICS.md) - Complete ethical guidelines
+- [RESPONSIBLE_USE_GUIDELINES.md](RESPONSIBLE_USE_GUIDELINES.md) - Professional practices
+
+---
+
 ## Table of Contents
 1. [Platform Definitions](#platform-definitions)
 2. [Quick-Use Scripts](#quick-use-scripts)
@@ -564,20 +581,44 @@ pkg install hydra nmap -y
 
 ---
 
-## Security Notes
+## Ethics & Legal Requirements
 
-⚠️ **Legal Warning:**
-- Only use on systems you own or have written permission to test
-- Unauthorized access is illegal
-- Always use VPN for anonymity
-- Document all testing activities
+⚠️ **CRITICAL - Read Before Any Use:**
 
-🔒 **Best Practices:**
+**📖 REQUIRED READING:**
+- **[ETHICS.md](ETHICS.md)** - Complete ethical guidelines (**MANDATORY**)
+- **[RESPONSIBLE_USE_GUIDELINES.md](RESPONSIBLE_USE_GUIDELINES.md)** - Professional best practices
+
+**🚫 ABSOLUTELY FORBIDDEN:**
+- **NEVER target individuals using personal information** (SSN, birthday, address, phone number)
+- **NEVER attack systems without explicit written authorization**
+- **NEVER use for harassment, stalking, doxxing, or personal vendettas**
+- **NEVER use for fraud, theft, blackmail, or extortion**
+
+**✅ ONLY AUTHORIZED USE:**
+- Professional penetration testing with signed contracts
+- Systems YOU own or explicitly control
+- Educational labs YOU created
+- Research with proper institutional approval
+
+**⚖️ LEGAL CONSEQUENCES:**
+- Unauthorized access = **FEDERAL CRIME**
+- Penalties: **5-20 years imprisonment**
+- Fines: **$250,000+ per violation**
+- **Permanent criminal record**
+- Civil lawsuits with millions in damages
+
+**🔒 Best Practices:**
+- Always obtain written authorization before testing
 - Start with single host before network scans
 - Use lower thread counts on production systems
 - Monitor for defensive responses
 - Keep attack logs for reporting
 - Responsibly disclose found vulnerabilities
+- Use VPN for anonymity
+- Document all testing activities
+
+**⚠️ If you cannot provide written authorization, DO NOT PROCEED.**
 
 ---
 
