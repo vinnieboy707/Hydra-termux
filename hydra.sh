@@ -64,15 +64,17 @@ EOF
 # Function to display and confirm ethics acknowledgment
 check_ethics_acknowledgment() {
     local ack_file="$HOME/.hydra_termux_ethics_acknowledged"
+    local SECONDS_PER_DAY=86400
+    local ACKNOWLEDGMENT_VALIDITY_DAYS=30
     
-    # Check if user has already acknowledged (valid for 30 days)
+    # Check if user has already acknowledged (valid for configured days)
     if [ -f "$ack_file" ]; then
         local ack_date=$(cat "$ack_file" 2>/dev/null)
         local current_date=$(date +%s)
-        local days_diff=$(( (current_date - ack_date) / 86400 ))
+        local days_diff=$(( (current_date - ack_date) / SECONDS_PER_DAY ))
         
-        # If acknowledged within last 30 days, skip
-        if [ $days_diff -lt 30 ]; then
+        # If acknowledged within validity period, skip
+        if [ $days_diff -lt $ACKNOWLEDGMENT_VALIDITY_DAYS ]; then
             return 0
         fi
     fi
@@ -133,11 +135,11 @@ check_ethics_acknowledgment() {
     # Require explicit acknowledgment
     while true; do
         echo ""
-        print_message "Type 'I AGREE' to acknowledge and proceed, or 'EXIT' to quit:" "$YELLOW"
+        print_message "Type EXACTLY 'I AGREE' (uppercase) to acknowledge, or 'EXIT' to quit:" "$YELLOW"
         read -r -p "> " response
         
         case "$response" in
-            "I AGREE"|"i agree")
+            "I AGREE")
                 # Log acknowledgment
                 date +%s > "$ack_file"
                 echo "[$(date '+%Y-%m-%d %H:%M:%S')] User acknowledged ethics and legal requirements" >> "$HOME/.hydra_termux_ethics.log"
@@ -153,7 +155,7 @@ check_ethics_acknowledgment() {
                 exit 0
                 ;;
             *)
-                print_message "Invalid response. Type 'I AGREE' to proceed or 'EXIT' to quit." "$RED"
+                print_message "Invalid response. Type EXACTLY 'I AGREE' (uppercase) to proceed or 'EXIT' to quit." "$RED"
                 ;;
         esac
     done
