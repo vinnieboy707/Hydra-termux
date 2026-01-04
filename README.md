@@ -9,9 +9,11 @@
 
 **A powerful brute-force tool suite optimized for Termux on Android devices**
 
+**⚠️ AUTHORIZED USE ONLY** - Read [ETHICS.md](ETHICS.md) before use. Never target individuals with personal information.
+
 **🚀 NEW: Full-Stack Web Application** - Professional web interface with real-time monitoring, attack orchestration, and comprehensive management features. See [fullstack-app/README.md](fullstack-app/README.md)
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [**Ethics**](#️-legal-disclaimer-and-ethical-requirements) • [Legal](#️-legal-disclaimer-and-ethical-requirements)
 
 </div>
 
@@ -341,6 +343,11 @@ bash scripts/results_viewer.sh --export results.csv --format csv
 
 ## 📚 Documentation
 
+### 🔴 **REQUIRED READING - Ethics and Legal:**
+- **[ETHICS.md](ETHICS.md)** - ⚠️ **READ FIRST** - Comprehensive ethical guidelines and legal requirements
+- **[RESPONSIBLE_USE_GUIDELINES.md](RESPONSIBLE_USE_GUIDELINES.md)** - Professional penetration testing best practices
+
+### Technical Documentation:
 - **[WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md)** - 🌟 **NEW!** Complete web interface feature guide
 - **[CLI_WEB_MAPPING.md](docs/CLI_WEB_MAPPING.md)** - 🌟 **NEW!** Quick reference for CLI to web mapping
 - **[Library.md](Library.md)** - 🔥 Quick-use scripts with platform comparisons
@@ -606,47 +613,136 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## ⚠️ Legal Disclaimer
+## ⚠️ Legal Disclaimer and Ethical Requirements
 
-**IMPORTANT - READ CAREFULLY:**
+**CRITICAL - READ BEFORE USE:**
 
-This tool is provided for **educational and authorized security testing purposes ONLY**.
+This tool is provided **EXCLUSIVELY** for **authorized security testing** and **educational purposes** in controlled environments.
 
-### Legal Requirements
+### 🚫 STRICTLY PROHIBITED ACTIVITIES
 
-- ✓ **ONLY** use on systems you own or have explicit written permission to test
-- ✓ Obtain proper authorization before conducting security assessments
-- ✓ Comply with all applicable laws and regulations
-- ✓ Document all testing activities and obtain consent
+**The following uses are ILLEGAL and FORBIDDEN:**
 
-### Illegal Activities
+❌ **NEVER target individuals using personal information:**
+- Using SSN, birthdays, addresses, phone numbers to target specific people
+- Conducting attacks based on someone's personal identity or private information
+- Using this tool for stalking, harassment, doxxing, or personal vendettas
+- Targeting individuals without their explicit written consent
 
-Unauthorized access to computer systems is **ILLEGAL** under:
+❌ **NEVER attack unauthorized systems:**
+- Systems you don't own or have written permission to test
+- Websites, servers, or networks without explicit authorization
+- "Testing" systems without proper legal authorization documents
+- Assuming permission based on casual conversation or verbal agreement
+
+❌ **NEVER use for malicious purposes:**
+- Identity theft, fraud, or financial crimes
+- Blackmail, extortion, or coercion
+- Corporate espionage or unauthorized competitive intelligence
+- Harassment, discrimination, or targeting protected groups
+
+### ✅ AUTHORIZED USE ONLY
+
+**This tool may ONLY be used for:**
+
+1. **Professional Security Testing** - With written authorization contracts
+2. **Your Own Systems** - Systems you personally own and control
+3. **Educational Labs** - Isolated practice environments you have created
+4. **Authorized Research** - With proper institutional review board approval
+
+**📖 Read our comprehensive ethics documentation:**
+- [ETHICS.md](ETHICS.md) - Complete ethical guidelines and prohibitions
+- [RESPONSIBLE_USE_GUIDELINES.md](RESPONSIBLE_USE_GUIDELINES.md) - Professional best practices
+
+### ⚖️ Legal Consequences
+
+**Unauthorized access is a FEDERAL CRIME punishable by:**
+
+- **5-20 years imprisonment** (Computer Fraud and Abuse Act - United States)
+- **Fines up to $250,000+** per violation
+- **Permanent criminal record** affecting employment and travel
+- **Civil lawsuits** with potential millions in damages
+- **Asset forfeiture** and restitution requirements
+
+**Applicable Laws:**
 - Computer Fraud and Abuse Act (CFAA) - United States
-- Computer Misuse Act - United Kingdom
-- Cybercrime laws in various jurisdictions worldwide
+- Computer Misuse Act 1990 - United Kingdom  
+- General Data Protection Regulation (GDPR) - European Union
+- Council of Europe Convention on Cybercrime
+- Local cybercrime laws in your jurisdiction
 
-Violators may face:
-- Criminal prosecution
-- Significant fines
-- Imprisonment
-- Civil liability
+### ⚠️ Developer Disclaimer
 
-### Disclaimer
+**The developers and contributors:**
 
-The developers and contributors:
-- ❌ Do NOT encourage or condone illegal activities
-- ❌ Assume NO responsibility for misuse
-- ❌ Are NOT liable for any damages or legal consequences
-- ✓ Provide this tool for legitimate security research ONLY
+- ❌ **EXPLICITLY CONDEMN** targeting individuals with personal information
+- ❌ **DO NOT AUTHORIZE** any illegal or unethical use
+- ❌ **ASSUME NO RESPONSIBILITY** for misuse of this software
+- ❌ **ARE NOT LIABLE** for any damages, legal consequences, or harm
+- ✓ **PROVIDE THIS TOOL** solely for legitimate authorized security testing
+- ✓ **RESERVE THE RIGHT** to report illegal use to authorities
 
-**BY USING THIS SOFTWARE, YOU AGREE TO:**
-1. Use it only on authorized systems
-2. Accept full responsibility for your actions
-3. Comply with all applicable laws
-4. Not hold the developers liable for misuse
+### 📋 User Acknowledgment
 
-**USE AT YOUR OWN RISK.**
+**BY DOWNLOADING, INSTALLING, OR USING THIS SOFTWARE, YOU EXPLICITLY AGREE TO:**
+
+1. ✅ Use only on systems with explicit written authorization
+2. ✅ **NEVER target individuals using personal information**
+3. ✅ Comply with all applicable local, state, national, and international laws
+4. ✅ Accept full legal and ethical responsibility for all actions
+5. ✅ Hold developers harmless from any consequences of your use
+6. ✅ Use only for legitimate security improvement purposes
+7. ✅ Follow professional security testing standards and ethics
+8. ✅ Report any discovered vulnerabilities responsibly
+9. ✅ Protect privacy and confidentiality of any discovered information
+10. ✅ Stop immediately if you lack proper authorization
+
+### 🚨 Red Flag Warning Signs
+
+**STOP IMMEDIATELY if you find yourself:**
+
+- Rationalizing why authorization "isn't necessary"
+- Thinking "they'll never find out"
+- Using personal details (SSN, birthday, address) to target someone
+- Testing systems because you're curious about someone's accounts
+- Planning to use discoveries for non-security purposes
+- Targeting someone you have a personal relationship with
+- Doing something you'd be ashamed to have publicized
+
+**If any of these apply, you are about to commit a CRIME.**
+
+### 📞 Reporting Abuse
+
+**If you become aware of unethical or illegal use of this tool:**
+
+- Report to: FBI Internet Crime Complaint Center (IC3) - https://ic3.gov
+- Local law enforcement cybercrime units
+- Repository maintainers (for tool improvements only)
+
+### 🎓 Educational Resources
+
+**Before using this tool, read:**
+
+1. **[ETHICS.md](ETHICS.md)** - Comprehensive ethical guidelines (REQUIRED)
+2. **[RESPONSIBLE_USE_GUIDELINES.md](RESPONSIBLE_USE_GUIDELINES.md)** - Professional practices
+3. **EC-Council Code of Ethics** - https://www.eccouncil.org/code-of-ethics/
+4. **ISC² Code of Ethics** - https://www.isc2.org/Ethics
+
+---
+
+**⚖️ FINAL WARNING:**
+
+Using this tool to target individuals with their personal information, or accessing systems without authorization, is:
+
+**ILLEGAL • UNETHICAL • CAREER-ENDING • LIFE-ALTERING**
+
+**Get written authorization. Never target individuals. Use responsibly or face criminal prosecution.**
+
+**Your freedom is not worth satisfying curiosity.**
+
+---
+
+**USE AT YOUR OWN RISK. NO WARRANTY. NO LIABILITY.**
 
 ## 🙏 Credits
 

@@ -61,6 +61,104 @@ EOF
     echo ""
 }
 
+# Function to display and confirm ethics acknowledgment
+check_ethics_acknowledgment() {
+    local ack_file="$HOME/.hydra_termux_ethics_acknowledged"
+    
+    # Check if user has already acknowledged (valid for 30 days)
+    if [ -f "$ack_file" ]; then
+        local ack_date=$(cat "$ack_file" 2>/dev/null)
+        local current_date=$(date +%s)
+        local days_diff=$(( (current_date - ack_date) / 86400 ))
+        
+        # If acknowledged within last 30 days, skip
+        if [ $days_diff -lt 30 ]; then
+            return 0
+        fi
+    fi
+    
+    clear
+    print_message "╔═══════════════════════════════════════════════════════════════╗" "$RED"
+    print_message "║           ⚠️  CRITICAL ETHICS & LEGAL NOTICE ⚠️                ║" "$RED"
+    print_message "╚═══════════════════════════════════════════════════════════════╝" "$RED"
+    echo ""
+    print_message "BEFORE PROCEEDING, YOU MUST READ AND ACKNOWLEDGE:" "$YELLOW"
+    echo ""
+    print_message "🚫 ABSOLUTELY FORBIDDEN:" "$RED"
+    echo ""
+    echo "  ❌ NEVER target individuals using personal information"
+    echo "     (SSN, birthday, address, phone number, personal details)"
+    echo ""
+    echo "  ❌ NEVER attack systems without explicit WRITTEN authorization"
+    echo ""
+    echo "  ❌ NEVER use this tool for harassment, stalking, or personal gain"
+    echo ""
+    echo "  ❌ NEVER access accounts or data you don't own or aren't authorized to test"
+    echo ""
+    print_message "✅ ONLY AUTHORIZED USE:" "$GREEN"
+    echo ""
+    echo "  ✓ Professional penetration testing with signed contracts"
+    echo "  ✓ Testing systems YOU OWN or explicitly control"
+    echo "  ✓ Educational use in isolated lab environments YOU created"
+    echo "  ✓ Security research with proper institutional approval"
+    echo ""
+    print_message "⚖️  LEGAL CONSEQUENCES:" "$YELLOW"
+    echo ""
+    echo "  Unauthorized access is a FEDERAL CRIME punishable by:"
+    echo "  • 5-20 years imprisonment"
+    echo "  • Fines up to $250,000+"
+    echo "  • Permanent criminal record"
+    echo "  • Civil lawsuits with millions in damages"
+    echo ""
+    print_message "📖 REQUIRED READING:" "$CYAN"
+    echo ""
+    echo "  Please read these documents before using this tool:"
+    echo "  • ETHICS.md - Comprehensive ethical guidelines"
+    echo "  • RESPONSIBLE_USE_GUIDELINES.md - Professional best practices"
+    echo ""
+    print_message "════════════════════════════════════════════════════════════════" "$BLUE"
+    echo ""
+    print_message "BY PROCEEDING, YOU ACKNOWLEDGE THAT:" "$YELLOW"
+    echo ""
+    echo "  1. You have read or will read ETHICS.md and RESPONSIBLE_USE_GUIDELINES.md"
+    echo "  2. You will NEVER target individuals with personal information"
+    echo "  3. You will ONLY use this tool on authorized systems"
+    echo "  4. You understand the criminal penalties for unauthorized access"
+    echo "  5. You accept FULL legal responsibility for your actions"
+    echo "  6. Developers are NOT liable for any misuse"
+    echo ""
+    print_message "════════════════════════════════════════════════════════════════" "$BLUE"
+    echo ""
+    
+    # Require explicit acknowledgment
+    while true; do
+        echo ""
+        print_message "Type 'I AGREE' to acknowledge and proceed, or 'EXIT' to quit:" "$YELLOW"
+        read -r -p "> " response
+        
+        case "$response" in
+            "I AGREE"|"i agree")
+                # Log acknowledgment
+                date +%s > "$ack_file"
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] User acknowledged ethics and legal requirements" >> "$HOME/.hydra_termux_ethics.log"
+                echo ""
+                print_message "✓ Acknowledgment recorded. Proceeding..." "$GREEN"
+                sleep 2
+                return 0
+                ;;
+            "EXIT"|"exit"|"quit"|"QUIT")
+                echo ""
+                print_message "Exiting. Read the ethics documentation before returning." "$YELLOW"
+                echo ""
+                exit 0
+                ;;
+            *)
+                print_message "Invalid response. Type 'I AGREE' to proceed or 'EXIT' to quit." "$RED"
+                ;;
+        esac
+    done
+}
+
 # Function to display main menu
 show_menu() {
     print_message "╔════════════════════ MAIN MENU ════════════════════════╗" "$BLUE"
@@ -254,6 +352,11 @@ show_help() {
     print_banner "Help & Documentation"
     echo ""
     
+    print_message "⚠️  READ FIRST - ETHICS & LEGAL:" "$RED"
+    echo "  ETHICS.md - Ethical guidelines and legal requirements"
+    echo "  RESPONSIBLE_USE_GUIDELINES.md - Professional best practices"
+    echo ""
+    
     echo "ATTACK SCRIPTS:"
     echo "  All attack scripts support the following options:"
     echo "    -t, --target      Target IP or hostname"
@@ -301,10 +404,24 @@ show_about() {
     echo "  Original: cyrushar/Hydra-Termux"
     echo "  Enhanced by: vinnieboy707"
     echo ""
-    print_message "⚠️  LEGAL DISCLAIMER ⚠️" "$RED"
-    echo "This tool is for educational and authorized testing ONLY."
-    echo "Unauthorized access to computer systems is illegal."
-    echo "The developers assume NO liability for misuse."
+    print_message "⚠️  ETHICS & LEGAL REQUIREMENTS ⚠️" "$RED"
+    echo ""
+    echo "This tool is ONLY for authorized security testing."
+    echo ""
+    print_message "🚫 NEVER:" "$RED"
+    echo "  • Target individuals using personal information"
+    echo "  • Attack systems without written authorization"
+    echo "  • Use for harassment, stalking, or personal gain"
+    echo ""
+    print_message "⚖️  CONSEQUENCES:" "$YELLOW"
+    echo "  Unauthorized access = Federal Crime"
+    echo "  Penalties: 5-20 years prison, $250,000+ fines"
+    echo ""
+    print_message "📖 Required Reading:" "$CYAN"
+    echo "  • ETHICS.md - Full ethical guidelines"
+    echo "  • RESPONSIBLE_USE_GUIDELINES.md - Best practices"
+    echo ""
+    print_message "The developers assume NO liability for misuse." "$RED"
     echo ""
     
     read -r -p "Press Enter to continue..."
@@ -353,6 +470,9 @@ main() {
         echo ""
         exit 1
     fi
+    
+    # Check and require ethics acknowledgment
+    check_ethics_acknowledgment
     
     # Main menu loop
     while true; do
