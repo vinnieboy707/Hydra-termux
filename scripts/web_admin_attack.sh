@@ -3,6 +3,13 @@
 # Web Admin Attack Script
 # Automated web admin panel brute-force
 
+# ⚠️ ETHICS & LEGAL NOTICE:
+# This tool is for AUTHORIZED security testing ONLY.
+# NEVER target individuals using personal information.
+# NEVER attack systems without written authorization.
+# Unauthorized access = Federal crime = Prison time.
+# Read ETHICS.md and RESPONSIBLE_USE_GUIDELINES.md before use.
+
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
