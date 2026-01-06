@@ -2,7 +2,7 @@
 # Database Migration Script
 # Applies database schema to PostgreSQL or Supabase
 
-set -e
+# Note: Not using 'set -e' to allow graceful error handling and user interaction
 
 # Colors for output
 RED='\033[0;31m'
