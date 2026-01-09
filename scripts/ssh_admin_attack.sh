@@ -138,6 +138,9 @@ run_attack() {
         exit 1
     fi
     
+    # Start tracking attack for reporting
+    start_attack_tracking
+    
     # Real-time status: Starting
     realtime_status "starting" "SSH attack on $TARGET:$PORT"
     
@@ -176,6 +179,9 @@ run_attack() {
         current_wordlist=$((current_wordlist + 1))
         local wordlist_name=$(basename "$wordlist")
         
+        # Update wordlist tracking for report
+        update_wordlist_count
+        
         realtime_status "progress" "Wordlist $current_wordlist/$total_wordlists: $wordlist_name"
         print_header "Wordlist $current_wordlist/$total_wordlists: $wordlist_name"
         
@@ -188,6 +194,9 @@ run_attack() {
         local word_count=$(wc -l < "$wordlist")
         realtime_status "running" "Testing $word_count passwords with $THREADS threads..."
         log_info "Testing $word_count passwords..."
+        
+        # Update attempt tracking for report
+        update_attack_attempts $word_count
         
         # Run hydra with enhanced error capture
         local output_file=$(mktemp)
@@ -219,6 +228,9 @@ run_attack() {
                 # Save to resume file
                 echo "SUCCESS: $login:$password @ $(date)" >> "$RESUME_FILE"
                 
+                # Generate detailed attack report with prevention recommendations
+                finish_attack_tracking "ssh" "$TARGET" "$PORT" "SUCCESS" "$login" "$password"
+                
                 rm -f "$output_file" "$error_file"
                 return 0
             fi
@@ -246,6 +258,9 @@ run_attack() {
     
     realtime_status "failure" "No valid credentials found after trying all wordlists"
     log_warning "No valid credentials found"
+    
+    # Generate report for failed attack
+    finish_attack_tracking "ssh" "$TARGET" "$PORT" "FAILED"
     
     # Provide helpful suggestions
     echo ""

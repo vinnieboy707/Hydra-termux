@@ -29,6 +29,18 @@ if [ ! -f "$RESULTS_FILE" ]; then
     echo "[]" > "$RESULTS_FILE"
 fi
 
+# Attack metadata tracking file
+ATTACK_METADATA_FILE="$LOG_DIR/attack_metadata_$(date +%Y%m%d).json"
+if [ ! -f "$ATTACK_METADATA_FILE" ]; then
+    echo "[]" > "$ATTACK_METADATA_FILE"
+fi
+
+# Initialize attack tracking variables
+ATTACK_START_TIME=""
+ATTACK_END_TIME=""
+ATTACK_ATTEMPTS=0
+ATTACK_WORDLIST_COUNT=0
+
 # Function to log messages
 log_message() {
     local level="$1"
@@ -124,6 +136,85 @@ save_result() {
     
     log_success "Credentials saved: $protocol://$username:$password@$target:$port"
     log_warning "Results contain sensitive data - stored with restricted permissions"
+}
+
+# Start tracking attack metadata
+start_attack_tracking() {
+    ATTACK_START_TIME=$(date "+%Y-%m-%d %H:%M:%S")
+    ATTACK_ATTEMPTS=0
+    ATTACK_WORDLIST_COUNT=0
+}
+
+# Update attack attempt count
+update_attack_attempts() {
+    local attempts="$1"
+    ATTACK_ATTEMPTS=$((ATTACK_ATTEMPTS + attempts))
+}
+
+# Update wordlist count
+update_wordlist_count() {
+    ATTACK_WORDLIST_COUNT=$((ATTACK_WORDLIST_COUNT + 1))
+}
+
+# Finish attack tracking and generate report
+finish_attack_tracking() {
+    local protocol="$1"
+    local target="$2"
+    local port="$3"
+    local status="$4"
+    local username="${5:-N/A}"
+    local password="${6:-N/A}"
+    
+    ATTACK_END_TIME=$(date "+%Y-%m-%d %H:%M:%S")
+    
+    # Source report generator if available
+    if [ -f "$SCRIPT_DIR/report_generator.sh" ]; then
+        source "$SCRIPT_DIR/report_generator.sh"
+        
+        # Generate detailed report
+        local report_file=$(generate_report "$protocol" "$target" "$port" \
+            "$ATTACK_START_TIME" "$ATTACK_END_TIME" "$status" \
+            "$username" "$password" "$ATTACK_ATTEMPTS" "$ATTACK_WORDLIST_COUNT")
+        
+        # Save metadata
+        save_attack_metadata "$protocol" "$target" "$port" "$status" "$report_file"
+        
+        # Show summary
+        generate_summary "$protocol" "$target" "$status" "$report_file"
+        
+        return 0
+    else
+        log_warning "Report generator not found - skipping detailed report"
+        return 1
+    fi
+}
+
+# Save attack metadata
+save_attack_metadata() {
+    local protocol="$1"
+    local target="$2"
+    local port="$3"
+    local status="$4"
+    local report_file="$5"
+    
+    local metadata_entry
+    metadata_entry=$(jq -n \
+        --arg protocol "$protocol" \
+        --arg target "$target" \
+        --arg port "$port" \
+        --arg status "$status" \
+        --arg start_time "$ATTACK_START_TIME" \
+        --arg end_time "$ATTACK_END_TIME" \
+        --arg attempts "$ATTACK_ATTEMPTS" \
+        --arg wordlist_count "$ATTACK_WORDLIST_COUNT" \
+        --arg report_file "$report_file" \
+        '{protocol: $protocol, target: $target, port: $port, status: $status, start_time: $start_time, end_time: $end_time, attempts: $attempts, wordlist_count: $wordlist_count, report_file: $report_file}')
+    
+    if [ -f "$ATTACK_METADATA_FILE" ]; then
+        local temp_file=$(mktemp)
+        jq --argjson entry "$metadata_entry" '. += [$entry]' "$ATTACK_METADATA_FILE" > "$temp_file" 2>/dev/null && \
+            mv "$temp_file" "$ATTACK_METADATA_FILE"
+    fi
 }
 
 # Export results to CSV
