@@ -333,9 +333,12 @@ echo ""
 
 # VPN Check (unless skipped)
 if [ "$SKIP_VPN_CHECK" = "false" ]; then
-    require_vpn "false"
+    check_vpn_warn
     echo ""
 fi
+
+# Track IP rotation for anonymity monitoring
+track_ip_rotation "ssh_attack"
 
 validate_input
 
