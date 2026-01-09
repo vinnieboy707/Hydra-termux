@@ -84,12 +84,13 @@ show_menu() {
     print_message "  MANAGEMENT:" "$MAGENTA"
     echo "  13) View Configuration"
     echo "  14) View Logs"
-    echo "  15) Export Results"
-    echo "  16) Update Hydra-Termux"
+    echo "  15) View Attack Reports"
+    echo "  16) Export Results"
+    echo "  17) Update Hydra-Termux"
     echo ""
     print_message "  OTHER:" "$MAGENTA"
-    echo "  17) Help & Documentation"
-    echo "  18) About & Credits"
+    echo "  18) Help & Documentation"
+    echo "  19) About & Credits"
     echo "  0)  Exit"
     echo ""
     print_message "╚════════════════════════════════════════════════════════╝" "$BLUE"
@@ -182,6 +183,131 @@ view_logs() {
     
     echo ""
     read -r -p "Press Enter to continue..."
+}
+
+# Function to view attack reports
+view_attack_reports() {
+    print_banner "Attack Reports"
+    echo ""
+    
+    local report_dir="$SCRIPT_DIR/reports"
+    
+    if [ ! -d "$report_dir" ]; then
+        log_warning "No reports directory found"
+        echo ""
+        read -r -p "Press Enter to continue..."
+        return 1
+    fi
+    
+    # Find all report files
+    local reports=$(find "$report_dir" -name "attack_report_*.md" -type f 2>/dev/null | sort -r)
+    
+    if [ -z "$reports" ]; then
+        log_warning "No attack reports found"
+        echo ""
+        log_info "Reports are automatically generated after each attack"
+        log_info "Run an attack (options 1-8) to generate your first report"
+        echo ""
+        read -r -p "Press Enter to continue..."
+        return 1
+    fi
+    
+    # Count reports
+    local report_count=$(echo "$reports" | wc -l)
+    log_success "Found $report_count attack report(s)"
+    echo ""
+    
+    # Display list of reports
+    print_message "Recent Attack Reports:" "$CYAN"
+    echo ""
+    
+    local index=1
+    echo "$reports" | while IFS= read -r report; do
+        local report_name=$(basename "$report")
+        local report_date=$(stat -c %y "$report" 2>/dev/null | cut -d' ' -f1,2 | cut -d'.' -f1)
+        local report_size=$(du -h "$report" 2>/dev/null | cut -f1)
+        
+        # Extract protocol and target from filename if possible
+        local protocol=$(echo "$report_name" | sed 's/attack_report_\([^_]*\)_.*/\1/')
+        
+        printf "${YELLOW}%2d)${NC} %-15s ${CYAN}%-20s${NC} (%s)\n" \
+            "$index" "$protocol" "$report_date" "$report_size"
+        
+        index=$((index + 1))
+    done
+    
+    echo ""
+    print_message "Actions:" "$BLUE"
+    echo "  1) View a specific report"
+    echo "  2) View latest report"
+    echo "  3) Export all reports (tar.gz)"
+    echo "  4) Delete old reports (30+ days)"
+    echo "  0) Back to main menu"
+    echo ""
+    read -r -p "Enter choice: " action_choice
+    
+    case $action_choice in
+        1)
+            echo ""
+            read -r -p "Enter report number to view: " report_num
+            local selected_report=$(echo "$reports" | sed -n "${report_num}p")
+            if [ -n "$selected_report" ] && [ -f "$selected_report" ]; then
+                echo ""
+                print_message "Opening report: $(basename "$selected_report")" "$GREEN"
+                echo ""
+                if command -v less >/dev/null 2>&1; then
+                    less "$selected_report"
+                else
+                    cat "$selected_report"
+                    echo ""
+                    read -r -p "Press Enter to continue..."
+                fi
+            else
+                log_error "Invalid report number"
+            fi
+            ;;
+        2)
+            local latest_report=$(echo "$reports" | head -1)
+            if [ -n "$latest_report" ] && [ -f "$latest_report" ]; then
+                echo ""
+                print_message "Opening latest report: $(basename "$latest_report")" "$GREEN"
+                echo ""
+                if command -v less >/dev/null 2>&1; then
+                    less "$latest_report"
+                else
+                    cat "$latest_report"
+                    echo ""
+                    read -r -p "Press Enter to continue..."
+                fi
+            fi
+            ;;
+        3)
+            local archive_file="$SCRIPT_DIR/attack_reports_$(date +%Y%m%d_%H%M%S).tar.gz"
+            tar -czf "$archive_file" -C "$report_dir" . 2>/dev/null
+            if [ $? -eq 0 ]; then
+                log_success "Reports exported to: $archive_file"
+            else
+                log_error "Failed to export reports"
+            fi
+            echo ""
+            read -r -p "Press Enter to continue..."
+            ;;
+        4)
+            echo ""
+            log_info "Deleting reports older than 30 days..."
+            find "$report_dir" -name "attack_report_*.md" -type f -mtime +30 -delete 2>/dev/null
+            log_success "Old reports deleted"
+            echo ""
+            read -r -p "Press Enter to continue..."
+            ;;
+        0)
+            return 0
+            ;;
+        *)
+            log_error "Invalid choice"
+            read -r -p "Press Enter to continue..."
+            ;;
+    esac
 }
 
 # Function to export results
@@ -359,7 +485,7 @@ main() {
         show_banner
         show_menu
         
-        read -r -p "Enter your choice [0-18]: " choice
+        read -r -p "Enter your choice [0-19]: " choice
         
         case $choice in
             1)
@@ -405,15 +531,18 @@ main() {
                 view_logs
                 ;;
             15)
-                export_results
+                view_attack_reports
                 ;;
             16)
-                update_tool
+                export_results
                 ;;
             17)
-                show_help
+                update_tool
                 ;;
             18)
+                show_help
+                ;;
+            19)
                 show_about
                 ;;
             0)
@@ -424,7 +553,7 @@ main() {
                 exit 0
                 ;;
             *)
-                log_error "Invalid choice. Please select 0-18."
+                log_error "Invalid choice. Please select 0-19."
                 sleep 2
                 ;;
         esac

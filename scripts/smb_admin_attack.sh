@@ -79,6 +79,9 @@ validate_input() {
 
 # Function to run SMB attack
 run_attack() {
+    # Start tracking attack for reporting
+    start_attack_tracking
+    
     local username_file=$(mktemp)
     
     # Get usernames
@@ -122,6 +125,9 @@ run_attack() {
             save_result "smb" "$TARGET" "$login" "$password" "$PORT"
             log_success "Valid credentials found: $login:$password"
             
+            # Generate detailed attack report with prevention recommendations
+            finish_attack_tracking "smb" "$TARGET" "$PORT" "SUCCESS" "$login" "$password"
+            
             rm -f "$username_file"
             return 0
         fi
@@ -134,6 +140,8 @@ run_attack() {
     
     if [ $result -ne 0 ]; then
         log_warning "No valid credentials found"
+        # Generate report for failed attack
+        finish_attack_tracking "smb" "$TARGET" "$PORT" "FAILED"
     fi
     
     return $result

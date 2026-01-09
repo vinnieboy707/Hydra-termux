@@ -77,6 +77,9 @@ validate_input() {
 
 # Function to run FTP attack
 run_attack() {
+    # Start tracking attack for reporting
+    start_attack_tracking
+    
     local username_file=$(mktemp)
     
     # Get usernames
@@ -123,6 +126,9 @@ run_attack() {
             save_result "ftp" "$TARGET" "$login" "$password" "$PORT"
             log_success "Valid credentials found: $login:$password"
             
+            # Generate detailed attack report with prevention recommendations
+            finish_attack_tracking "ftp" "$TARGET" "$PORT" "SUCCESS" "$login" "$password"
+            
             rm -f "$username_file" "$output_file"
             return 0
         fi
@@ -137,6 +143,8 @@ run_attack() {
         log_success "Attack successful!"
     else
         log_warning "No valid credentials found"
+        # Generate report for failed attack
+        finish_attack_tracking "ftp" "$TARGET" "$PORT" "FAILED"
     fi
     
     return $result
