@@ -147,13 +147,13 @@ start_attack_tracking() {
 
 # Update attack attempt count
 update_attack_attempts() {
-    local attempts="$1"
-    ATTACK_ATTEMPTS=$((ATTACK_ATTEMPTS + attempts))
+    local attempts="${1:-0}"
+    ATTACK_ATTEMPTS=$((ATTACK_ATTEMPTS + attempts)) 2>/dev/null || true
 }
 
 # Update wordlist count
 update_wordlist_count() {
-    ATTACK_WORDLIST_COUNT=$((ATTACK_WORDLIST_COUNT + 1))
+    ATTACK_WORDLIST_COUNT=$((ATTACK_WORDLIST_COUNT + 1)) 2>/dev/null || true
 }
 
 # Finish attack tracking and generate report
@@ -167,10 +167,14 @@ finish_attack_tracking() {
     
     ATTACK_END_TIME=$(date "+%Y-%m-%d %H:%M:%S")
     
-    # Source report generator if available
-    if [ -f "$SCRIPT_DIR/report_generator.sh" ]; then
+    # Source report generator if available and not already sourced
+    if [ -f "$SCRIPT_DIR/report_generator.sh" ] && [ -z "$REPORT_GENERATOR_SOURCED" ]; then
         source "$SCRIPT_DIR/report_generator.sh"
-        
+        export REPORT_GENERATOR_SOURCED=1
+    fi
+    
+    # Generate detailed report if functions are available
+    if declare -f generate_report >/dev/null 2>&1; then
         # Generate detailed report
         local report_file=$(generate_report "$protocol" "$target" "$port" \
             "$ATTACK_START_TIME" "$ATTACK_END_TIME" "$status" \
