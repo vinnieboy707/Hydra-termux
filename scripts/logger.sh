@@ -171,6 +171,106 @@ print_header() {
     print_message "═══ $header ═══" "$MAGENTA"
 }
 
+# VPN Check Warning
+check_vpn_warn() {
+    local vpn_script="$PROJECT_ROOT/scripts/vpn_check.sh"
+    
+    # Source VPN check if available
+    if [ -f "$vpn_script" ]; then
+        source "$vpn_script"
+        
+        # Check if VPN is connected
+        if ! check_vpn_connection "false" 2>/dev/null; then
+            echo ""
+            log_warning "═════════════════════════════════════════════════════════"
+            log_warning "  ⚠️  VPN NOT DETECTED - ANONYMITY AT RISK  ⚠️"
+            log_warning "═════════════════════════════════════════════════════════"
+            log_warning "It is STRONGLY recommended to use a VPN when running"
+            log_warning "penetration testing tools to protect your identity."
+            log_warning ""
+            log_warning "VPN Detection Methods (all failed):"
+            log_warning "  ✗ Network interface check (tun/tap/wg)"
+            log_warning "  ✗ VPN process check (openvpn/wireguard)"
+            log_warning "  ✗ DNS check (VPN-provided DNS)"
+            log_warning ""
+            log_warning "Recommended Actions:"
+            log_warning "  • Install OpenVPN: pkg install openvpn"
+            log_warning "  • Install WireGuard: pkg install wireguard-tools"
+            log_warning "  • Use commercial VPN: NordVPN, ExpressVPN, etc."
+            log_warning "═════════════════════════════════════════════════════════"
+            echo ""
+            
+            # Ask user if they want to continue
+            if [ -t 0 ]; then  # Check if stdin is a terminal
+                read -r -p "Continue without VPN? (y/N): " response
+                if [[ ! "$response" =~ ^[Yy]$ ]]; then
+                    log_info "Exiting. Please connect to VPN and try again."
+                    exit 0
+                fi
+                log_warning "Proceeding WITHOUT VPN protection..."
+            fi
+        else
+            log_success "VPN connection verified ✓"
+        fi
+    fi
+}
+
+# Track IP for rotation monitoring
+track_ip_rotation() {
+    local user_id="${1:-unknown}"
+    local log_file="$LOG_DIR/ip_rotation_${user_id}.log"
+    
+    # Get current public IP
+    local current_ip=""
+    if command -v curl &>/dev/null; then
+        current_ip=$(curl -s --connect-timeout 3 https://api.ipify.org 2>/dev/null || echo "unknown")
+    fi
+    
+    if [ "$current_ip" != "unknown" ] && [ -n "$current_ip" ]; then
+        local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+        echo "$timestamp|$current_ip" >> "$log_file"
+        
+        # Count unique IPs in last hour
+        local one_hour_ago=$(date -d '1 hour ago' '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-1H '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+        local unique_ips=0
+        
+        if [ -f "$log_file" ]; then
+            unique_ips=$(awk -F'|' -v cutoff="$one_hour_ago" '$1 >= cutoff {print $2}' "$log_file" 2>/dev/null | sort -u | wc -l)
+        fi
+        
+        log_debug "IP Rotation: Current=$current_ip, Unique IPs (last hour)=$unique_ips"
+        
+        # Check if approaching the 1000 IP threshold
+        local total_ips=$(wc -l < "$log_file" 2>/dev/null || echo "0")
+        if [ "$total_ips" -ge 900 ] && [ "$total_ips" -lt 1000 ]; then
+            log_info "IP Rotation: $total_ips/1000 IPs tracked ($(($total_ips * 100 / 1000))%)"
+        elif [ "$total_ips" -ge 1000 ]; then
+            log_success "IP Rotation: Reached tracking threshold (1000+ IPs)"
+        fi
+    fi
+}
+
+# Get IP rotation statistics
+get_ip_rotation_stats() {
+    local user_id="${1:-unknown}"
+    local log_file="$LOG_DIR/ip_rotation_${user_id}.log"
+    
+    if [ -f "$log_file" ]; then
+        local total_ips=$(wc -l < "$log_file")
+        local unique_ips=$(cut -d'|' -f2 "$log_file" | sort -u | wc -l)
+        local first_seen=$(head -n1 "$log_file" | cut -d'|' -f1)
+        local last_seen=$(tail -n1 "$log_file" | cut -d'|' -f1)
+        
+        echo "Total IPs tracked: $total_ips"
+        echo "Unique IPs: $unique_ips"
+        echo "First seen: $first_seen"
+        echo "Last seen: $last_seen"
+        echo "Threshold reached: $([[ $total_ips -ge 1000 ]] && echo "Yes" || echo "No ($total_ips/1000)")"
+    else
+        echo "No IP rotation data found for user: $user_id"
+    fi
+}
+
 # Progress bar
 show_progress() {
     local current=$1
@@ -651,6 +751,9 @@ export -f diagnose_smb_failure
 export -f diagnose_web_failure
 export -f diagnose_generic_failure
 export -f show_realtime_progress
+export -f check_vpn_warn
+export -f track_ip_rotation
+export -f get_ip_rotation_stats
 
 # If sourced, make functions available
 # If executed directly, show usage
