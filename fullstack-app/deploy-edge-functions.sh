@@ -18,7 +18,7 @@ echo ""
 # Check if Supabase CLI is installed
 if ! command -v supabase &> /dev/null; then
     echo -e "${RED}✗ Supabase CLI not found${NC}"
-    echo "Install with: npm install -g supabase"
+    echo "Install using the official instructions: https://supabase.com/docs/guides/cli"
     exit 1
 fi
 
