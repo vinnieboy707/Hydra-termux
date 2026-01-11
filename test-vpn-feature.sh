@@ -3,8 +3,18 @@
 # Integration Test for VPN Verification and IP Routing Feature
 # Tests the new VPN detection and IP tracking functionality
 
-set +e  # Don't exit on error for now, we'll handle errors explicitly
+# Exit immediately on unexpected errors; individual tests should explicitly
+# handle expected failures via conditionals or status checks.
+set -euo pipefail
 
+# Basic handler so unexpected errors produce a clear message.
+cleanup() {
+    local exit_code=$?
+    if [ "$exit_code" -ne 0 ]; then
+        echo "ERROR: Aborting VPN integration tests due to unexpected failure (exit code ${exit_code})." >&2
+    fi
+}
+trap cleanup EXIT
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
