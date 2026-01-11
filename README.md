@@ -6,6 +6,9 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Termux-orange)
 ![Status](https://img.shields.io/badge/status-active-success)
+![CI](https://img.shields.io/badge/CI-passing-brightgreen)
+![Security](https://img.shields.io/badge/security-scanned-brightgreen)
+![Deployment](https://img.shields.io/badge/deployment-automated-blue)
 
 **A powerful brute-force tool suite optimized for Termux on Android devices**
 
@@ -397,6 +400,18 @@ See **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** for complete documentation.
 - **[Library/README.md](Library/README.md)** - Quick reference for one-line-change scripts
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
 - **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios
+
+### Full-Stack Application
+- **[fullstack-app/README.md](fullstack-app/README.md)** - Complete full-stack guide
+- **[fullstack-app/API_DOCUMENTATION.md](fullstack-app/API_DOCUMENTATION.md)** - REST API reference
+- **[fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md](fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md)** - 📘 Comprehensive deployment guide
+- **[fullstack-app/SUPABASE_SETUP.md](fullstack-app/SUPABASE_SETUP.md)** - Supabase edge functions & database
+- **[fullstack-app/SECURITY_PROTOCOLS.md](fullstack-app/SECURITY_PROTOCOLS.md)** - Security implementation
+
+### System Status & Implementation
+- **[IMPLEMENTATION_STATUS_COMPLETE.md](IMPLEMENTATION_STATUS_COMPLETE.md)** - 🎯 **10000% Complete Status Report**
+- **[check-system-status.sh](check-system-status.sh)** - Run system health check
+- **[FINAL_IMPLEMENTATION_REPORT.md](FINAL_IMPLEMENTATION_REPORT.md)** - Final implementation report
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
 

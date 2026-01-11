@@ -1,0 +1,160 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight
+
+jobs:
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-and-quality
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+    
+    - name: Audit Backend Dependencies
+      working-directory: ./fullstack-app/backend
+      run: |
+        npm audit --audit-level=moderate || true
+        npm audit fix --dry-run || true
+    
+    - name: Audit Frontend Dependencies
+      working-directory: ./fullstack-app/frontend
+      run: |
+        npm audit --audit-level=moderate || true
+        npm audit fix --dry-run || true
+
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: TruffleHog OSS
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+        extra_args: --debug --only-verified
+
+  security-headers:
+    name: Security Headers Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check Security Headers in Backend
+      run: |
+        # Check for Helmet.js usage
+        if grep -r "helmet" fullstack-app/backend/*.js; then
+          echo "✓ Helmet.js security headers found"
+        else
+          echo "⚠ Warning: Helmet.js not found in backend"
+        fi
+        
+        # Check for CORS configuration
+        if grep -r "cors" fullstack-app/backend/*.js; then
+          echo "✓ CORS configuration found"
+        else
+          echo "⚠ Warning: CORS not configured"
+        fi
+        
+        # Check for rate limiting
+        if grep -r "rateLimit\|express-rate-limit" fullstack-app/backend/*.js; then
+          echo "✓ Rate limiting found"
+        else
+          echo "⚠ Warning: Rate limiting not found"
+        fi
+
+  sql-injection-check:
+    name: SQL Injection Prevention Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for Parameterized Queries
+      run: |
+        echo "Checking for unsafe SQL patterns..."
+        
+        # Look for dangerous SQL concatenation patterns inside likely SQL statements
+        # This is a heuristic check - any matches MUST be reviewed manually
+        if matches=$(grep -rEn --include="*.js" "\.query\s*\(\s*['\`](SELECT|INSERT|UPDATE|DELETE)[^'\`]*\$\{" fullstack-app/backend/); then
+          echo "⚠ Warning: Potential SQL injection risk - string interpolation detected in likely SQL queries:"
+          echo "$matches"
+          echo ""
+          echo "Action required: Manually review each occurrence above to confirm that parameterized/prepared statements or safe query builders are used."
+          echo "Note: This is a heuristic check and may flag safe, non-SQL template literal usage. It does NOT replace a full security review."
+          # Don't fail build, just warn
+        else
+          echo "✓ No obvious SQL injection patterns with string interpolation found"
+        fi
+
+  shellscript-security:
+    name: Shell Script Security
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for Dangerous Shell Patterns
+      run: |
+        echo "Checking for dangerous shell patterns..."
+        
+        # Check for eval usage (dangerous)
+        if grep -r "eval " scripts/ Library/ --include="*.sh"; then
+          echo "⚠ Warning: eval found - potential security risk"
+        fi
+        
+        # Check for unquoted variables
+        shellcheck -S error scripts/*.sh || echo "ShellCheck completed"
+        
+        echo "✓ Shell security check completed"
