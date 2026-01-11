@@ -1317,7 +1317,12 @@ generate_report() {
     local start_epoch=$(date -d "$start_time" +%s 2>/dev/null || echo 0)
     local end_epoch=$(date -d "$end_time" +%s 2>/dev/null || echo 0)
     local duration=$((end_epoch - start_epoch))
-    local duration_human=$(printf '%02d:%02d:%02d' $((duration/3600)) $((duration%3600/60)) $((duration%60)))
+    local duration_human
+    if [ "$start_epoch" -eq 0 ] || [ "$end_epoch" -eq 0 ]; then
+        duration_human="calculation failed"
+    else
+        duration_human=$(printf '%02d:%02d:%02d' $((duration/3600)) $((duration%3600/60)) $((duration%60)))
+    fi
     
     # Generate report content
     cat > "$report_file" << EOF
