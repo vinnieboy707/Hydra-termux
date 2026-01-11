@@ -245,17 +245,25 @@ const vpnCheckMiddleware = (options = {}) => {
       next();
     } catch (error) {
       console.error('VPN check middleware error:', error);
-      
+
+      // Classify expected VPN detection failures (e.g. upstream/network issues)
+      const expectedErrorCodes = new Set(['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'EAI_AGAIN']);
+      const isAxiosError = Boolean(error && error.isAxiosError);
+      const isExpectedCode = Boolean(error && error.code && expectedErrorCodes.has(error.code));
+      const isExpectedError = isAxiosError || isExpectedCode;
+
       // In case of error, decide whether to fail open or closed
-      if (enforceVPN) {
+      // - Always fail closed when enforceVPN is true
+      // - When enforceVPN is false, only fail open for expected/operational errors
+      if (enforceVPN || !isExpectedError) {
         return res.status(500).json({
           error: 'VPN verification failed',
           message: 'Unable to verify VPN status',
-          details: error.message
+          details: error && error.message ? error.message : String(error)
         });
       } else {
-        // Fail open - allow request but log error
-        console.error('VPN check failed but continuing (enforceVPN=false)');
+        // Fail open for expected detection errors - allow request but log
+        console.error('VPN check failed due to expected detection error; continuing (enforceVPN=false)');
         next();
       }
     }
