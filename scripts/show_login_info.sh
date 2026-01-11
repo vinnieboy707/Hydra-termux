@@ -94,18 +94,20 @@ show_reset_password() {
     echo -e "  (Follow prompts to create new admin account)"
     echo ""
     echo -e "${BOLD}Method 2: Create New Admin User${NC}"
-    echo -e "  ${CYAN}cd fullstack-app/backend${NC}"
-    echo -e "  ${CYAN}node -e \"${NC}"
-    echo -e "    const bcrypt = require('bcryptjs');"
-    echo -e "    const { run } = require('./database');"
-    echo -e "    (async () => {"
-    echo -e "      const hash = await bcrypt.hash('YourNewPassword', 10);"
-    echo -e "      await run('INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',"
-    echo -e "        ['newadmin', hash, 'admin@example.com', 'admin']);"
-    echo -e "      console.log('✅ New admin user created');"
-    echo -e "      process.exit(0);"
-    echo -e "    })();"
-    echo -e "  ${CYAN}\"${NC}"
+    echo -e "  Create a Node.js script in fullstack-app/backend:"
+    echo -e "  ${CYAN}// create-user.js${NC}"
+    echo -e "  const bcrypt = require('bcryptjs');"
+    echo -e "  const { run } = require('./database');"
+    echo -e "  const [user, pass, email] = process.argv.slice(2);"
+    echo -e "  (async () => {"
+    echo -e "    const hash = await bcrypt.hash(pass, 10);"
+    echo -e "    await run('INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',"
+    echo -e "      [user, hash, email, 'admin']);"
+    echo -e "    console.log('✅ Admin user created');"
+    echo -e "    process.exit(0);"
+    echo -e "  })();"
+    echo -e ""
+    echo -e "  Run: ${CYAN}node create-user.js newadmin YourPassword admin@example.com${NC}"
     echo ""
     echo -e "${BOLD}Method 3: Reset Database${NC}"
     echo -e "  ${CYAN}cd fullstack-app/backend${NC}"
@@ -120,6 +122,13 @@ check_web_app_status() {
     echo -e "${BOLD}${CYAN}📊 Web Application Status${NC}"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
+    
+    # Check if curl is available
+    if ! command -v curl >/dev/null 2>&1; then
+        echo -e "  ${YELLOW}⚠ curl not available - cannot check service status${NC}"
+        echo ""
+        return
+    fi
     
     # Check if backend is running
     if curl -s http://localhost:3000/api/health >/dev/null 2>&1; then
@@ -137,8 +146,11 @@ check_web_app_status() {
     
     echo ""
     
+    # Database path
+    local db_path="$PROJECT_ROOT/fullstack-app/backend/hydra.db"
+    
     # Check if database exists
-    if [ -f "$PROJECT_ROOT/fullstack-app/backend/hydra.db" ]; then
+    if [ -f "$db_path" ]; then
         echo -e "  Database: ${GREEN}✓ Found${NC} (SQLite)"
     else
         echo -e "  Database: ${YELLOW}⚠ Not Found${NC} (run setup first)"
