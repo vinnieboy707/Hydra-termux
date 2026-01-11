@@ -11,7 +11,7 @@ jobs:
   deploy-backend:
     name: Deploy Backend to Server
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - name: Checkout code
@@ -50,7 +50,7 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend to CDN
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - name: Checkout code
@@ -82,7 +82,7 @@ jobs:
   deploy-supabase-functions:
     name: Deploy Supabase Edge Functions
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - name: Checkout code
@@ -99,8 +99,8 @@ jobs:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
       run: |
-        # Login to Supabase
-        supabase login
+        # Login to Supabase using access token
+        echo "$SUPABASE_ACCESS_TOKEN" | supabase login --token
         
         # Link to project
         supabase link --project-ref $SUPABASE_PROJECT_ID
@@ -131,9 +131,15 @@ jobs:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
       run: |
-        supabase login
+        # Login to Supabase using access token
+        echo "$SUPABASE_ACCESS_TOKEN" | supabase login --token
+        
+        # Link to project
         supabase link --project-ref $SUPABASE_PROJECT_ID
+        
+        # Apply migrations
         supabase db push
+        
         echo "Database migrations applied successfully!"
 
   create-release:

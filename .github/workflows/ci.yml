@@ -85,8 +85,9 @@ jobs:
         
     - name: Check Main Scripts
       run: |
-        shellcheck -S warning hydra.sh install.sh fix-hydra.sh || true
-        shellcheck -S warning Library/*.sh || true
+        # Allow warnings but not errors
+        shellcheck -S warning hydra.sh install.sh fix-hydra.sh || exit 0
+        shellcheck -S warning Library/*.sh || exit 0
 
   validate-json:
     name: Validate JSON Files

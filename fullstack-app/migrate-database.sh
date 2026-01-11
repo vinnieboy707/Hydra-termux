@@ -26,9 +26,13 @@ show_usage() {
     echo "  --port <port>              Database port (default: 5432)"
     echo "  --user <username>          Database user (default: postgres)"
     echo "  --db <database>            Database name (default: hydra_termux)"
-    echo "  --password <password>      Database password"
+    echo "  --password <password>      Database password (⚠️  NOT RECOMMENDED: visible in process list)"
     echo "  --file <schema_file>       Schema file to apply"
     echo "  --help                     Show this help message"
+    echo ""
+    echo "Security Note:"
+    echo "  Using --password exposes credentials in process listings and shell history."
+    echo "  For production, use password prompts or environment variables instead."
     echo ""
     echo "Examples:"
     echo "  $0 --type postgres --host localhost --password mypass"
@@ -155,11 +159,15 @@ elif [ "$DB_TYPE" = "postgres" ]; then
     echo "Testing database connection..."
     export PGPASSWORD="$DB_PASSWORD"
     
+    # Ensure PGPASSWORD is unset on exit
+    trap 'unset PGPASSWORD' EXIT INT TERM
+    
     if psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "SELECT version();" &> /dev/null; then
         echo -e "${GREEN}✓ Connected to database successfully${NC}"
     else
         echo -e "${RED}✗ Failed to connect to database${NC}"
         echo "Please check your connection parameters"
+        unset PGPASSWORD
         exit 1
     fi
     
@@ -173,9 +181,11 @@ elif [ "$DB_TYPE" = "postgres" ]; then
     else
         echo ""
         echo -e "${RED}✗ Failed to apply schema to PostgreSQL${NC}"
+        unset PGPASSWORD
         exit 1
     fi
     
+    # Trap will handle cleanup automatically
     unset PGPASSWORD
 else
     echo -e "${RED}✗ Unknown database type: $DB_TYPE${NC}"
