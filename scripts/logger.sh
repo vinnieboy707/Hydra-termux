@@ -221,9 +221,18 @@ track_ip_rotation() {
     local log_file="$LOG_DIR/ip_rotation_${user_id}.log"
     
     # Get current public IP
-    local current_ip=""
+    # Uses external service (https://api.ipify.org); if unavailable, logs a warning and skips tracking
+    local current_ip="unknown"
     if command -v curl &>/dev/null; then
-        current_ip=$(curl -s --connect-timeout 3 https://api.ipify.org 2>/dev/null || echo "unknown")
+        local ip_output
+        ip_output=$(curl -s --connect-timeout 3 https://api.ipify.org 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$ip_output" ]; then
+            current_ip="$ip_output"
+        else
+            log_warn "IP Rotation: Failed to fetch public IP from https://api.ipify.org (network/firewall issue?). Skipping IP rotation tracking for this run."
+        fi
+    else
+        log_warn "IP Rotation: 'curl' command not found. Cannot fetch public IP; IP rotation tracking is disabled for this run."
     fi
     
     if [ "$current_ip" != "unknown" ] && [ -n "$current_ip" ]; then
