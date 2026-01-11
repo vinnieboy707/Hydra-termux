@@ -96,11 +96,27 @@ router.post('/', authMiddleware, vpnCheckMiddleware({ enforceVPN: true, trackRot
     
     // Log IP rotation stats
     if (req.ipRotation) {
-      await run(
-        `INSERT INTO ip_rotation_log (attack_id, user_id, ip_address, total_ips_tracked, unique_ips_last_hour)
-         VALUES (?, ?, ?, ?, ?)`,
-        [attackId, req.user.id, req.clientIP, req.ipRotation.totalIPsTracked, req.ipRotation.uniqueIPsLastHour]
-      ).catch(err => console.error('Failed to log IP rotation:', err));
+      try {
+        await run(
+          `INSERT INTO ip_rotation_log (attack_id, user_id, ip_address, total_ips_tracked, unique_ips_last_hour)
+           VALUES (?, ?, ?, ?, ?)`,
+          [attackId, req.user.id, req.clientIP, req.ipRotation.totalIPsTracked, req.ipRotation.uniqueIPsLastHour]
+        );
+      } catch (err) {
+        console.error(
+          'Failed to log IP rotation for attack',
+          attackId,
+          'and user',
+          req.user.id,
+          err
+        );
+        if (typeof process !== 'undefined' && typeof process.emitWarning === 'function') {
+          process.emitWarning(
+            `Failed to log IP rotation for attack ${attackId} and user ${req.user.id}`,
+            { cause: err }
+          );
+        }
+      }
     }
     
     // Queue the attack
