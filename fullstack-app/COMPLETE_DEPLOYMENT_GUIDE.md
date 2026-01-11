@@ -18,7 +18,7 @@ This guide covers the complete deployment process for Hydra-Termux Full-Stack Ap
 - npm or yarn
 - Git
 - PostgreSQL 14+ (if using local database) or Supabase account
-- Supabase CLI: `npm install -g supabase`
+- Supabase CLI: use `npx supabase` or install via a supported package manager (see https://supabase.com/docs/guides/cli)
 
 ### Required Accounts
 - GitHub account (for CI/CD)
