@@ -54,9 +54,16 @@ show_web_app_info() {
     echo -e "  Frontend: ${CYAN}http://localhost:3001${NC}"
     echo -e "  Backend:  ${CYAN}http://localhost:3000${NC}"
     echo ""
-    echo -e "${BOLD}Default Credentials:${NC}"
+    echo -e "${BOLD}Default Admin Credentials:${NC} ${YELLOW}(if using start.sh)${NC}"
     echo -e "  Username: ${GREEN}${BOLD}admin${NC}"
     echo -e "  Password: ${GREEN}${BOLD}admin${NC}"
+    echo -e "  Role:     ${CYAN}admin${NC}"
+    echo ""
+    echo -e "${BOLD}Super Admin Credentials:${NC} ${YELLOW}(if using quickstart.sh)${NC}"
+    echo -e "  Username: ${GREEN}${BOLD}[you chose during setup]${NC}"
+    echo -e "  Password: ${GREEN}${BOLD}[you chose during setup]${NC}"
+    echo -e "  Role:     ${CYAN}super_admin${NC}"
+    echo -e "  ${BLUE}ℹ️  Default username: admin (if you pressed Enter)${NC}"
     echo ""
     echo -e "${YELLOW}⚠️  IMPORTANT SECURITY NOTICE:${NC}"
     echo -e "  ${RED}Change the default password immediately after first login!${NC}"
@@ -93,21 +100,22 @@ show_reset_password() {
     echo -e "  ${CYAN}bash quickstart.sh${NC}"
     echo -e "  (Follow prompts to create new admin account)"
     echo ""
-    echo -e "${BOLD}Method 2: Create New Admin User${NC}"
+    echo -e "${BOLD}Method 2: Create New Admin/Super Admin User${NC}"
     echo -e "  Create a Node.js script in fullstack-app/backend:"
     echo -e "  ${CYAN}// create-user.js${NC}"
     echo -e "  const bcrypt = require('bcryptjs');"
     echo -e "  const { run } = require('./database');"
-    echo -e "  const [user, pass, email] = process.argv.slice(2);"
+    echo -e "  const [user, pass, email, role] = process.argv.slice(2);"
     echo -e "  (async () => {"
     echo -e "    const hash = await bcrypt.hash(pass, 10);"
     echo -e "    await run('INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',"
-    echo -e "      [user, hash, email, 'admin']);"
-    echo -e "    console.log('✅ Admin user created');"
+    echo -e "      [user, hash, email, role || 'admin']);"
+    echo -e "    console.log(\`✅ \${role || 'admin'} user created\`);"
     echo -e "    process.exit(0);"
     echo -e "  })();"
     echo -e ""
-    echo -e "  Run: ${CYAN}node create-user.js newadmin YourPassword admin@example.com${NC}"
+    echo -e "  Run for ${CYAN}admin${NC}:       ${CYAN}node create-user.js newadmin YourPassword admin@example.com admin${NC}"
+    echo -e "  Run for ${GREEN}super_admin${NC}: ${CYAN}node create-user.js newsuperadmin YourPassword admin@example.com super_admin${NC}"
     echo ""
     echo -e "${BOLD}Method 3: Reset Database${NC}"
     echo -e "  ${CYAN}cd fullstack-app/backend${NC}"
@@ -158,6 +166,48 @@ check_web_app_status() {
     echo ""
 }
 
+# Function to check super admin in database
+check_super_admin_info() {
+    echo -e "${BOLD}${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BOLD}${CYAN}🔑 Check Super Admin in Database${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    local db_path="$PROJECT_ROOT/fullstack-app/backend/hydra.db"
+    
+    if [ ! -f "$db_path" ]; then
+        echo -e "  ${YELLOW}⚠ Database not found${NC}"
+        echo -e "  Run setup first: ${CYAN}cd fullstack-app && bash quickstart.sh${NC}"
+        echo ""
+        return
+    fi
+    
+    # Check if sqlite3 is available
+    if ! command -v sqlite3 >/dev/null 2>&1; then
+        echo -e "  ${YELLOW}⚠ sqlite3 not available - cannot query database${NC}"
+        echo -e "  Install: ${CYAN}pkg install sqlite -y${NC} (Termux)"
+        echo -e "  Or: ${CYAN}sudo apt install sqlite3 -y${NC} (Debian/Ubuntu)"
+        echo ""
+        return
+    fi
+    
+    echo -e "${BOLD}Current users in database:${NC}"
+    echo ""
+    
+    # Query database for users
+    sqlite3 "$db_path" << 'SQL'
+.mode column
+.headers on
+.width 15 30 10
+SELECT username, email, role FROM users ORDER BY role DESC, username;
+SQL
+    
+    echo ""
+    echo -e "${BLUE}ℹ️  Note: Passwords are hashed and cannot be displayed${NC}"
+    echo -e "${BLUE}ℹ️  If you forgot your password, see reset methods below${NC}"
+    echo ""
+}
+
 # Function to show additional help
 show_additional_help() {
     echo -e "${BOLD}${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -186,6 +236,7 @@ main() {
     show_web_app_info
     show_web_app_startup
     check_web_app_status
+    check_super_admin_info
     show_reset_password
     show_additional_help
     
