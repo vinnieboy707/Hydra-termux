@@ -227,15 +227,18 @@ track_ip_rotation() {
     fi
     
     if [ "$current_ip" != "unknown" ] && [ -n "$current_ip" ]; then
-        local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
-        echo "$timestamp|$current_ip" >> "$log_file"
+        local timestamp
+        timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+        local now_epoch
+        now_epoch=$(date +%s)
+        echo "$timestamp|$current_ip|$now_epoch" >> "$log_file"
         
-        # Count unique IPs in last hour
-        local one_hour_ago=$(date -d '1 hour ago' '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-1H '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+        # Count unique IPs in last hour (using epoch timestamps for portability)
+        local one_hour_ago_epoch=$((now_epoch - 3600))
         local unique_ips=0
         
         if [ -f "$log_file" ]; then
-            unique_ips=$(awk -F'|' -v cutoff="$one_hour_ago" '$1 >= cutoff {print $2}' "$log_file" 2>/dev/null | sort -u | wc -l)
+            unique_ips=$(awk -F'|' -v cutoff_epoch="$one_hour_ago_epoch" 'NF >= 3 && ($3 + 0) >= (cutoff_epoch + 0) {print $2}' "$log_file" 2>/dev/null | sort -u | wc -l)
         fi
         
         log_debug "IP Rotation: Current=$current_ip, Unique IPs (last hour)=$unique_ips"
