@@ -68,6 +68,13 @@ show_web_app_info() {
     echo -e "${YELLOW}⚠️  IMPORTANT SECURITY NOTICE:${NC}"
     echo -e "  ${RED}Change the default password immediately after first login!${NC}"
     echo ""
+    echo -e "${BOLD}${RED}❌ Credentials Not Working?${NC}"
+    echo -e "  ${YELLOW}1.${NC} Make sure you've run setup: ${CYAN}cd fullstack-app && bash start.sh${NC}"
+    echo -e "  ${YELLOW}2.${NC} Check if database exists: ${CYAN}ls -la fullstack-app/database.sqlite${NC}"
+    echo -e "  ${YELLOW}3.${NC} Verify backend is running on port 3000"
+    echo -e "  ${YELLOW}4.${NC} Check browser console for errors (F12)"
+    echo -e "  ${YELLOW}5.${NC} See 'Check Super Admin in Database' section below to verify users"
+    echo ""
 }
 
 # Function to show how to start web app
@@ -119,7 +126,7 @@ show_reset_password() {
     echo ""
     echo -e "${BOLD}Method 3: Reset Database${NC}"
     echo -e "  ${CYAN}cd fullstack-app/backend${NC}"
-    echo -e "  ${CYAN}rm hydra.db${NC}  (deletes existing database)"
+    echo -e "  ${CYAN}rm ../database.sqlite${NC}  (deletes existing database)"
     echo -e "  ${CYAN}npm start${NC}   (will recreate with default admin/admin)"
     echo ""
 }
@@ -155,7 +162,7 @@ check_web_app_status() {
     echo ""
     
     # Database path
-    local db_path="$PROJECT_ROOT/fullstack-app/backend/hydra.db"
+    local db_path="$PROJECT_ROOT/fullstack-app/database.sqlite"
     
     # Check if database exists
     if [ -f "$db_path" ]; then
@@ -173,7 +180,7 @@ check_super_admin_info() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    local db_path="$PROJECT_ROOT/fullstack-app/backend/hydra.db"
+    local db_path="$PROJECT_ROOT/fullstack-app/database.sqlite"
     
     if [ ! -f "$db_path" ]; then
         echo -e "  ${YELLOW}⚠ Database not found${NC}"
