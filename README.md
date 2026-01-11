@@ -274,6 +274,8 @@ cd frontend && npm start
 - Backend API: http://localhost:3000
 - Default login: admin / admin (change immediately!)
 
+**🔑 Forgot your login?** Run: `./what-is-my-login.sh` or use menu option 20
+
 **Features:**
 - 🎨 Modern dark-themed UI optimized for security professionals
 - 📊 Real-time dashboard with attack statistics

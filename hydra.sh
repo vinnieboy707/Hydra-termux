@@ -91,6 +91,7 @@ show_menu() {
     print_message "  OTHER:" "$MAGENTA"
     echo "  18) Help & Documentation"
     echo "  19) About & Credits"
+    echo "  20) Show Login Credentials"
     echo "  0)  Exit"
     echo ""
     print_message "╚════════════════════════════════════════════════════════╝" "$BLUE"
@@ -493,7 +494,7 @@ main() {
         show_banner
         show_menu
         
-        read -r -p "Enter your choice [0-19]: " choice
+        read -r -p "Enter your choice [0-20]: " choice
         
         case $choice in
             1)
@@ -553,6 +554,9 @@ main() {
             19)
                 show_about
                 ;;
+            20)
+                run_utility "show_login_info.sh" "Login Credentials Helper"
+                ;;
             0)
                 clear
                 print_message "Thanks for using Hydra-Termux Ultimate Edition!" "$GREEN"
@@ -561,7 +565,7 @@ main() {
                 exit 0
                 ;;
             *)
-                log_error "Invalid choice. Please select 0-19."
+                log_error "Invalid choice. Please select 0-20."
                 sleep 2
                 ;;
         esac
