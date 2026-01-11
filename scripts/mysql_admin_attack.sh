@@ -77,6 +77,9 @@ validate_input() {
 
 # Function to run MySQL attack
 run_attack() {
+    # Start tracking attack for reporting
+    start_attack_tracking
+    
     local username_file=$(mktemp)
     
     # Get usernames
@@ -122,6 +125,9 @@ run_attack() {
             # Show connection string
             log_info "Connection string: mysql -h $TARGET -P $PORT -u $login -p$password"
             
+            # Generate detailed attack report with prevention recommendations
+            finish_attack_tracking "mysql" "$TARGET" "$PORT" "SUCCESS" "$login" "$password"
+            
             rm -f "$username_file"
             return 0
         fi
@@ -134,6 +140,8 @@ run_attack() {
     
     if [ $result -ne 0 ]; then
         log_warning "No valid credentials found"
+        # Generate report for failed attack
+        finish_attack_tracking "mysql" "$TARGET" "$PORT" "FAILED"
     fi
     
     return $result

@@ -116,6 +116,9 @@ detect_admin_panel() {
 
 # Function to run web attack
 run_attack() {
+    # Start tracking attack for reporting
+    start_attack_tracking
+    
     local username_file=$(mktemp)
     
     # Get usernames
@@ -167,6 +170,9 @@ run_attack() {
                 save_result "http" "$TARGET" "$login" "$password" "$PORT"
                 log_success "Valid credentials found: $login:$password"
                 
+                # Generate detailed attack report with prevention recommendations
+                finish_attack_tracking "web" "$TARGET" "$PORT" "SUCCESS" "$login" "$password"
+                
                 rm -f "$username_file"
                 return 0
             fi
@@ -192,6 +198,9 @@ run_attack() {
                 save_result "http" "$TARGET" "$login" "$password" "$PORT"
                 log_success "Valid credentials found: $login:$password"
                 
+                # Generate detailed attack report with prevention recommendations
+                finish_attack_tracking "web" "$TARGET" "$PORT" "SUCCESS" "$login" "$password"
+                
                 rm -f "$username_file"
                 return 0
             fi
@@ -205,6 +214,8 @@ run_attack() {
     
     if [ $result -ne 0 ]; then
         log_warning "No valid credentials found"
+        # Generate report for failed attack
+        finish_attack_tracking "web" "$TARGET" "$PORT" "FAILED"
     fi
     
     return $result
