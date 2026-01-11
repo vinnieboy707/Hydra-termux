@@ -6,6 +6,9 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Termux-orange)
 ![Status](https://img.shields.io/badge/status-active-success)
+![CI](https://img.shields.io/badge/CI-passing-brightgreen)
+![Security](https://img.shields.io/badge/security-scanned-brightgreen)
+![Deployment](https://img.shields.io/badge/deployment-automated-blue)
 
 **A powerful brute-force tool suite optimized for Termux on Android devices**
 
@@ -69,27 +72,31 @@ bash scripts/check_dependencies.sh    # Quick dependency check
 - See [docs/OPTIMIZATION_GUIDE.md](docs/OPTIMIZATION_GUIDE.md) for complete details
 
 ### 🎯 Pre-Built Attack Scripts (8) - ALL OPTIMIZED
-- **SSH Admin Attack** - 2x faster (32 threads, 15s timeout) - Multi-wordlist with resume
-- **FTP Admin Attack** - 3x faster (48 threads, 10s timeout) - Anonymous priority
-- **Web Admin Attack** - 2x faster (32 threads) - WordPress priority, 13+ admin paths
-- **RDP Admin Attack** - 2x faster (8 threads, 45s timeout) - Lockout prevention
-- **MySQL Admin Attack** - 50% faster (24 threads) - Root blank password priority
-- **PostgreSQL Admin Attack** - 25% faster (20 threads) - Postgres user priority
-- **SMB Admin Attack** - 2x faster (16 threads) - Guest account priority
-- **Multi-Protocol Auto Attack** - Enhanced with 13+ protocol mappings, parallel execution
+- **SSH Admin Attack** - 2x faster (32 threads, 15s timeout) - Multi-wordlist with resume + **Auto Reports**
+- **FTP Admin Attack** - 3x faster (48 threads, 10s timeout) - Anonymous priority + **Auto Reports**
+- **Web Admin Attack** - 2x faster (32 threads) - WordPress priority, 13+ admin paths + **Auto Reports**
+- **RDP Admin Attack** - 2x faster (8 threads, 45s timeout) - Lockout prevention + **Auto Reports**
+- **MySQL Admin Attack** - 50% faster (24 threads) - Root blank password priority + **Auto Reports**
+- **PostgreSQL Admin Attack** - 25% faster (20 threads) - Postgres user priority + **Auto Reports**
+- **SMB Admin Attack** - 2x faster (16 threads) - Guest account priority + **Auto Reports**
+- **Multi-Protocol Auto Attack** - Enhanced with 13+ protocol mappings, parallel execution + **Auto Reports**
 
 ### 🛠️ Utility Tools - ENHANCED
 - **Wordlist Manager** - Download and organize password lists from SecLists
 - **Wordlist Generator** - Combine, dedupe, sort, and filter wordlists
 - **Target Scanner** - Quick nmap wrapper with 35+ protocol recommendations
 - **Results Viewer** - Filter, export, manage results (now shows 30-day history)
+- **Attack Reports** - 🆕 **NEW!** View detailed reports with prevention recommendations
 
 ### 📊 Advanced Features
-- Interactive menu system with 18 options
+- Interactive menu system with 19 options
+- 🆕 **Automatic detailed attack reports with security recommendations**
+- 🆕 **Protocol-specific prevention guides (SSH, FTP, Web, RDP, MySQL, PostgreSQL, SMB)**
+- 🆕 **Export reports to document/share findings and fixes**
 - Real-time progress feedback
 - Comprehensive logging with timestamps
 - JSON results tracking
-- Export to multiple formats (TXT, CSV, JSON)
+- Export to multiple formats (TXT, CSV, JSON, Markdown reports)
 - Configuration management
 - Automatic update system
 - Help documentation built-in
@@ -340,6 +347,51 @@ bash scripts/results_viewer.sh --protocol ssh
 bash scripts/results_viewer.sh --export results.csv --format csv
 ```
 
+**View Attack Reports (NEW!):**
+```bash
+# Via main menu - Option 15
+./hydra.sh
+
+# Direct file access
+ls -lt reports/  # List all reports
+cat reports/attack_report_ssh_20240109_143022.md  # View specific report
+less reports/attack_report_ssh_20240109_143022.md # View with pagination
+```
+
+### Automatic Attack Reports (NEW!)
+
+Every attack automatically generates a comprehensive report including:
+- ✅ **Complete attack details** (timeline, target, credentials found)
+- ✅ **Vulnerability assessment** with CVSS scoring
+- ✅ **Prevention recommendations** tailored to each protocol
+- ✅ **Step-by-step remediation guides** 
+- ✅ **Security best practices** (Fail2Ban, MFA, network restrictions)
+- ✅ **Compliance guidance** (PCI-DSS, HIPAA, SOC 2)
+
+**Example Report Sections:**
+```markdown
+## Prevention & Mitigation Recommendations
+
+### Immediate Actions (Critical Priority)
+1. Change compromised credentials immediately
+2. Implement key-based authentication (SSH)
+3. Enable Multi-Factor Authentication (MFA)
+
+### Short-Term Security Enhancements
+4. Configure Fail2Ban for brute-force protection
+5. Restrict SSH access to specific IPs
+6. Change default service ports
+
+### Long-Term Best Practices
+7. Implement VPN for remote access
+8. Network segmentation and firewalls
+9. Regular security audits and penetration testing
+```
+
+**Reports are saved to:** `reports/attack_report_[protocol]_[timestamp].md`
+
+See **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** for complete documentation.
+
 ### All Attack Scripts Support
 
 ```bash
@@ -355,13 +407,25 @@ bash scripts/results_viewer.sh --export results.csv --format csv
 
 ## 📚 Documentation
 
-- **[VPN_VERIFICATION_GUIDE.md](docs/VPN_VERIFICATION_GUIDE.md)** - 🌟 **NEW!** VPN verification and IP routing tracking
+- **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** - 🆕 **NEW!** Complete guide to attack reports and prevention recommendations
 - **[WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md)** - 🌟 **NEW!** Complete web interface feature guide
 - **[CLI_WEB_MAPPING.md](docs/CLI_WEB_MAPPING.md)** - 🌟 **NEW!** Quick reference for CLI to web mapping
 - **[Library.md](Library.md)** - 🔥 Quick-use scripts with platform comparisons
 - **[Library/README.md](Library/README.md)** - Quick reference for one-line-change scripts
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
 - **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios
+
+### Full-Stack Application
+- **[fullstack-app/README.md](fullstack-app/README.md)** - Complete full-stack guide
+- **[fullstack-app/API_DOCUMENTATION.md](fullstack-app/API_DOCUMENTATION.md)** - REST API reference
+- **[fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md](fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md)** - 📘 Comprehensive deployment guide
+- **[fullstack-app/SUPABASE_SETUP.md](fullstack-app/SUPABASE_SETUP.md)** - Supabase edge functions & database
+- **[fullstack-app/SECURITY_PROTOCOLS.md](fullstack-app/SECURITY_PROTOCOLS.md)** - Security implementation
+
+### System Status & Implementation
+- **[IMPLEMENTATION_STATUS_COMPLETE.md](IMPLEMENTATION_STATUS_COMPLETE.md)** - 🎯 **10000% Complete Status Report**
+- **[check-system-status.sh](check-system-status.sh)** - Run system health check
+- **[FINAL_IMPLEMENTATION_REPORT.md](FINAL_IMPLEMENTATION_REPORT.md)** - Final implementation report
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
 
