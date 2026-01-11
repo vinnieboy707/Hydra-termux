@@ -18,6 +18,13 @@ echo ""
 log_warning "⚠️  Use this tool responsibly and only on accounts you own!"
 echo ""
 
+# Check for PHP
+if ! command -v php >/dev/null 2>&1; then
+    log_error "PHP is not installed!"
+    log_info "Install PHP: pkg install php -y (Termux) or apt install php -y (Linux)"
+    exit 1
+fi
+
 # Create Tools directory if it doesn't exist
 mkdir -p "$TOOLS_DIR"
 

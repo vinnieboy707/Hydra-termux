@@ -58,4 +58,11 @@ sleep 3
 
 log_info "Launching Auto IP Changer..."
 cd "$TOOL_DIR"
-python3 Auto_IP_changer.py 2>/dev/null || aut 2>/dev/null || true
+# Try multiple possible commands
+if [ -f "Auto_IP_changer.py" ]; then
+    python3 Auto_IP_changer.py 2>/dev/null
+elif command -v aut >/dev/null 2>&1; then
+    aut 2>/dev/null
+else
+    log_warning "Could not find Auto_IP_changer executable. Try running python3 Auto_IP_changer.py manually."
+fi

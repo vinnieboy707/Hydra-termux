@@ -42,4 +42,7 @@ fi
 
 log_info "Launching DARKARMY..."
 cd "$TOOL_DIR"
+log_warning "⚠️  Note: This tool uses Python 2 (deprecated and unmaintained)"
+log_warning "Security updates are no longer available for Python 2"
+echo ""
 python2 darkarmy.py 2>/dev/null || python darkarmy.py

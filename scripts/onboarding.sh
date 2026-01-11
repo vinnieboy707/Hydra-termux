@@ -188,7 +188,7 @@ step_first_setup() {
     
     if [[ "$download_wl" =~ ^[Yy]$ ]]; then
         log_info "This may take a few minutes..."
-        bash "$SCRIPT_DIR/download_wordlists.sh" --all
+        bash "$PROJECT_ROOT/scripts/download_wordlists.sh" --all
     else
         log_info "You can download wordlists later from option 9."
     fi
