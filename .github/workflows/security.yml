@@ -124,15 +124,17 @@ jobs:
       run: |
         echo "Checking for unsafe SQL patterns..."
         
-        # Look for dangerous SQL concatenation patterns
-        # This is a basic check - review flagged items manually
-        if grep -rE "\.query\(['\"]SELECT.+\$\{|\.query\(['\"]INSERT.+\$\{|\.query\(['\"]UPDATE.+\$\{|\.query\(['\"]DELETE.+\$\{" fullstack-app/backend/ --include="*.js"; then
-          echo "⚠ Warning: Potential SQL injection vulnerability found"
-          echo "Please verify these queries use parameterized statements"
-          echo "This check may produce false positives - review manually"
+        # Look for dangerous SQL concatenation patterns inside likely SQL statements
+        # This is a heuristic check - any matches MUST be reviewed manually
+        if matches=$(grep -rEn --include="*.js" "\.query\s*\(\s*['\`](SELECT|INSERT|UPDATE|DELETE)[^'\`]*\$\{" fullstack-app/backend/); then
+          echo "⚠ Warning: Potential SQL injection risk - string interpolation detected in likely SQL queries:"
+          echo "$matches"
+          echo ""
+          echo "Action required: Manually review each occurrence above to confirm that parameterized/prepared statements or safe query builders are used."
+          echo "Note: This is a heuristic check and may flag safe, non-SQL template literal usage. It does NOT replace a full security review."
           # Don't fail build, just warn
         else
-          echo "✓ No obvious SQL injection patterns found"
+          echo "✓ No obvious SQL injection patterns with string interpolation found"
         fi
 
   shellscript-security:
