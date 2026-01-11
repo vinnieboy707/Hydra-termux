@@ -33,13 +33,14 @@ jobs:
     - name: Deploy via SSH
       uses: appleboy/ssh-action@master
       env:
-        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/opt/hydra-termux' }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
       with:
         host: ${{ secrets.DEPLOY_HOST }}
         username: ${{ secrets.DEPLOY_USER }}
         key: ${{ secrets.DEPLOY_KEY }}
         envs: DEPLOY_PATH
         script: |
+          DEPLOY_PATH="${DEPLOY_PATH:-/opt/hydra-termux}"
           cd ${DEPLOY_PATH}/fullstack-app/backend
           git pull origin main
           npm ci --production
