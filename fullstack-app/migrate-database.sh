@@ -104,7 +104,8 @@ if [ "$DB_TYPE" = "supabase" ]; then
     # Check if Supabase CLI is installed
     if ! command -v supabase &> /dev/null; then
         echo -e "${RED}✗ Supabase CLI not found${NC}"
-        echo "Install with: npm install -g supabase"
+        echo "Install the Supabase CLI using the official instructions:"
+        echo "  https://supabase.com/docs/guides/cli/getting-started"
         exit 1
     fi
     
