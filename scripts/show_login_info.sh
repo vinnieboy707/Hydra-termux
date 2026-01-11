@@ -110,7 +110,7 @@ show_reset_password() {
     echo -e "    const hash = await bcrypt.hash(pass, 10);"
     echo -e "    await run('INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',"
     echo -e "      [user, hash, email, role || 'admin']);"
-    echo -e "    console.log(\`✅ \${role || 'admin'} user created\`);"
+    echo -e "    console.log('✅ ' + (role || 'admin') + ' user created');"
     echo -e "    process.exit(0);"
     echo -e "  })();"
     echo -e ""
@@ -185,7 +185,7 @@ check_super_admin_info() {
     # Check if sqlite3 is available
     if ! command -v sqlite3 >/dev/null 2>&1; then
         echo -e "  ${YELLOW}⚠ sqlite3 not available - cannot query database${NC}"
-        echo -e "  Install: ${CYAN}pkg install sqlite -y${NC} (Termux)"
+        echo -e "  Install with: ${CYAN}pkg install sqlite -y${NC} (Termux)"
         echo -e "  Or: ${CYAN}sudo apt install sqlite3 -y${NC} (Debian/Ubuntu)"
         echo ""
         return
@@ -194,17 +194,21 @@ check_super_admin_info() {
     echo -e "${BOLD}Current users in database:${NC}"
     echo ""
     
-    # Query database for users
-    sqlite3 "$db_path" << 'SQL'
+    # Query database for users with error handling
+    if sqlite3 "$db_path" 2>/dev/null << 'SQL'
 .mode column
 .headers on
 .width 15 30 10
 SELECT username, email, role FROM users ORDER BY role DESC, username;
 SQL
-    
-    echo ""
-    echo -e "${BLUE}ℹ️  Note: Passwords are hashed and cannot be displayed${NC}"
-    echo -e "${BLUE}ℹ️  If you forgot your password, see reset methods below${NC}"
+    then
+        echo ""
+        echo -e "${BLUE}ℹ️  Note: Passwords are hashed and cannot be displayed${NC}"
+        echo -e "${BLUE}ℹ️  If you forgot your password, see reset methods below${NC}"
+    else
+        echo -e "${YELLOW}⚠ Unable to query database${NC}"
+        echo -e "  Database may be corrupted or inaccessible"
+    fi
     echo ""
 }
 
