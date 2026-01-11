@@ -315,6 +315,20 @@ track_ip_rotation() {
     local user_id="${1:-unknown}"
     local log_file="$LOG_DIR/ip_rotation_${user_id}.log"
     
+    # Rotate log file if it exceeds 10000 lines
+    if [ -f "$log_file" ]; then
+        local line_count=$(wc -l < "$log_file" 2>/dev/null || echo "0")
+        if [ "$line_count" -gt 10000 ]; then
+            # Archive old log and start fresh
+            local archive_file="$LOG_DIR/ip_rotation_${user_id}_$(date +%Y%m%d_%H%M%S).log.gz"
+            gzip -c "$log_file" > "$archive_file" 2>/dev/null || true
+            # Keep only last 1000 entries in active log
+            tail -n 1000 "$log_file" > "$log_file.tmp"
+            mv "$log_file.tmp" "$log_file"
+            log_debug "IP Rotation: Log rotated, archived to $(basename "$archive_file")"
+        fi
+    fi
+    
     # Get current public IP
     # Uses external service (https://api.ipify.org); if unavailable, logs a warning and skips tracking
     local current_ip="unknown"
@@ -325,9 +339,11 @@ track_ip_rotation() {
             current_ip="$ip_output"
         else
             log_warn "IP Rotation: Failed to fetch public IP from https://api.ipify.org (network/firewall issue?). Skipping IP rotation tracking for this run."
+            return 1
         fi
     else
         log_warn "IP Rotation: 'curl' command not found. Cannot fetch public IP; IP rotation tracking is disabled for this run."
+        return 1
     fi
     
     if [ "$current_ip" != "unknown" ] && [ -n "$current_ip" ]; then

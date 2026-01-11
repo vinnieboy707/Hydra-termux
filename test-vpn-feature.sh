@@ -3,18 +3,8 @@
 # Integration Test for VPN Verification and IP Routing Feature
 # Tests the new VPN detection and IP tracking functionality
 
-# Exit immediately on unexpected errors; individual tests should explicitly
-# handle expected failures via conditionals or status checks.
-set -euo pipefail
-
-# Basic handler so unexpected errors produce a clear message.
-cleanup() {
-    local exit_code=$?
-    if [ "$exit_code" -ne 0 ]; then
-        echo "ERROR: Aborting VPN integration tests due to unexpected failure (exit code ${exit_code})." >&2
-    fi
-}
-trap cleanup EXIT
+# Allow tests to report failures without exiting
+set -uo pipefail
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -45,16 +35,9 @@ if [ -f "$VPN_SCRIPT" ] && [ -x "$VPN_SCRIPT" ]; then
     ((TESTS_PASSED++))
 else
     echo -e "${RED}✗ FAILED${NC} - vpn_check.sh not found or not executable"
-    echo -e "${YELLOW}  Debug: PROJECT_ROOT=$PROJECT_ROOT${NC}"
-    echo -e "${YELLOW}  Debug: VPN_SCRIPT=$VPN_SCRIPT${NC}"
-    echo -e "${YELLOW}  Debug: File exists: $([ -f "$VPN_SCRIPT" ] && echo yes || echo no)${NC}"
-    echo -e "${YELLOW}  Debug: Is executable: $([ -x "$VPN_SCRIPT" ] && echo yes || echo no)${NC}"
     ((TESTS_FAILED++))
 fi
 echo ""
-echo "DEBUG: After Test 1" >&2
-
-echo "DEBUG: Before Test 2" >&2
 
 # Test 2: Test VPN detection function (SKIPPED in automated test)
 echo -e "${BLUE}[TEST 2]${NC} Test VPN detection function..."
@@ -62,8 +45,6 @@ echo -e "${YELLOW}⊘ SKIPPED${NC} - VPN detection test (requires manual testing
 echo -e "${GREEN}✓ INFO${NC} - To manually test: bash scripts/vpn_check.sh -v"
 ((TESTS_PASSED++))
 echo ""
-
-echo "DEBUG: Before Test 3" >&2
 
 # Test 3: Test logger.sh new functions (file syntax check)
 echo -e "${BLUE}[TEST 3]${NC} Verify logger.sh new functions..."

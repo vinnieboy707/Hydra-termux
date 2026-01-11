@@ -7,6 +7,7 @@ const {
   clearIPHistory,
   getAllTrackedUsers
 } = require('../middleware/vpn-check');
+const { extractClientIP } = require('../utils/ip-utils');
 
 const router = express.Router();
 
@@ -16,20 +17,14 @@ const router = express.Router();
  */
 router.get('/status', authMiddleware, async (req, res) => {
   try {
-    // Get user IP address
-    const userIP = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                   req.headers['x-real-ip'] ||
-                   req.connection.remoteAddress ||
-                   req.socket.remoteAddress ||
-                   req.ip;
-
-    const cleanIP = userIP.replace(/^::ffff:/, '');
+    // Extract clean IP address using utility function
+    const cleanIP = extractClientIP(req);
 
     // Detect VPN
     const vpnStatus = await detectVPN(cleanIP);
 
     // Get IP rotation stats if user is tracked
-    const rotationStats = req.user?.id ? getIPRotationStats(req.user.id) : null;
+    const rotationStats = req.user?.id ? await getIPRotationStats(req.user.id) : null;
 
     res.json({
       vpn: {
@@ -69,16 +64,11 @@ router.post('/track', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
     
-    const userIP = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                   req.headers['x-real-ip'] ||
-                   req.connection.remoteAddress ||
-                   req.socket.remoteAddress ||
-                   req.ip;
-
-    const cleanIP = userIP.replace(/^::ffff:/, '');
+    // Extract clean IP address using utility function
+    const cleanIP = extractClientIP(req);
 
     // Track this IP
-    const rotationStats = trackIPRotation(userId, cleanIP);
+    const rotationStats = await trackIPRotation(userId, cleanIP);
 
     res.json({
       message: 'IP tracked successfully',
@@ -100,7 +90,7 @@ router.post('/track', authMiddleware, async (req, res) => {
 router.get('/rotation-history', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    const stats = getIPRotationStats(userId);
+    const stats = await getIPRotationStats(userId);
 
     res.json({
       userId,
@@ -127,7 +117,7 @@ router.get('/rotation-history', authMiddleware, async (req, res) => {
 router.delete('/rotation-history', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    clearIPHistory(userId);
+    await clearIPHistory(userId);
 
     res.json({
       message: 'IP rotation history cleared successfully',
@@ -169,13 +159,8 @@ router.get('/tracked-users', authMiddleware, adminMiddleware, async (req, res) =
  */
 router.get('/verify', authMiddleware, async (req, res) => {
   try {
-    const userIP = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                   req.headers['x-real-ip'] ||
-                   req.connection.remoteAddress ||
-                   req.socket.remoteAddress ||
-                   req.ip;
-
-    const cleanIP = userIP.replace(/^::ffff:/, '');
+    // Extract clean IP address using utility function
+    const cleanIP = extractClientIP(req);
 
     // Perform comprehensive VPN check
     const vpnStatus = await detectVPN(cleanIP);
@@ -278,27 +263,39 @@ router.get('/recommendations', async (req, res) => {
 // Helper functions
 
 function calculateConfidence(vpnStatus) {
-  let confidence = 0;
-  let total = 0;
-
-  if (vpnStatus.interfaceCheck !== undefined) {
-    total++;
-    if (vpnStatus.interfaceCheck) confidence++;
+  // Weighted confidence scoring - different methods have different reliability
+  // Interface check (40%) - most reliable
+  // Process check (30%) - reliable
+  // DNS check (15%) - less reliable due to custom DNS configs
+  // Public IP check (15%) - depends on external service
+  
+  const weights = {
+    interfaceCheck: 0.40,
+    processCheck: 0.30,
+    dnsCheck: 0.15,
+    publicIPCheck: 0.15
+  };
+  
+  let weightedScore = 0;
+  let totalWeight = 0;
+  
+  // Only include defined checks in calculation
+  Object.keys(weights).forEach(check => {
+    if (vpnStatus[check] !== undefined) {
+      totalWeight += weights[check];
+      if (vpnStatus[check] === true) {
+        weightedScore += weights[check];
+      }
+    }
+  });
+  
+  // Prevent division by zero
+  if (totalWeight === 0) {
+    return 0;
   }
-  if (vpnStatus.processCheck !== undefined) {
-    total++;
-    if (vpnStatus.processCheck) confidence++;
-  }
-  if (vpnStatus.dnsCheck !== undefined) {
-    total++;
-    if (vpnStatus.dnsCheck) confidence++;
-  }
-  if (vpnStatus.publicIPCheck !== undefined) {
-    total++;
-    if (vpnStatus.publicIPCheck) confidence++;
-  }
-
-  return total > 0 ? Math.round((confidence / total) * 100) : 0;
+  
+  // Calculate percentage based on weighted score
+  return Math.round((weightedScore / totalWeight) * 100);
 }
 
 function generateRecommendations(vpnStatus, rotationStats) {
@@ -328,7 +325,8 @@ function generateRecommendations(vpnStatus, rotationStats) {
     });
   }
 
-  if (vpnStatus.isVPNDetected && (!vpnStatus.dnsCheck)) {
+  // Explicit check for false (not undefined)
+  if (vpnStatus.isVPNDetected && vpnStatus.dnsCheck === false) {
     recommendations.push({
       priority: 'medium',
       message: 'Potential DNS leak detected',
