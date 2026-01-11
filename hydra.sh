@@ -224,7 +224,15 @@ view_attack_reports() {
     local index=1
     echo "$reports" | while IFS= read -r report; do
         local report_name=$(basename "$report")
-        local report_date=$(stat -c %y "$report" 2>/dev/null | cut -d' ' -f1,2 | cut -d'.' -f1)
+        local report_date
+        # Try GNU coreutils stat (-c) first; fall back to BSD/macOS stat (-f) if needed
+        if stat -c %y "$report" >/dev/null 2>&1; then
+            report_date=$(stat -c %y "$report" 2>/dev/null | cut -d' ' -f1,2 | cut -d'.' -f1)
+        elif stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$report" >/dev/null 2>&1; then
+            report_date=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$report" 2>/dev/null)
+        else
+            report_date="unknown"
+        fi
         local report_size=$(du -h "$report" 2>/dev/null | cut -f1)
         
         # Extract protocol and target from filename if possible
