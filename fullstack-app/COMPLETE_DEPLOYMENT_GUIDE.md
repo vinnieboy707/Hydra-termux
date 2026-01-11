@@ -320,6 +320,10 @@ This guide covers the complete deployment process for Hydra-Termux Full-Stack Ap
 
 2. **Deploy All Functions**
    ```bash
+   # Prerequisites:
+   # - Supabase CLI is installed and you have run `supabase login` (see step 1 above).
+   # - Any required Supabase project configuration or environment variables for the CLI
+   #   are available in your current shell session (see earlier Supabase setup steps).
    bash deploy-edge-functions.sh
    ```
 
