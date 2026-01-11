@@ -30,11 +30,21 @@ jobs:
     
     - name: Install Backend Dependencies
       working-directory: ./fullstack-app/backend
-      run: npm ci
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
       
     - name: Install Frontend Dependencies
       working-directory: ./fullstack-app/frontend
-      run: npm ci
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
     
     - name: Lint Backend Code
       working-directory: ./fullstack-app/backend
@@ -166,7 +176,11 @@ jobs:
     - name: Build Frontend
       working-directory: ./fullstack-app/frontend
       run: |
-        npm ci
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
         npm run build
         
     - name: Check Build Output
