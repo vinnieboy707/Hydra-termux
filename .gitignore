@@ -11,6 +11,10 @@ logs/*.json
 # Wordlists (downloaded)
 wordlists/
 
+# ALHacking downloaded tools
+Tools/
+.onboarding_complete
+
 # Backups
 *.bak
 *.backup
