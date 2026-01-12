@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const axios = require('axios');
-const { extractClientIP, sanitizeIPForLog } = require('../utils/ip-utils');
+const { extractClientIP, sanitizeIPForLog, isValidIP, isPrivateIP } = require('../utils/ip-utils');
 const { run, get } = require('../database');
 
 const execPromise = promisify(exec);
@@ -128,7 +128,10 @@ async function detectVPN(userIP) {
       const now = Date.now();
       const lastCall = apiCallTimestamps.get(userIP) || 0;
       
-      if (now - lastCall < API_RATE_LIMIT_MS) {
+      if (!isValidIP(userIP) || isPrivateIP(userIP)) {
+        // Skip external VPN API lookup for invalid or private/internal IPs
+        console.debug(`Skipping VPN API check for non-public or invalid IP: ${userIP}`);
+      } else if (now - lastCall < API_RATE_LIMIT_MS) {
         // Skip API call if rate limited, use cached result if available
         console.debug(`VPN API check rate limited for IP: ${userIP}`);
       } else {
