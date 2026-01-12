@@ -6,6 +6,9 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Termux-orange)
 ![Status](https://img.shields.io/badge/status-active-success)
+![CI](https://img.shields.io/badge/CI-passing-brightgreen)
+![Security](https://img.shields.io/badge/security-scanned-brightgreen)
+![Deployment](https://img.shields.io/badge/deployment-automated-blue)
 
 **A powerful brute-force tool suite optimized for Termux on Android devices**
 
@@ -99,7 +102,10 @@ bash scripts/check_dependencies.sh    # Quick dependency check
 - Help documentation built-in
 
 ### 🔒 Security Features
-- VPN check and warning
+- **VPN Verification** - Multi-method VPN detection before attacks
+- **IP Rotation Tracking** - Monitor and track IP changes (up to 1000 IPs)
+- **Anonymity Enforcement** - Configurable VPN requirements
+- **Connection Audit Trail** - Log all attack sources and VPN status
 - Rate limiting to avoid detection
 - Random delay between attempts
 - Resume support for interrupted attacks
@@ -119,6 +125,7 @@ bash scripts/check_dependencies.sh    # Quick dependency check
 - **Target Scanner** - Scan IPs, domains, emails with protocol detection (Option 11)
 - **Wordlist Management** - Upload, view, and manage wordlists (Option 9)
 - **Custom Wordlist Generator** - Create targeted wordlists (Option 10)
+- **VPN Status Monitoring** - Real-time VPN verification and IP rotation tracking
 - **Real-time Monitoring** - Live attack progress via WebSocket
 - **Attack Orchestration** - Queue and manage multiple concurrent attacks
 - **RESTful API** - Complete backend API with JWT authentication
@@ -325,6 +332,16 @@ bash scripts/admin_auto_attack.sh -t 192.168.1.100 -r
 bash scripts/target_scanner.sh -t 192.168.1.100 -s full
 ```
 
+**VPN Verification:**
+```bash
+# Check VPN status with detailed diagnostics
+bash scripts/vpn_check.sh -v
+
+# View IP rotation statistics
+source scripts/logger.sh
+get_ip_rotation_stats "ssh_attack"
+```
+
 **View Results:**
 ```bash
 bash scripts/results_viewer.sh --all
@@ -399,6 +416,18 @@ See **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** for complete documentation.
 - **[Library/README.md](Library/README.md)** - Quick reference for one-line-change scripts
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
 - **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios
+
+### Full-Stack Application
+- **[fullstack-app/README.md](fullstack-app/README.md)** - Complete full-stack guide
+- **[fullstack-app/API_DOCUMENTATION.md](fullstack-app/API_DOCUMENTATION.md)** - REST API reference
+- **[fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md](fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md)** - 📘 Comprehensive deployment guide
+- **[fullstack-app/SUPABASE_SETUP.md](fullstack-app/SUPABASE_SETUP.md)** - Supabase edge functions & database
+- **[fullstack-app/SECURITY_PROTOCOLS.md](fullstack-app/SECURITY_PROTOCOLS.md)** - Security implementation
+
+### System Status & Implementation
+- **[IMPLEMENTATION_STATUS_COMPLETE.md](IMPLEMENTATION_STATUS_COMPLETE.md)** - 🎯 **10000% Complete Status Report**
+- **[check-system-status.sh](check-system-status.sh)** - Run system health check
+- **[FINAL_IMPLEMENTATION_REPORT.md](FINAL_IMPLEMENTATION_REPORT.md)** - Final implementation report
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
 
@@ -463,7 +492,10 @@ output_format=json
 log_directory=~/hydra-logs
 
 [SECURITY]
-vpn_check=true
+vpn_check=true              # Verify VPN connection before attacks
+vpn_enforce=false           # Block attacks if VPN not detected (true/false)
+track_ip_rotation=true      # Track IP address changes for anonymity monitoring
+min_ip_rotation=0           # Minimum unique IPs per hour (0 = no requirement)
 rate_limit=true
 max_attempts=1000
 random_delay=true

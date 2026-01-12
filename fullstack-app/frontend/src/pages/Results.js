@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
 function Results() {
@@ -6,11 +6,7 @@ function Results() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState({ protocol: '', success: '' });
 
-  useEffect(() => {
-    fetchResults();
-  }, [filter]);
-
-  const fetchResults = async () => {
+  const fetchResults = useCallback(async () => {
     try {
       const params = {};
       if (filter.protocol) params.protocol = filter.protocol;
@@ -23,7 +19,11 @@ function Results() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    fetchResults();
+  }, [fetchResults]);
 
   const handleExport = async () => {
     try {

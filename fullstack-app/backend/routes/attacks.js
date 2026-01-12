@@ -1,5 +1,6 @@
 const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
+const { vpnCheckMiddleware } = require('../middleware/vpn-check');
 const { run, get, all } = require('../database');
 const AttackService = require('../services/attackService');
 
@@ -66,8 +67,8 @@ router.get('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Create new attack
-router.post('/', authMiddleware, async (req, res) => {
+// Create new attack (with VPN check)
+router.post('/', authMiddleware, vpnCheckMiddleware({ enforceVPN: true, trackRotation: true }), async (req, res) => {
   try {
     const { attack_type, target_host, target_port, protocol, config } = req.body;
     
@@ -77,14 +78,46 @@ router.post('/', authMiddleware, async (req, res) => {
       });
     }
     
-    // Create attack record
+    // Create attack record with VPN and IP information
+    const vpnInfo = {
+      vpnDetected: req.vpnStatus?.isVPNDetected || false,
+      clientIP: req.clientIP || 'unknown',
+      vpnProvider: req.vpnStatus?.vpnProvider,
+      detectedInterface: req.vpnStatus?.detectedInterface
+    };
+    
     const result = await run(
-      `INSERT INTO attacks (attack_type, target_host, target_port, protocol, status, user_id, config)
-       VALUES (?, ?, ?, ?, 'queued', ?, ?)`,
-      [attack_type, target_host, target_port, protocol, req.user.id, JSON.stringify(config || {})]
+      `INSERT INTO attacks (attack_type, target_host, target_port, protocol, status, user_id, config, vpn_info, source_ip)
+       VALUES (?, ?, ?, ?, 'queued', ?, ?, ?, ?)`,
+      [attack_type, target_host, target_port, protocol, req.user.id, JSON.stringify(config || {}), JSON.stringify(vpnInfo), req.clientIP]
     );
     
     const attackId = result.id;
+    
+    // Log IP rotation stats
+    if (req.ipRotation) {
+      try {
+        await run(
+          `INSERT INTO ip_rotation_log (attack_id, user_id, ip_address, total_ips_tracked, unique_ips_last_hour)
+           VALUES (?, ?, ?, ?, ?)`,
+          [attackId, req.user.id, req.clientIP, req.ipRotation.totalIPsTracked, req.ipRotation.uniqueIPsLastHour]
+        );
+      } catch (err) {
+        console.error(
+          'Failed to log IP rotation for attack',
+          attackId,
+          'and user',
+          req.user.id,
+          err
+        );
+        if (typeof process !== 'undefined' && typeof process.emitWarning === 'function') {
+          process.emitWarning(
+            `Failed to log IP rotation for attack ${attackId} and user ${req.user.id}`,
+            { cause: err }
+          );
+        }
+      }
+    }
     
     // Queue the attack
     attackService.queueAttack({
@@ -94,13 +127,16 @@ router.post('/', authMiddleware, async (req, res) => {
       target_port,
       protocol,
       config,
-      userId: req.user.id
+      userId: req.user.id,
+      vpnInfo
     });
     
     res.status(201).json({
       message: 'Attack queued successfully',
       attackId,
-      status: 'queued'
+      status: 'queued',
+      vpn: vpnInfo,
+      ipRotation: req.ipRotation
     });
   } catch (error) {
     console.error('Error creating attack:', error);

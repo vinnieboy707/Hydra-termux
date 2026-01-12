@@ -32,8 +32,12 @@ if ! SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" 2>/dev/null && pwd)"; then
     exit 1
 fi
 
-# Source logger
+# Source logger and AI assistant
 source "$SCRIPT_DIR/scripts/logger.sh"
+source "$SCRIPT_DIR/scripts/ai_assistant.sh"
+
+# Initialize AI assistant
+init_assistant
 
 # Version
 VERSION="2.0.0 Ultimate Edition"
@@ -91,10 +95,29 @@ show_menu() {
     print_message "  OTHER:" "$MAGENTA"
     echo "  18) Help & Documentation"
     echo "  19) About & Credits"
-    echo "  20) Show Login Credentials"
+    echo ""
+    print_message "  ALHACKING TOOLS:" "$MAGENTA"
+    echo "  20) Requirements & Update      21) Phishing Tool"
+    echo "  22) WebCam Hack                23) Subscan"
+    echo "  24) Gmail Bomber               25) DDOS Attack"
+    echo "  26) IP Info                    27) dorks-eye"
+    echo "  28) HackerPro                  29) RED_HAWK"
+    echo "  30) VirusCrafter               31) Info-Site"
+    echo "  32) BadMod                     33) Facebash"
+    echo "  34) DARKARMY                   35) AUTO-IP-CHANGER"
+    echo "  36) ALHacking Help             37) Uninstall Tools"
+    echo ""
+    print_message "  AI ASSISTANT:" "$CYAN"
+    echo "  88) AI Help System             89) Workflow Guides"
+    echo "  90) My Progress                91) Smart Suggestions"
+    echo ""
     echo "  0)  Exit"
     echo ""
     print_message "╚════════════════════════════════════════════════════════╝" "$BLUE"
+    echo ""
+    
+    # Show contextual AI hint
+    get_contextual_hint "main_menu"
     echo ""
 }
 
@@ -108,9 +131,15 @@ run_attack_script() {
     
     if [ ! -f "$SCRIPT_DIR/scripts/$script" ]; then
         log_error "Script not found: $script"
+        get_contextual_hint "error_occurred"
+        echo ""
         read -r -p "Press Enter to continue..."
         return 1
     fi
+    
+    # Show target entry hint
+    get_contextual_hint "target_entry"
+    echo ""
     
     read -r -p "Enter target IP/hostname: " target
     
@@ -122,12 +151,26 @@ run_attack_script() {
     
     echo ""
     log_info "Starting attack on $target..."
+    log_action "attack_started:$name:$target"
+    
+    # Show attack progress hint
+    get_contextual_hint "attack_started"
     echo ""
     
     bash "$SCRIPT_DIR/scripts/$script" -t "$target"
     
+    local exit_code=$?
+    
     echo ""
-    log_info "Attack completed. Check logs for results."
+    if [ $exit_code -eq 0 ]; then
+        log_info "Attack completed. Check logs for results."
+        log_action "attack_completed:$name:$target"
+        get_contextual_hint "attack_completed"
+    else
+        log_warning "Attack ended with errors. Check logs."
+        get_contextual_hint "error_occurred"
+    fi
+    echo ""
     read -r -p "Press Enter to continue..."
 }
 
@@ -489,12 +532,19 @@ main() {
         exit 1
     fi
     
+    # Check if first time user and run onboarding
+    if [ ! -f "$SCRIPT_DIR/.onboarding_complete" ]; then
+        if [ -f "$SCRIPT_DIR/scripts/onboarding.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/onboarding.sh"
+        fi
+    fi
+    
     # Main menu loop
     while true; do
         show_banner
         show_menu
         
-        read -r -p "Enter your choice [0-20]: " choice
+        read -r -p "Enter your choice [0-37, 88-91]: " choice
         
         case $choice in
             1)
@@ -555,7 +605,75 @@ main() {
                 show_about
                 ;;
             20)
-                run_utility "show_login_info.sh" "Login Credentials Helper"
+                run_utility "alhacking_requirements.sh" "ALHacking Requirements & Update"
+                ;;
+            21)
+                run_utility "alhacking_phishing.sh" "Phishing Tool"
+                ;;
+            22)
+                run_utility "alhacking_webcam.sh" "WebCam Hack"
+                ;;
+            23)
+                run_utility "alhacking_subscan.sh" "Subscan"
+                ;;
+            24)
+                run_utility "alhacking_gmail_bomber.sh" "Gmail Bomber"
+                ;;
+            25)
+                run_utility "alhacking_ddos.sh" "DDOS Attack"
+                ;;
+            26)
+                run_utility "alhacking_ipinfo.sh" "IP Info"
+                ;;
+            27)
+                run_utility "alhacking_dorkseye.sh" "dorks-eye"
+                ;;
+            28)
+                run_utility "alhacking_hackerpro.sh" "HackerPro"
+                ;;
+            29)
+                run_utility "alhacking_redhawk.sh" "RED_HAWK"
+                ;;
+            30)
+                run_utility "alhacking_viruscrafter.sh" "VirusCrafter"
+                ;;
+            31)
+                run_utility "alhacking_infosite.sh" "Info-Site"
+                ;;
+            32)
+                run_utility "alhacking_badmod.sh" "BadMod"
+                ;;
+            33)
+                run_utility "alhacking_facebash.sh" "Facebash"
+                ;;
+            34)
+                run_utility "alhacking_darkarmy.sh" "DARKARMY"
+                ;;
+            35)
+                run_utility "alhacking_autoipchanger.sh" "AUTO-IP-CHANGER"
+                ;;
+            36)
+                run_utility "alhacking_help.sh" "ALHacking Help"
+                ;;
+            37)
+                run_utility "alhacking_uninstall.sh" "Uninstall ALHacking Tools"
+                ;;
+            88)
+                interactive_help
+                ;;
+            89)
+                show_workflow_menu
+                ;;
+            90)
+                show_progress
+                ;;
+            91)
+                clear
+                print_banner "🤖 Smart Suggestions"
+                echo ""
+                suggest_next_action
+                echo ""
+                read -r -p "Press Enter to continue..."
                 ;;
             0)
                 clear
@@ -565,7 +683,7 @@ main() {
                 exit 0
                 ;;
             *)
-                log_error "Invalid choice. Please select 0-20."
+                log_error "Invalid choice. Please select a valid option."
                 sleep 2
                 ;;
         esac
