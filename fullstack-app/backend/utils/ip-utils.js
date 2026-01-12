@@ -25,6 +25,20 @@ function extractClientIP(req) {
 }
 
 /**
+ * Sanitize an IP string before logging to prevent log injection.
+ * Removes newline characters that could break log formatting.
+ * 
+ * @param {string} ip - IP address or value to sanitize
+ * @returns {string} Sanitized IP string safe for logs
+ */
+function sanitizeIPForLog(ip) {
+  if (ip === null || ip === undefined) {
+    return '';
+  }
+  return String(ip).replace(/[\r\n]/g, '');
+}
+
+/**
  * Validate if a string is a valid IP address (IPv4 or IPv6)
  * 
  * @param {string} ip - IP address to validate
@@ -73,6 +87,7 @@ function isPrivateIP(ip) {
 
 module.exports = {
   extractClientIP,
+  sanitizeIPForLog,
   isValidIP,
   isPrivateIP
 };

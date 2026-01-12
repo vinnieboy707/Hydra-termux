@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const axios = require('axios');
-const { extractClientIP } = require('../utils/ip-utils');
+const { extractClientIP, sanitizeIPForLog } = require('../utils/ip-utils');
 const { run, get } = require('../database');
 
 const execPromise = promisify(exec);
@@ -329,7 +329,8 @@ const vpnCheckMiddleware = (options = {}) => {
       // If VPN is not required, just log and continue
       if (!userVPNRequired) {
         if (!vpnStatus.isVPNDetected) {
-          console.log(`⚠️  Warning: User ${req.user?.username || 'unknown'} not using VPN (IP: ${cleanIP})`);
+          const safeIPForLog = sanitizeIPForLog(cleanIP);
+          console.log(`⚠️  Warning: User ${req.user?.username || 'unknown'} not using VPN (IP: ${safeIPForLog})`);
         }
         return next();
       }
