@@ -36,5 +36,14 @@
   "proxy": "http://localhost:3000",
   "devDependencies": {
     "typescript": "^4.9.5"
+  },
+  "overrides": {
+    "@svgr/plugin-svgo": "^6.5.1",
+    "@svgr/webpack": "^6.5.1",
+    "nth-check": "^2.1.1",
+    "postcss": "^8.4.47",
+    "resolve-url-loader": "^5.0.0",
+    "svgo": "^2.8.0",
+    "webpack-dev-server": "^5.2.3"
   }
 }
