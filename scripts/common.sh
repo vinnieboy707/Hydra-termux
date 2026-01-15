@@ -33,10 +33,12 @@ safe_source() {
     fi
     
     # Source the file and capture any errors
-    if ! source "$file" 2>&1; then
+    local error_output
+    error_output=$(source "$file" 2>&1) || {
         echo "ERROR: Failed to source $description: $file" >&2
+        [ -n "$error_output" ] && echo "Details: $error_output" >&2
         return 1
-    fi
+    }
     
     return 0
 }
@@ -217,10 +219,12 @@ load_config() {
     fi
     
     # Source the configuration file
-    if ! source "$config_file" 2>&1; then
+    local error_output
+    error_output=$(source "$config_file" 2>&1) || {
         echo "WARNING: Failed to load configuration from $description: $config_file" >&2
+        [ -n "$error_output" ] && echo "Details: $error_output" >&2
         return 1
-    fi
+    }
     
     return 0
 }
