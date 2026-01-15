@@ -18,18 +18,21 @@ Created a dedicated function with multiple retry strategies:
 
 ```bash
 install_hydra() {
+    # Create a secure temporary log file for this installation attempt
+    log_file="$(mktemp /tmp/hydra_install.XXXXXX.log)"
+
     # Attempt 1: Standard 'hydra' package
-    pkg install hydra -y 2>&1 | tee /tmp/hydra_install.log
+    pkg install hydra -y 2>&1 | tee "$log_file"
     
     # Attempt 2: Alternative name 'thc-hydra'
-    pkg install thc-hydra -y 2>&1 | tee -a /tmp/hydra_install.log
+    pkg install thc-hydra -y 2>&1 | tee -a "$log_file"
     
     # Attempt 3: Search for any hydra package in repos
     available_hydra=$(pkg search hydra 2>/dev/null | grep -i "^hydra")
     pkg install "$available_hydra" -y
     
     # Show error output on failure
-    tail -10 /tmp/hydra_install.log
+    tail -10 "$log_file"
 }
 ```
 
