@@ -28,7 +28,7 @@ install_hydra() {
     pkg install thc-hydra -y 2>&1 | tee -a "$log_file"
     
     # Attempt 3: Search for any hydra package in repos
-    available_hydra=$(pkg search hydra 2>/dev/null | grep -i "^hydra")
+    available_hydra=$(pkg search hydra 2>/dev/null | grep -i "^hydra" | head -1 | awk '{print $1}')
     pkg install "$available_hydra" -y
     
     # Show error output on failure
