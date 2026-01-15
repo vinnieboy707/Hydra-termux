@@ -152,7 +152,6 @@ class CacheManager {
       if (this.redisEnabled && this.redis) {
         try {
           await this.redis.del(key);
-          deleted = true;
         } catch (error) {
           logger.warn(`Redis delete failed: ${error.message}`);
         }

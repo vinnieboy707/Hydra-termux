@@ -12,9 +12,6 @@ const {
   dnsIntelligence,
   attackOrchestrator,
   credentialManager,
-  resultParser,
-  notificationManager,
-  analyticsEngine,
   exportManager,
   cacheManager,
   
@@ -353,7 +350,7 @@ app.post('/api/export/credentials',
   async (req, res) => {
     try {
       const userId = req.user?.id;
-      const { format, includePasswords, filters } = req.body;
+      const { format, includePasswords } = req.body;
       
       // Get credentials
       const credentials = await credentialManager.exportCredentials(

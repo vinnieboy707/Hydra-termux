@@ -47,8 +47,7 @@ class ExportManager {
       logger.info(`Exporting data to ${format} format`);
 
       const {
-        filename = `export_${Date.now()}`,
-        title = 'Data Export'
+        filename = `export_${Date.now()}`
       } = options;
 
       let result;
@@ -255,8 +254,7 @@ class ExportManager {
     try {
       const {
         sheetName = 'Sheet1',
-        title = 'Export',
-        includeHeaders = true
+        title = 'Export'
       } = options;
 
       const filePath = path.join(this.exportDir, `${filename}.xlsx`);

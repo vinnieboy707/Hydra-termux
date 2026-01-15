@@ -7,8 +7,6 @@
 const Queue = require('bull');
 const { logger } = require('./logManager');
 const { spawn } = require('child_process');
-const path = require('path');
-const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
 
 /**
@@ -224,7 +222,6 @@ class AttackOrchestrator {
       passwordList,
       usernameList,
       threads = 4,
-      verbose = false,
       timeout = 30
     } = options;
 

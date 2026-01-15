@@ -30,7 +30,6 @@
     "react-modal": "^3.16.1",
     "react-tooltip": "^5.25.1",
     "react-copy-to-clipboard": "^5.1.0",
-    "react-json-view": "^1.21.3",
     "crypto-js": "^4.2.0",
     "file-saver": "^2.0.5",
     "xlsx": "^0.18.5"

@@ -7,8 +7,6 @@ const router = express.Router();
 // Get attack analytics summary
 router.get('/summary', authMiddleware, async (req, res) => {
   try {
-    const { date_from, date_to } = req.query;
-    
     // Get all attack counts
     const emailIpCount = await get(
       'SELECT COUNT(*) as count FROM email_ip_attacks WHERE user_id = $1',
@@ -102,10 +100,10 @@ router.get('/timeseries', authMiddleware, async (req, res) => {
         SUM(total_credentials_found) as total_credentials_found,
         AVG(avg_success_rate) as avg_success_rate
       FROM attack_analytics
-      WHERE user_id = $1 AND date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'
+      WHERE user_id = $1 AND date >= CURRENT_DATE - INTERVAL '$2 days'
       GROUP BY date
       ORDER BY date ASC
-    `, [req.user.id]);
+    `, [req.user.id, parseInt(days)]);
     
     res.json({ analytics, period_days: parseInt(days) });
   } catch (error) {
@@ -330,9 +328,9 @@ router.get('/export', authMiddleware, async (req, res) => {
     
     const data = await all(`
       SELECT * FROM attack_analytics
-      WHERE user_id = $1 AND date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'
+      WHERE user_id = $1 AND date >= CURRENT_DATE - INTERVAL '$2 days'
       ORDER BY date DESC, hour DESC
-    `, [req.user.id]);
+    `, [req.user.id, parseInt(days)]);
     
     if (format === 'csv') {
       // Convert to CSV

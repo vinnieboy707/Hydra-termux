@@ -2,7 +2,6 @@ const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
 const { run, get, all } = require('../database-pg');
 const dns = require('dns').promises;
-const axios = require('axios');
 
 const router = express.Router();
 
@@ -193,8 +192,8 @@ async function scanDomainIntelligence(domain, userId) {
     
     for (const selector of commonSelectors) {
       try {
-        const dkimRecords = await dns.resolveTxt(`${selector}._domainkey.${domain}`);
-        for (const record of dkimRecords) {
+        const records = await dns.resolveTxt(`${selector}._domainkey.${domain}`);
+        for (const record of records) {
           const txt = Array.isArray(record) ? record.join('') : record;
           if (txt.includes('v=DKIM1')) {
             intel.dkim_selectors.push(selector);

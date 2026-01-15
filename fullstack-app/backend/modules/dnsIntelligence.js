@@ -6,8 +6,6 @@
 
 const dns = require('dns').promises;
 const { Resolver } = require('dns');
-const dnsPacket = require('dns-packet');
-const axios = require('axios');
 const { logger } = require('./logManager');
 
 /**

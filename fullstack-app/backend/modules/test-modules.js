@@ -8,15 +8,9 @@ const modules = require('./modules');
 
 const {
   dnsIntelligence,
-  attackOrchestrator,
-  credentialManager,
-  resultParser,
-  notificationManager,
-  analyticsEngine,
   exportManager,
   cacheManager,
   logger,
-  validateMiddleware,
   schemas
 } = modules;
 
@@ -118,7 +112,7 @@ async function testValidationSchemas() {
       threads: 4
     };
     
-    const { valid, errors, value } = modules.validate(
+    const { valid, errors } = modules.validate(
       validConfig,
       schemas.attackConfigSchema
     );

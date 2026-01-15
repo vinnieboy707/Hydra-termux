@@ -411,8 +411,13 @@ smtp_banner_grab() {
         return 1
     fi
     
-    # Use printf to safely pass parameters
-    local banner=$(timeout 10 bash -c "exec 3<>/dev/tcp/${target}/${port} 2>/dev/null && cat <&3 2>/dev/null" 2>/dev/null | head -1)
+    # Use netcat or telnet for safer network connections
+    local banner=""
+    if command -v nc &>/dev/null; then
+        banner=$(timeout 10 nc -w 5 "$target" "$port" < /dev/null 2>/dev/null | head -1)
+    elif command -v telnet &>/dev/null; then
+        banner=$(timeout 10 telnet "$target" "$port" 2>/dev/null | head -1)
+    fi
     
     if [ -n "$banner" ]; then
         log_success "  Banner: $banner"
@@ -455,14 +460,13 @@ smtp_capability_check() {
         return 1
     fi
     
-    local response=$(timeout 15 bash -c "
-        exec 3<>/dev/tcp/${target}/${port} 2>/dev/null
-        cat <&3 | head -1
-        echo 'EHLO test.local' >&3
-        sleep 2
-        cat <&3
-        echo 'QUIT' >&3
-    " 2>/dev/null)
+    # Use openssl s_client or nc for SMTP capability detection
+    local response=""
+    if command -v openssl &>/dev/null && [ "$port" = "465" ]; then
+        response=$(timeout 15 sh -c "echo -e 'EHLO test.local\r\nQUIT\r\n' | openssl s_client -connect $target:$port -quiet 2>/dev/null" 2>/dev/null)
+    elif command -v nc &>/dev/null; then
+        response=$(timeout 15 sh -c "echo -e 'EHLO test.local\r\nQUIT\r\n' | nc -w 10 $target $port 2>/dev/null" 2>/dev/null)
+    fi
     
     if [ -n "$response" ]; then
         if echo "$response" | grep -qi "STARTTLS"; then
@@ -525,15 +529,11 @@ smtp_enumerate_users() {
         username=$(echo "$username" | tr -cd '[:alnum:]@._-')
         [ -z "$username" ] && continue
         
-        # Use printf for safe parameter passing
-        local response=$(timeout 5 bash -c "
-            exec 3<>/dev/tcp/${target}/${port} 2>/dev/null
-            cat <&3 | head -1 > /dev/null
-            printf 'VRFY %s\r\n' '${username}' >&3
-            sleep 1
-            cat <&3 | head -1
-            echo 'QUIT' >&3
-        " 2>/dev/null)
+        # Use nc for safe VRFY command
+        local response=""
+        if command -v nc &>/dev/null; then
+            response=$(timeout 5 sh -c "printf 'VRFY %s\r\nQUIT\r\n' '$username' | nc -w 3 $target $port 2>/dev/null" 2>/dev/null | grep -E "^250|^252")
+        fi
         
         if echo "$response" | grep -qE "^250|^252"; then
             log_success "  ✓ User exists: $username"

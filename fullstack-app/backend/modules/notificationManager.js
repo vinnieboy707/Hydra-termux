@@ -89,7 +89,6 @@ class NotificationManager {
     try {
       const {
         attackId,
-        userId,
         target,
         attackType,
         status,
