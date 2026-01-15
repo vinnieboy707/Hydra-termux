@@ -32,14 +32,24 @@ safe_source() {
         return 1
     fi
     
-    # Source the file and capture any errors
+    # Source the file and capture any errors without using a subshell
     local error_output
-    error_output=$(source "$file" 2>&1) || {
-        echo "ERROR: Failed to source $description: $file" >&2
-        [ -n "$error_output" ] && echo "Details: $error_output" >&2
+    local tmp_err
+    
+    tmp_err="$(mktemp "${TMPDIR:-/tmp}/safe_source.XXXXXX")" || {
+        echo "ERROR: safe_source could not create temporary file for $description" >&2
         return 1
     }
     
+    if ! source "$file" 2>"$tmp_err"; then
+        error_output="$(cat "$tmp_err" 2>/dev/null)"
+        rm -f "$tmp_err"
+        echo "ERROR: Failed to source $description: $file" >&2
+        [ -n "$error_output" ] && echo "Details: $error_output" >&2
+        return 1
+    fi
+    
+    rm -f "$tmp_err"
     return 0
 }
 
