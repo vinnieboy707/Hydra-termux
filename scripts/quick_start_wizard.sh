@@ -124,7 +124,20 @@ EOF
             if [ -d "/data/data/com.termux" ]; then
                 pkg install hydra -y
             else
-                sudo apt install hydra -y 2>/dev/null || sudo dnf install hydra -y 2>/dev/null
+                if command_exists apt; then
+                    INSTALL_CMD="sudo apt install hydra -y"
+                elif command_exists dnf; then
+                    INSTALL_CMD="sudo dnf install hydra -y"
+                else
+                    ui_alert_error "No supported package manager found (apt or dnf). Please install Hydra manually."
+                    exit 1
+                fi
+
+                echo "Running: $INSTALL_CMD"
+                if ! eval "$INSTALL_CMD"; then
+                    ui_alert_error "Package installation command failed. Please check the output above and install Hydra manually."
+                    exit 1
+                fi
             fi
             
             if command_exists hydra; then
