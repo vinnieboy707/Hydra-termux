@@ -110,35 +110,42 @@ install_hydra() {
         return 0
     fi
     
+    # Create secure temporary log file
+    local hydra_log=$(mktemp)
+    
     # Attempt 1: Try standard 'hydra' package
     print_message "   Attempting: pkg install hydra..." "$CYAN"
-    if pkg install hydra -y 2>&1 | tee /tmp/hydra_install.log | grep -q "Installing\|Setting up\|Unpacking"; then
+    if pkg install hydra -y 2>&1 | tee "$hydra_log" | grep -q "Installing\|Setting up\|Unpacking"; then
         sleep 2
         if command -v hydra &> /dev/null; then
             print_message "   ✓ hydra installed successfully" "$GREEN"
+            rm -f "$hydra_log"
             return 0
         fi
     fi
     
     # Attempt 2: Try 'thc-hydra' alternative name
     print_message "   Attempting: pkg install thc-hydra..." "$CYAN"
-    if pkg install thc-hydra -y 2>&1 | tee -a /tmp/hydra_install.log | grep -q "Installing\|Setting up\|Unpacking"; then
+    if pkg install thc-hydra -y 2>&1 | tee -a "$hydra_log" | grep -q "Installing\|Setting up\|Unpacking"; then
         sleep 2
         if command -v hydra &> /dev/null; then
             print_message "   ✓ thc-hydra installed successfully" "$GREEN"
+            rm -f "$hydra_log"
             return 0
         fi
     fi
     
     # Attempt 3: Search for available hydra packages
     print_message "   Searching for hydra in repositories..." "$CYAN"
-    local available_hydra=$(pkg search hydra 2>/dev/null | grep -i "^hydra" | head -1 | awk '{print $1}')
+    local available_hydra
+    available_hydra=$(pkg search hydra 2>/dev/null | grep -i "^hydra" | head -1 | awk '{print $1}')
     if [ -n "$available_hydra" ]; then
         print_message "   Found: $available_hydra" "$BLUE"
-        if pkg install "$available_hydra" -y 2>&1 | tee -a /tmp/hydra_install.log | grep -q "Installing\|Setting up\|Unpacking"; then
+        if pkg install "$available_hydra" -y 2>&1 | tee -a "$hydra_log" | grep -q "Installing\|Setting up\|Unpacking"; then
             sleep 2
             if command -v hydra &> /dev/null; then
                 print_message "   ✓ $available_hydra installed successfully" "$GREEN"
+                rm -f "$hydra_log"
                 return 0
             fi
         fi
@@ -148,9 +155,9 @@ install_hydra() {
     print_message "   ✗ All hydra installation attempts FAILED" "$RED"
     echo ""
     print_message "   Last error output:" "$YELLOW"
-    if [ -f /tmp/hydra_install.log ]; then
-        tail -10 /tmp/hydra_install.log | sed 's/^/     /'
-        rm -f /tmp/hydra_install.log
+    if [ -f "$hydra_log" ]; then
+        tail -10 "$hydra_log" | sed 's/^/     /'
+        rm -f "$hydra_log"
     fi
     echo ""
     
