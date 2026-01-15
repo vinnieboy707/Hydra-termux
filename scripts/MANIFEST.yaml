@@ -1,0 +1,491 @@
+# Hydra-Termux Script Dependency Manifest
+# This file documents all script dependencies, sources, and requirements
+# Version: 2.0.0
+
+core_utilities:
+  logger.sh:
+    description: "Centralized logging and result tracking utility"
+    exports:
+      - log_info
+      - log_success
+      - log_error
+      - log_warning
+      - log_debug
+      - print_message
+      - print_banner
+      - save_result
+      - generate_attack_report
+    variables:
+      - _LOGGER_SCRIPT_DIR (private)
+      - PROJECT_ROOT
+      - LOG_DIR
+      - LOG_FILE
+      - RESULTS_FILE
+    dependencies: []
+    sourced_by:
+      - hydra.sh
+      - All attack scripts
+      - All utility scripts
+      - Most Library scripts
+
+  ai_assistant.sh:
+    description: "Contextual help and guidance system"
+    exports:
+      - init_assistant
+      - get_user_level
+      - log_action
+      - get_contextual_hint
+      - interactive_help
+      - show_workflow_menu
+      - show_progress
+      - suggest_next_action
+    variables:
+      - _AI_SCRIPT_DIR (private)
+      - PROJECT_ROOT
+      - STATE_FILE
+      - USER_HISTORY
+    dependencies:
+      - logger.sh
+    sourced_by:
+      - hydra.sh
+
+  vpn_check.sh:
+    description: "VPN connectivity verification"
+    exports:
+      - check_vpn_connection
+      - require_vpn
+      - check_vpn_warn
+      - track_ip_rotation
+      - get_ip_rotation_stats
+    variables:
+      - None (uses color codes only)
+    dependencies: []
+    sourced_by:
+      - ssh_admin_attack.sh
+      - Many Library scripts
+
+  target_manager.sh:
+    description: "Target expansion and validation"
+    exports:
+      - expand_targets
+      - validate_target
+      - get_target_count
+    variables:
+      - None
+    dependencies:
+      - logger.sh
+    sourced_by:
+      - admin_auto_attack.sh
+      - Various attack scripts
+
+  common.sh:
+    description: "Shared utility functions for safe operations"
+    exports:
+      - safe_source
+      - validate_var
+      - validate_dir
+      - validate_file
+      - validate_environment
+      - resolve_script_path
+      - get_script_dir
+      - load_config
+      - safe_mkdir
+      - command_exists
+      - check_commands
+      - die
+      - make_temp_file
+      - cleanup_temp_files
+      - debug_log
+      - is_sourced
+      - validate_ip
+      - validate_hostname
+      - validate_port
+      - print_usage
+    variables:
+      - _COMMON_SCRIPT_DIR (private)
+      - _COMMON_PROJECT_ROOT (private)
+      - _COMMON_SH_LOADED
+    dependencies: []
+    sourced_by:
+      - Recommended for all scripts
+
+attack_scripts:
+  ssh_admin_attack.sh:
+    description: "SSH brute force attack with optimized parameters"
+    sources:
+      - logger.sh
+      - vpn_check.sh
+      - target_manager.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+      - config/admin_usernames.txt
+      - config/admin_passwords.txt
+    wordlists:
+      - ~/wordlists/common_passwords.txt
+      - ~/wordlists/rockyou.txt
+    requires:
+      commands:
+        - hydra
+        - ssh
+      files:
+        - scripts/logger.sh
+        - scripts/vpn_check.sh
+
+  ftp_admin_attack.sh:
+    description: "FTP brute force attack"
+    sources:
+      - logger.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+      - config/admin_usernames.txt
+      - config/admin_passwords.txt
+    requires:
+      commands:
+        - hydra
+        - ftp
+
+  web_admin_attack.sh:
+    description: "Web admin panel brute force"
+    sources:
+      - logger.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+    requires:
+      commands:
+        - hydra
+        - curl
+
+  rdp_admin_attack.sh:
+    description: "RDP brute force attack"
+    sources:
+      - logger.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+    requires:
+      commands:
+        - hydra
+        - rdesktop (optional)
+
+  mysql_admin_attack.sh:
+    description: "MySQL brute force attack"
+    sources:
+      - logger.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+    requires:
+      commands:
+        - hydra
+        - mysql (optional)
+
+  postgres_admin_attack.sh:
+    description: "PostgreSQL brute force attack"
+    sources:
+      - logger.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+    requires:
+      commands:
+        - hydra
+        - psql (optional)
+
+  smb_admin_attack.sh:
+    description: "SMB brute force attack"
+    sources:
+      - logger.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+    requires:
+      commands:
+        - hydra
+        - smbclient (optional)
+
+  admin_auto_attack.sh:
+    description: "Multi-protocol automatic attack orchestration"
+    sources:
+      - logger.sh
+      - target_manager.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+    requires:
+      commands:
+        - hydra
+        - nmap
+      scripts:
+        - ssh_admin_attack.sh
+        - ftp_admin_attack.sh
+        - mysql_admin_attack.sh
+        - web_admin_attack.sh
+
+utility_scripts:
+  download_wordlists.sh:
+    description: "Download password wordlists"
+    sources:
+      - logger.sh
+    requires:
+      commands:
+        - wget or curl
+        - tar
+        - gzip
+
+  wordlist_generator.sh:
+    description: "Generate custom wordlists"
+    sources:
+      - logger.sh
+    requires:
+      commands:
+        - sort
+        - uniq
+
+  target_scanner.sh:
+    description: "Port and service scanner with attack recommendations"
+    sources:
+      - logger.sh
+    configs:
+      - config/optimized_attack_profiles.conf
+    requires:
+      commands:
+        - nmap
+
+  results_viewer.sh:
+    description: "View and filter attack results"
+    sources:
+      - logger.sh
+    requires:
+      commands:
+        - jq (optional, for JSON parsing)
+
+  report_generator.sh:
+    description: "Generate detailed attack reports"
+    sources:
+      - logger.sh
+    requires:
+      files:
+        - logs/results_*.json
+        - logs/attack_metadata_*.json
+
+  check_dependencies.sh:
+    description: "Verify all required dependencies"
+    sources:
+      - logger.sh
+    requires:
+      commands:
+        - hydra (critical)
+
+  system_diagnostics.sh:
+    description: "Comprehensive system health check"
+    sources:
+      - logger.sh
+    requires:
+      commands:
+        - hydra
+        - various diagnostic tools
+
+  auto_fix.sh:
+    description: "Automated installation and fixing"
+    sources:
+      - logger.sh
+    requires:
+      commands:
+        - pkg (Termux) or apt (Linux)
+
+  setup_wizard.sh:
+    description: "Interactive setup and configuration"
+    sources:
+      - logger.sh
+    requires:
+      files:
+        - scripts/check_dependencies.sh
+
+  onboarding.sh:
+    description: "First-time user onboarding"
+    sources:
+      - logger.sh
+      - ai_assistant.sh
+    requires:
+      files:
+        - docs/*.md
+
+  validate_integration.sh:
+    description: "Cross-script validation testing"
+    sources:
+      - logger.sh
+    requires:
+      commands:
+        - grep
+        - find
+
+alhacking_wrappers:
+  pattern: "alhacking_*.sh"
+  description: "External tool integration wrappers"
+  common_sources:
+    - logger.sh
+  common_requirements:
+    commands:
+      - git
+      - wget or curl
+    directories:
+      - Tools/ (created dynamically)
+
+library_scripts:
+  pattern: "Library/*_quick.sh"
+  description: "Quick attack profiles for rapid deployment"
+  common_sources:
+    - scripts/logger.sh (via $PROJECT_ROOT/scripts/logger.sh)
+    - scripts/vpn_check.sh (optional, via 2>/dev/null redirect)
+  common_requirements:
+    commands:
+      - hydra
+
+configuration_files:
+  config/hydra.conf:
+    description: "Main application configuration"
+    format: INI-style
+    sections:
+      - GENERAL (threads, timeout, verbose, etc.)
+      - SECURITY (vpn_check, vpn_enforce, etc.)
+      - WORDLISTS (default paths)
+    sourced_by:
+      - system_optimizer.sh
+      - Various scripts via load_config
+
+  config/optimized_attack_profiles.conf:
+    description: "Protocol-specific optimization profiles"
+    format: Bash variables
+    variables:
+      - SSH_THREADS, SSH_TIMEOUT, SSH_PRIORITY_USERS
+      - FTP_THREADS, FTP_TIMEOUT, FTP_TRY_ANONYMOUS
+      - And more for all protocols
+    sourced_by:
+      - All attack scripts
+      - target_scanner.sh
+      - admin_auto_attack.sh
+
+  config/admin_usernames.txt:
+    description: "Default username wordlist"
+    format: Plain text (one per line)
+    used_by:
+      - All attack scripts as fallback
+
+  config/admin_passwords.txt:
+    description: "Default password wordlist"
+    format: Plain text (one per line)
+    used_by:
+      - All attack scripts as fallback
+
+entry_points:
+  hydra.sh:
+    description: "Main interactive menu launcher"
+    sources:
+      - scripts/logger.sh
+      - scripts/ai_assistant.sh
+    calls:
+      - All attack scripts (via run_attack_script function)
+      - All utility scripts (via run_utility function)
+    requires:
+      commands:
+        - hydra (verified before menu display)
+      files:
+        - scripts/*.sh (all scripts)
+
+  install.sh:
+    description: "Installation and setup script"
+    sources: []
+    requires:
+      commands:
+        - pkg (Termux) or apt-get (Linux)
+        - git
+
+  fix-hydra.sh:
+    description: "Interactive diagnostic and fix tool"
+    sources:
+      - scripts/logger.sh
+      - scripts/check_dependencies.sh
+      - scripts/auto_fix.sh
+      - scripts/system_diagnostics.sh
+    requires:
+      commands:
+        - Various (checks multiple tools)
+
+variable_naming_standards:
+  main_scripts:
+    SCRIPT_DIR: "Directory containing the script"
+    PROJECT_ROOT: "Root directory of the project"
+    SCRIPT_PATH: "Full path to the script file"
+
+  utility_modules:
+    _LOGGER_SCRIPT_DIR: "Private variable for logger.sh"
+    _AI_SCRIPT_DIR: "Private variable for ai_assistant.sh"
+    _COMMON_SCRIPT_DIR: "Private variable for common.sh"
+    _VPN_SCRIPT_DIR: "Private variable for vpn_check.sh (if needed)"
+    _TARGET_SCRIPT_DIR: "Private variable for target_manager.sh (if needed)"
+
+  configuration:
+    UPPER_CASE: "Configuration settings (threads, timeouts, etc.)"
+    DEFAULT_*: "Default value constants"
+
+  exports:
+    UPPER_CASE: "Variables exported to child processes"
+    LOG_DIR: "Logging directory (exported)"
+    RESULTS_FILE: "Results file path (exported)"
+
+  internal:
+    _PRIVATE_NAME: "Internal/private variables (not for external use)"
+    lower_case: "Local function variables"
+
+critical_paths:
+  sourcing_order:
+    1: "common.sh (if using standardized utilities)"
+    2: "logger.sh (always first after common)"
+    3: "vpn_check.sh (if network operations)"
+    4: "target_manager.sh (if handling multiple targets)"
+    5: "ai_assistant.sh (only in interactive scripts)"
+    6: "Configuration files (last, after utilities)"
+
+  error_handling:
+    recommended:
+      - "set -euo pipefail for critical scripts"
+      - "trap cleanup EXIT INT TERM"
+      - "Validate all inputs before use"
+      - "Check file existence before sourcing"
+      - "Use safe_source from common.sh"
+
+best_practices:
+  - "Always use private variable names (_MODULE_*) in sourced utility scripts"
+  - "Validate SCRIPT_DIR and PROJECT_ROOT before use"
+  - "Check file existence before sourcing"
+  - "Use readonly for constants"
+  - "Quote all variable references"
+  - "Add trap handlers for cleanup"
+  - "Document all exported functions"
+  - "Test with symlinked execution"
+  - "Use common.sh utilities for standardization"
+
+testing_requirements:
+  unit_tests:
+    location: "tests/"
+    coverage:
+      - "Function-level testing"
+      - "Input validation testing"
+      - "Error handling testing"
+    
+  integration_tests:
+    location: "tests/"
+    coverage:
+      - "Sourcing chain validation"
+      - "Cross-script communication"
+      - "End-to-end workflows"
+
+  validation_scripts:
+    - "validate_integration.sh - Checks script integration"
+    - "check_dependencies.sh - Verifies dependencies"
+    - "test-vpn-feature.sh - VPN feature testing"
+
+notes:
+  - "All paths use absolute paths (no relative paths)"
+  - "Symlink resolution handled by hydra.sh and common.sh"
+  - "Configuration uses ~ for home directory (requires bash expansion)"
+  - "All attack scripts generate markdown reports automatically"
+  - "VPN check is optional but configurable per script"
+  - "Wordlists stored in ~/wordlists/ by default"
+  - "Logs stored in PROJECT_ROOT/logs/ directory"
+  - "Results tracked in JSON format for programmatic access"
