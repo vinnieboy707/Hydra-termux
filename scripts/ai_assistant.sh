@@ -3,11 +3,12 @@
 # AI Assistant System for Hydra-Termux
 # Provides contextual help, hints, and guidance throughout user journey
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+# Get script directory (use local variable to avoid collision with parent scripts)
+_AI_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$_AI_SCRIPT_DIR")"
 
 # Source logger
-source "$SCRIPT_DIR/logger.sh"
+source "$_AI_SCRIPT_DIR/logger.sh"
 
 # Assistant state file
 STATE_FILE="$PROJECT_ROOT/.assistant_state"
