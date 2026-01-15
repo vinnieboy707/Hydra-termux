@@ -161,3 +161,68 @@ See the main documentation:
 ---
 
 **Remember:** One line change, then run. Simple as that! 🐍
+
+---
+
+## 🚀 Supreme Combo Scripts
+
+Advanced multi-protocol penetration testing scripts that test multiple services simultaneously for comprehensive security assessments.
+
+### Available Supreme Combos
+
+1. **combo_supreme_email_web_db.sh** - Corporate Stack (7 protocols)
+   - Email (SMTP, IMAP, POP3) + Web (HTTP, HTTPS) + DB (MySQL, PostgreSQL)
+   - Perfect for: Corporate infrastructure, web applications with backend
+
+2. **combo_supreme_cloud_infra.sh** - Cloud Services (8+ protocols)
+   - SSH, RDP, MySQL/RDS, PostgreSQL, Redis, MongoDB, API endpoints
+   - Perfect for: AWS/Azure/GCP, cloud databases, DevOps environments
+
+3. **combo_supreme_network_complete.sh** - Full Network (10 protocols)
+   - SSH, Telnet, FTP, SMB, HTTP, HTTPS, MySQL, PostgreSQL, RDP, VNC
+   - Perfect for: Complete network audits, internal infrastructure
+
+4. **combo_supreme_active_directory.sh** - Windows AD (7+ services)
+   - LDAP, LDAPS, SMB, RDP, MSSQL, OWA, SharePoint, DNS
+   - Perfect for: Windows domains, Active Directory, enterprise environments
+
+5. **combo_supreme_webapp_api.sh** - Web Apps & APIs (10+ interfaces)
+   - Login forms, REST APIs, WordPress, Joomla, Drupal, phpMyAdmin, cPanel
+   - Perfect for: Web applications, API testing, CMS platforms
+
+### How to Use Supreme Combos
+
+```bash
+# 1. Edit the script
+nano Library/combo_supreme_email_web_db.sh
+
+# 2. Change the target variables (at the top)
+TARGET="corporate.example.com"
+EMAIL="admin@corporate.example.com"
+
+# 3. Run the comprehensive test
+bash Library/combo_supreme_email_web_db.sh
+```
+
+### Comparison: Regular vs Supreme
+
+| Feature | Regular Combos | Supreme Combos |
+|---------|---------------|----------------|
+| Protocols | 3-4 | 7-10+ |
+| Execution Time | 5-15 min | 20-70 min |
+| Logging | Basic | Comprehensive |
+| Results Format | Simple | Detailed + Summary |
+| Recommendations | None | Security guidance |
+| Use Case | Quick tests | Professional audits |
+
+### Documentation
+
+For complete details, see: `docs/SUPREME_COMBO_SCRIPTS_GUIDE.md`
+
+- Detailed protocol explanations
+- Usage patterns and examples
+- Best practices and security tips
+- Troubleshooting guide
+- Integration with other tools
+
+---
