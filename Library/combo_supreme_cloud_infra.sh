@@ -7,11 +7,11 @@
 # ═══════════════════════════════════════════════════════════════════
 
 # ════════════════════════════════════════════════════════════════
-# ⚡ CHANGE THESE LINES ⚡
+# ⚡ CONFIGURATION - Replace with actual target ⚡
 # ════════════════════════════════════════════════════════════════
-TARGET="cloud-server.example.com"    # Cloud instance IP/hostname
-CLOUD_PROVIDER="aws"                  # aws, azure, or gcp
-API_ENDPOINT="/api/v1/login"          # API authentication endpoint
+TARGET="cloud-server.yourtarget.com"  # Cloud instance IP/hostname - REPLACE THIS
+CLOUD_PROVIDER="aws"                   # aws, azure, or gcp
+API_ENDPOINT="/api/v1/login"           # API authentication endpoint
 # ════════════════════════════════════════════════════════════════
 
 set -euo pipefail

@@ -7,12 +7,12 @@
 # ═══════════════════════════════════════════════════════════════════
 
 # ════════════════════════════════════════════════════════════════
-# ⚡ CHANGE THESE LINES ⚡
+# ⚡ CONFIGURATION - Replace with actual target ⚡
 # ════════════════════════════════════════════════════════════════
-TARGET="webapp.example.com"          # Main target domain
-API_BASE="/api/v1"                   # API base path
-LOGIN_PATH="/login"                  # Login page path
-ADMIN_PATH="/admin"                  # Admin panel path
+TARGET="webapp.yourtarget.com"        # Main target domain - REPLACE THIS
+API_BASE="/api/v1"                     # API base path
+LOGIN_PATH="/login"                    # Login page path
+ADMIN_PATH="/admin"                    # Admin panel path
 # ════════════════════════════════════════════════════════════════
 
 set -euo pipefail

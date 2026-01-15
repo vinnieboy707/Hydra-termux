@@ -106,9 +106,9 @@ show_help() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Target Specification (choose one):"
-    echo "  -e, --email         Target email address (e.g., admin@example.com)"
-    echo "  -i, --ip            Target IP/hostname (e.g., 192.168.1.100)"
-    echo "  -t, --target        Direct mail server target (e.g., mail.example.com)"
+    echo "  -e, --email         Target email address (e.g., admin@targetdomain.com)"
+    echo "  -i, --ip            Target IP/hostname (e.g., mail server IP)"
+    echo "  -t, --target        Direct mail server target (e.g., mail.targetdomain.com)"
     echo ""
     echo "Attack Configuration:"
     echo "  -m, --mode          Attack mode: quick/full/enum/stealth/aggressive (default: full)"
@@ -145,8 +145,8 @@ show_help() {
     echo "  • Comprehensive JSON result tracking"
     echo ""
     echo "Examples:"
-    echo "  $0 -e admin@example.com -m quick              # Quick 3-protocol test"
-    echo "  $0 -i mail.example.com -m full -a             # Full comprehensive scan"
+    echo "  $0 -e admin@targetdomain.com -m quick              # Quick 3-protocol test"
+    echo "  $0 -i mail.targetdomain.com -m full -a             # Full comprehensive scan"
     echo "  $0 -t smtp.gmail.com -m aggressive --enumerate # Aggressive + enumeration"
     echo "  $0 -e user@company.com -m stealth -v          # Stealth mode, verbose"
     echo "  $0 -i 192.168.1.50 -p imap -T 2.0             # IMAP only, 2x threads"
@@ -199,12 +199,12 @@ show_optimization_tips() {
     echo ""
     echo "╔═══ USERNAME GENERATION STRATEGIES ═══╗"
     echo "║"
-    echo "║ From Email: admin@example.com generates:"
+    echo "║ From Email: admin@targetdomain.com generates:"
     echo "║   • admin                    (local part)"
-    echo "║   • admin@example.com        (full email)"
+    echo "║   • admin@targetdomain.com        (full email)"
     echo "║   • administrator            (variations)"
-    echo "║   • postmaster@example.com   (RFC standard)"
-    echo "║   • abuse@example.com        (RFC standard)"
+    echo "║   • postmaster@targetdomain.com   (RFC standard)"
+    echo "║   • abuse@targetdomain.com        (RFC standard)"
     echo "║"
     echo "║ Priority Order (commonly successful):"
     echo "║   1. admin (most common)"
@@ -462,10 +462,11 @@ smtp_capability_check() {
     
     # Use openssl s_client or nc for SMTP capability detection
     local response=""
+    local client_hostname=$(hostname 2>/dev/null || echo "client")
     if command -v openssl &>/dev/null && [ "$port" = "465" ]; then
-        response=$(timeout 15 sh -c "echo -e 'EHLO test.local\r\nQUIT\r\n' | openssl s_client -connect $target:$port -quiet 2>/dev/null" 2>/dev/null)
+        response=$(timeout 15 sh -c "echo -e 'EHLO ${client_hostname}\r\nQUIT\r\n' | openssl s_client -connect $target:$port -quiet 2>/dev/null" 2>/dev/null)
     elif command -v nc &>/dev/null; then
-        response=$(timeout 15 sh -c "echo -e 'EHLO test.local\r\nQUIT\r\n' | nc -w 10 $target $port 2>/dev/null" 2>/dev/null)
+        response=$(timeout 15 sh -c "echo -e 'EHLO ${client_hostname}\r\nQUIT\r\n' | nc -w 10 $target $port 2>/dev/null" 2>/dev/null)
     fi
     
     if [ -n "$response" ]; then

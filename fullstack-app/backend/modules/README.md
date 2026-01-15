@@ -21,7 +21,8 @@ DNS analysis and intelligence gathering module.
 const { dnsIntelligence } = require('./modules');
 
 // Analyze a domain
-const analysis = await dnsIntelligence.analyzeDomain('example.com');
+// Example usage - replace with actual target domain
+const analysis = await dnsIntelligence.analyzeDomain('targetdomain.com');
 console.log('Security Score:', analysis.security_score);
 ```
 
@@ -120,7 +121,7 @@ await notificationManager.notifyAttackComplete({
   target: '192.168.1.100',
   status: 'completed',
   credentialsFound: 3,
-  userEmail: 'user@example.com'
+  userEmail: 'user@targetdomain.com'  // Replace with actual recipient
 });
 ```
 

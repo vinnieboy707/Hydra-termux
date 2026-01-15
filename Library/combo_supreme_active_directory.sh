@@ -7,11 +7,11 @@
 # ═══════════════════════════════════════════════════════════════════
 
 # ════════════════════════════════════════════════════════════════
-# ⚡ CHANGE THESE LINES ⚡
+# ⚡ CONFIGURATION - Replace with actual target ⚡
 # ════════════════════════════════════════════════════════════════
-DOMAIN_CONTROLLER="dc01.corp.local"    # DC hostname/IP
-DOMAIN="CORP"                           # NetBIOS domain name
-FULL_DOMAIN="corp.local"                # Full DNS domain
+DOMAIN_CONTROLLER="dc01.yourdomain.local"  # DC hostname/IP - REPLACE THIS
+DOMAIN="YOURDOMAIN"                         # NetBIOS domain name - REPLACE THIS
+FULL_DOMAIN="yourdomain.local"              # Full DNS domain - REPLACE THIS
 # ════════════════════════════════════════════════════════════════
 
 set -euo pipefail

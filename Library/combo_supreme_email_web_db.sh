@@ -7,11 +7,11 @@
 # ═══════════════════════════════════════════════════════════════════
 
 # ════════════════════════════════════════════════════════════════
-# ⚡ CHANGE THESE LINES ⚡
+# ⚡ CONFIGURATION - Replace with actual target ⚡
 # ════════════════════════════════════════════════════════════════
-TARGET="corporate.example.com"      # Main target domain/IP
-EMAIL="admin@corporate.example.com"  # Test email account
-WEB_PATH="/admin"                    # Web admin path
+TARGET="corporate.yourtarget.com"      # Main target domain/IP - REPLACE THIS
+EMAIL="admin@corporate.yourtarget.com" # Test email account - REPLACE THIS
+WEB_PATH="/admin"                      # Web admin path
 # ════════════════════════════════════════════════════════════════
 
 set -euo pipefail

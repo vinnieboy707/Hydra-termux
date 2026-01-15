@@ -182,7 +182,8 @@ const {
 await initializeModules();
 
 // Use DNS intelligence
-const analysis = await dnsIntelligence.analyzeDomain('example.com');
+// Example - replace targetdomain.com with actual target
+const analysis = await dnsIntelligence.analyzeDomain('targetdomain.com');
 
 // Queue an attack
 const job = await attackOrchestrator.queueAttack({
