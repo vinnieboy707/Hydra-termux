@@ -248,13 +248,22 @@ ui_loading() {
         printf "${COLORS[BRIGHT_CYAN]}%${i}s${COLORS[NC]}" | tr ' ' '▓'
         printf "%$((width-i))s" | tr ' ' '░'
         printf "] %3d%%" "$percent"
-        sleep $(echo "scale=3; $duration / $width" | bc)
+        
+        # Use bash arithmetic fallback if bc not available
+        if command -v bc >/dev/null 2>&1; then
+            sleep $(echo "scale=3; $duration / $width" | bc)
+        else
+            # Fallback: approximate sleep duration
+            sleep 0.1
+        fi
     done
     ui_cursor_show
     echo ""
 }
 
 # Menu system
+# Note: Requires terminal with raw mode support for arrow key navigation
+# Arrow keys send escape sequences: ESC[A (up), ESC[B (down)
 ui_menu() {
     local title="$1"
     shift
@@ -282,15 +291,21 @@ ui_menu() {
         echo ""
         echo -e "${COLORS[DIM]}Use ↑/↓ arrows to navigate, Enter to select, q to quit${COLORS[NC]}"
         
-        # Read single character
+        # Read escape sequences for arrow keys
+        # Arrow keys send: ESC [ A (up), ESC [ B (down)
         read -rsn1 key
         
+        # Handle escape sequences
+        if [[ "$key" == $'\x1b' ]]; then
+            read -rsn2 -t 0.1 key
+        fi
+        
         case "$key" in
-            A) # Up arrow
+            "[A"|"A") # Up arrow (ESC[A or just A)
                 ((selected--))
                 [ $selected -lt 0 ] && selected=$((${#options[@]} - 1))
                 ;;
-            B) # Down arrow
+            "[B"|"B") # Down arrow (ESC[B or just B)
                 ((selected++))
                 [ $selected -ge ${#options[@]} ] && selected=0
                 ;;

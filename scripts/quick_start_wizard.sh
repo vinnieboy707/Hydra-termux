@@ -102,6 +102,23 @@ EOF
 )"
         
         if ui_confirm "Do you want to try auto-installation?" "n"; then
+            echo ""
+            ui_alert_info "Installation requires system package manager with elevated privileges"
+            echo ""
+            echo "This will run one of the following commands:"
+            if [ -d "/data/data/com.termux" ]; then
+                echo "  ${COLORS[CYAN]}pkg install hydra -y${COLORS[NC]}"
+            else
+                echo "  ${COLORS[CYAN]}sudo apt install hydra -y${COLORS[NC]} (Debian/Ubuntu)"
+                echo "  OR ${COLORS[CYAN]}sudo dnf install hydra -y${COLORS[NC]} (Fedora/RHEL)"
+            fi
+            echo ""
+            
+            if ! ui_confirm "Proceed with installation?" "y"; then
+                ui_alert_warning "Installation cancelled"
+                exit 1
+            fi
+            
             ui_loading 3 "Installing Hydra"
             
             if [ -d "/data/data/com.termux" ]; then
