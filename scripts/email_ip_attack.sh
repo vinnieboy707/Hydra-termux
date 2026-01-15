@@ -15,7 +15,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/logger.sh"
 source "$SCRIPT_DIR/vpn_check.sh"
 
-# 🚀 LOAD OPTIMIZED ATTACK PROFILES - 10000% PROTOCOL OPTIMIZATION
+# 🚀 LOAD OPTIMIZED ATTACK PROFILES - ENHANCED PROTOCOL OPTIMIZATION
 if [ -f "$PROJECT_ROOT/config/optimized_attack_profiles.conf" ]; then
     source "$PROJECT_ROOT/config/optimized_attack_profiles.conf"
     log_success "✨ EMAIL OPTIMIZATION MODE ACTIVATED - Elite attack strategies loaded"
@@ -160,7 +160,7 @@ show_optimization_tips() {
     echo "╔═══ PROTOCOL-SPECIFIC OPTIMIZATIONS ═══╗"
     echo "║"
     echo "║ IMAP (Port 143/993):"
-    echo "║   • Try blank passwords first (5-10% success on IoT/embedded devices)"
+    echo "║   • Try blank passwords first (commonly found on IoT/embedded devices)"
     echo "║   • Username = email local part (before @) OR full email address"
     echo "║   • STARTTLS detection - automatically upgrades to secure"
     echo "║   • Threads: 16 (fast), Timeout: 20s (responsive protocol)"
@@ -399,13 +399,20 @@ smtp_banner_grab() {
     
     log_info "🔍 SMTP Banner Grabbing: $target:$port"
     
-    # Validate target
-    if [ -z "$target" ]; then
-        log_error "  Invalid target"
+    # Validate target and port
+    if [ -z "$target" ] || ! [[ "$port" =~ ^[0-9]+$ ]]; then
+        log_error "  Invalid target or port"
         return 1
     fi
     
-    local banner=$(timeout 10 bash -c "exec 3<>/dev/tcp/$target/$port 2>/dev/null && cat <&3 2>/dev/null" 2>/dev/null | head -1)
+    # Sanitize target (allow only valid hostname characters)
+    if ! [[ "$target" =~ ^[a-zA-Z0-9.-]+$ ]]; then
+        log_error "  Invalid target format"
+        return 1
+    fi
+    
+    # Use printf to safely pass parameters
+    local banner=$(timeout 10 bash -c "exec 3<>/dev/tcp/${target}/${port} 2>/dev/null && cat <&3 2>/dev/null" 2>/dev/null | head -1)
     
     if [ -n "$banner" ]; then
         log_success "  Banner: $banner"
@@ -436,8 +443,20 @@ smtp_capability_check() {
     
     log_info "🔍 Checking SMTP capabilities: $target:$port"
     
+    # Validate target and port
+    if [ -z "$target" ] || ! [[ "$port" =~ ^[0-9]+$ ]]; then
+        log_error "  Invalid target or port"
+        return 1
+    fi
+    
+    # Sanitize target
+    if ! [[ "$target" =~ ^[a-zA-Z0-9.-]+$ ]]; then
+        log_error "  Invalid target format"
+        return 1
+    fi
+    
     local response=$(timeout 15 bash -c "
-        exec 3<>/dev/tcp/$target/$port 2>/dev/null
+        exec 3<>/dev/tcp/${target}/${port} 2>/dev/null
         cat <&3 | head -1
         echo 'EHLO test.local' >&3
         sleep 2
@@ -478,8 +497,18 @@ smtp_enumerate_users() {
     log_info "🔍 SMTP User Enumeration via VRFY/EXPN/RCPT TO"
     echo ""
     
+    # Validate inputs
+    if [ -z "$target" ] || ! [[ "$port" =~ ^[0-9]+$ ]]; then
+        log_error "Invalid target or port"
+        return 1
+    fi
+    
+    if ! [[ "$target" =~ ^[a-zA-Z0-9.-]+$ ]]; then
+        log_error "Invalid target format"
+        return 1
+    fi
+    
     local found_users="/tmp/found_users_$$.tmp"
-    local commands=("VRFY" "EXPN")
     
     # Read usernames
     if [ ! -f "$userlist" ]; then
@@ -496,10 +525,11 @@ smtp_enumerate_users() {
         username=$(echo "$username" | tr -cd '[:alnum:]@._-')
         [ -z "$username" ] && continue
         
+        # Use printf for safe parameter passing
         local response=$(timeout 5 bash -c "
-            exec 3<>/dev/tcp/$target/$port 2>/dev/null
+            exec 3<>/dev/tcp/${target}/${port} 2>/dev/null
             cat <&3 | head -1 > /dev/null
-            echo 'VRFY $username' >&3
+            printf 'VRFY %s\r\n' '${username}' >&3
             sleep 1
             cat <&3 | head -1
             echo 'QUIT' >&3
@@ -543,29 +573,29 @@ generate_usernames_from_email() {
     # Priority usernames based on success statistics
     cat > "$output_file" << EOF
 # Generated from: $email
-# Priority order based on success rates
+# Priority order based on common usage patterns
 
-# 1. Direct email address (40% success)
+# 1. Direct email address (commonly tried first)
 $email
 
-# 2. Local part only (30% success)
+# 2. Local part only (frequently successful)
 $local_part
 
-# 3. Common admin variations (25% success)
+# 3. Common admin variations (standard accounts)
 admin
 root
 administrator
 postmaster
 webmaster
 
-# 4. Email-based variations (15% success)
+# 4. Email-based variations (domain-specific accounts)
 admin@$domain
 postmaster@$domain
 abuse@$domain
 hostmaster@$domain
 info@$domain
 
-# 5. Standard service accounts (10% success)
+# 5. Standard service accounts (common on mail servers)
 user
 mail
 support
@@ -579,7 +609,7 @@ get_default_usernames() {
     local output_file="$1"
     
     cat > "$output_file" << 'EOF'
-# Email Priority Usernames - Ordered by success rate
+# Email Priority Usernames - Ordered by common usage patterns
 admin
 root
 administrator
@@ -623,15 +653,15 @@ generate_email_passwords() {
     cat > "$output_file" << EOF
 # Email-specific passwords - High priority
 
-# 1. Blank password (5-10% success on IoT/embedded devices)
+# 1. Blank password (try first - commonly found on IoT/embedded devices)
 
 
-# 2. Username-based passwords (20% success)
+# 2. Username-based passwords (commonly successful)
 $username
 $local_part
 $domain_base
 
-# 3. Email-based passwords (15% success)
+# 3. Email-based passwords (commonly successful)
 $email
 $local_part@123
 $local_part!
@@ -639,13 +669,13 @@ ${local_part}123
 ${local_part}2024
 ${local_part}2023
 
-# 4. Domain-based passwords (10% success)
+# 4. Domain-based passwords (commonly successful)
 $domain_base
 ${domain_base}123
 ${domain_base}!
 ${domain_base}2024
 
-# 5. Common email passwords (40% success across all systems)
+# 5. Common email passwords (frequently encountered)
 password
 123456
 12345678
