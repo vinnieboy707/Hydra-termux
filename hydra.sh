@@ -78,6 +78,7 @@ show_menu() {
     echo "  6)  PostgreSQL Admin Attack"
     echo "  7)  SMB Admin Attack"
     echo "  8)  Multi-Protocol Auto Attack"
+    echo "  38) 🚀 Email & IP Penetration Test (NEW!)"
     echo ""
     print_message "  UTILITIES:" "$MAGENTA"
     echo "  9)  Download Wordlists"
@@ -119,6 +120,71 @@ show_menu() {
     # Show contextual AI hint
     get_contextual_hint "main_menu"
     echo ""
+}
+
+# Function to run email-IP attack
+run_email_ip_attack() {
+    print_banner "🚀 Email & IP Penetration Test"
+    echo ""
+    
+    get_contextual_hint "target_entry"
+    echo ""
+    
+    read -r -p "Enter email address (e.g., admin@example.com) [optional]: " email
+    read -r -p "Enter IP/hostname (e.g., mail.example.com): " ip
+    
+    if [ -z "$email" ] && [ -z "$ip" ]; then
+        log_error "At least one of email or IP is required"
+        read -r -p "Press Enter to continue..."
+        return 1
+    fi
+    
+    echo ""
+    print_message "Attack Mode:" "$CYAN"
+    echo "  1) Quick (3 protocols, ~5 min)"
+    echo "  2) Full (6+ protocols, comprehensive)"
+    echo "  3) Aggressive (maximum speed)"
+    echo "  4) Stealth (slow, evasive)"
+    read -r -p "Select mode [1-4] (default: 1): " mode_choice
+    
+    local mode="quick"
+    case $mode_choice in
+        2) mode="full" ;;
+        3) mode="aggressive" ;;
+        4) mode="stealth" ;;
+        *) mode="quick" ;;
+    esac
+    
+    echo ""
+    log_info "Starting email-IP attack..."
+    log_info "Mode: $mode"
+    [ -n "$email" ] && log_info "Email: $email"
+    [ -n "$ip" ] && log_info "IP: $ip"
+    log_action "email_ip_attack_started:$mode:$email:$ip"
+    
+    get_contextual_hint "attack_started"
+    echo ""
+    
+    # Build command
+    local cmd="bash \"$SCRIPT_DIR/scripts/email_ip_attack.sh\" -m \"$mode\" -v"
+    [ -n "$email" ] && cmd+=" -e \"$email\""
+    [ -n "$ip" ] && cmd+=" -i \"$ip\""
+    
+    eval "$cmd"
+    
+    local exit_code=$?
+    
+    echo ""
+    if [ $exit_code -eq 0 ]; then
+        log_info "Attack completed. Check logs for results."
+        log_action "email_ip_attack_completed:$mode:$email:$ip"
+        get_contextual_hint "attack_completed"
+    else
+        log_warning "Attack ended with errors. Check logs."
+        get_contextual_hint "error_occurred"
+    fi
+    echo ""
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to run attack script
@@ -544,7 +610,7 @@ main() {
         show_banner
         show_menu
         
-        read -r -p "Enter your choice [0-37, 88-91]: " choice
+        read -r -p "Enter your choice [0-38, 88-91]: " choice
         
         case $choice in
             1)
@@ -657,6 +723,9 @@ main() {
                 ;;
             37)
                 run_utility "alhacking_uninstall.sh" "Uninstall ALHacking Tools"
+                ;;
+            38)
+                run_email_ip_attack
                 ;;
             88)
                 interactive_help
