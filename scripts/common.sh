@@ -352,6 +352,12 @@ validate_ip() {
 # Usage: validate_hostname "example.com"
 validate_hostname() {
     local hostname="$1"
+    
+    # First check if it's an IP address (should be rejected)
+    if validate_ip "$hostname" 2>/dev/null; then
+        return 1
+    fi
+    
     local regex='^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$'
     
     [[ "$hostname" =~ $regex ]]
