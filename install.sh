@@ -100,9 +100,75 @@ echo ""
 # Track failed installations
 FAILED_PACKAGES=()
 
+# Special handling for hydra - try multiple approaches
+install_hydra() {
+    print_message "   Installing: hydra (CRITICAL PACKAGE)" "$BLUE"
+    
+    # Check if already installed
+    if command -v hydra &> /dev/null; then
+        print_message "   ✓ hydra already installed" "$GREEN"
+        return 0
+    fi
+    
+    # Attempt 1: Try standard 'hydra' package
+    print_message "   Attempting: pkg install hydra..." "$CYAN"
+    if pkg install hydra -y 2>&1 | tee /tmp/hydra_install.log | grep -q "Installing\|Setting up\|Unpacking"; then
+        sleep 2
+        if command -v hydra &> /dev/null; then
+            print_message "   ✓ hydra installed successfully" "$GREEN"
+            return 0
+        fi
+    fi
+    
+    # Attempt 2: Try 'thc-hydra' alternative name
+    print_message "   Attempting: pkg install thc-hydra..." "$CYAN"
+    if pkg install thc-hydra -y 2>&1 | tee -a /tmp/hydra_install.log | grep -q "Installing\|Setting up\|Unpacking"; then
+        sleep 2
+        if command -v hydra &> /dev/null; then
+            print_message "   ✓ thc-hydra installed successfully" "$GREEN"
+            return 0
+        fi
+    fi
+    
+    # Attempt 3: Search for available hydra packages
+    print_message "   Searching for hydra in repositories..." "$CYAN"
+    local available_hydra=$(pkg search hydra 2>/dev/null | grep -i "^hydra" | head -1 | awk '{print $1}')
+    if [ -n "$available_hydra" ]; then
+        print_message "   Found: $available_hydra" "$BLUE"
+        if pkg install "$available_hydra" -y 2>&1 | tee -a /tmp/hydra_install.log | grep -q "Installing\|Setting up\|Unpacking"; then
+            sleep 2
+            if command -v hydra &> /dev/null; then
+                print_message "   ✓ $available_hydra installed successfully" "$GREEN"
+                return 0
+            fi
+        fi
+    fi
+    
+    # All attempts failed - show detailed error
+    print_message "   ✗ All hydra installation attempts FAILED" "$RED"
+    echo ""
+    print_message "   Last error output:" "$YELLOW"
+    if [ -f /tmp/hydra_install.log ]; then
+        tail -10 /tmp/hydra_install.log | sed 's/^/     /'
+        rm -f /tmp/hydra_install.log
+    fi
+    echo ""
+    
+    return 1
+}
+
+# Try to install hydra first (most critical)
+if ! install_hydra; then
+    FAILED_PACKAGES+=("hydra")
+fi
+
+# Install other packages
 while IFS= read -r package || [ -n "$package" ]; do
     # Skip empty lines and comments
     [[ -z "$package" || "$package" =~ ^[[:space:]]*# ]] && continue
+    
+    # Skip hydra (already handled above)
+    [ "$package" = "hydra" ] && continue
     
     print_message "   Installing: $package" "$BLUE"
     
@@ -145,7 +211,18 @@ if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
         echo ""
         print_message "Hydra is the CORE dependency. Without it, nothing will work." "$YELLOW"
         echo ""
-        print_message "═══ TROUBLESHOOTING STEPS ═══" "$CYAN"
+        print_message "═══ AUTOMATIC FIX AVAILABLE ═══" "$CYAN"
+        echo ""
+        print_message "🔧 Run the automatic fixer to try advanced installation methods:" "$BLUE"
+        print_message "   bash scripts/auto_fix.sh" "$GREEN"
+        echo ""
+        print_message "This will attempt:" "$BLUE"
+        print_message "  • Multiple package repository updates" "$BLUE"
+        print_message "  • Alternative package names (thc-hydra, etc.)" "$BLUE"
+        print_message "  • Compilation from source if needed" "$BLUE"
+        print_message "  • Pre-built binary downloads" "$BLUE"
+        echo ""
+        print_message "═══ MANUAL TROUBLESHOOTING STEPS ═══" "$CYAN"
         echo ""
         print_message "1. Update package repositories:" "$BLUE"
         print_message "   pkg update && pkg upgrade -y" "$GREEN"
@@ -156,8 +233,15 @@ if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
         print_message "3. Check for package availability:" "$BLUE"
         print_message "   pkg search hydra" "$GREEN"
         echo ""
-        print_message "4. If hydra is not in repositories, compile from source:" "$BLUE"
-        print_message "   pkg install git make gcc -y" "$GREEN"
+        print_message "4. Try alternative package names:" "$BLUE"
+        print_message "   pkg install thc-hydra -y" "$GREEN"
+        echo ""
+        print_message "5. If hydra is not in repositories, install from root repo:" "$BLUE"
+        print_message "   pkg install root-repo" "$GREEN"
+        print_message "   pkg install hydra -y" "$GREEN"
+        echo ""
+        print_message "6. Compile from source (advanced):" "$BLUE"
+        print_message "   pkg install git make clang libssh2 openssl -y" "$GREEN"
         print_message "   git clone https://github.com/vanhauser-thc/thc-hydra" "$GREEN"
         print_message "   cd thc-hydra && ./configure && make && make install" "$GREEN"
         echo ""
@@ -275,18 +359,29 @@ else
     echo ""
     print_message "Hydra-Termux WILL NOT WORK without the hydra tool installed." "$YELLOW"
     echo ""
+    print_message "═══ QUICK FIX (RECOMMENDED) ═══" "$CYAN"
+    echo ""
+    print_message "🔧 Try the automatic fixer (attempts multiple methods):" "$GREEN"
+    print_message "   bash scripts/auto_fix.sh" "$GREEN"
+    echo ""
+    print_message "Or use the interactive help center:" "$GREEN"
+    print_message "   ./fix-hydra.sh" "$GREEN"
+    echo ""
     print_message "═══ NEXT STEPS ═══" "$CYAN"
     echo ""
-    print_message "1. Read the error messages above carefully" "$BLUE"
-    print_message "2. Try the troubleshooting steps provided" "$BLUE"
+    print_message "1. Review error messages above for specific issues" "$BLUE"
+    print_message "2. Run automatic fixer: bash scripts/auto_fix.sh" "$BLUE"
     print_message "3. Run dependency check for detailed diagnosis:" "$BLUE"
     print_message "   bash scripts/check_dependencies.sh" "$GREEN"
     echo ""
-    print_message "4. If issues persist, check documentation:" "$BLUE"
+    print_message "4. Check system diagnostics (shows health score):" "$BLUE"
+    print_message "   bash scripts/system_diagnostics.sh" "$GREEN"
+    echo ""
+    print_message "5. Review documentation for manual fixes:" "$BLUE"
     print_message "   • README.md - Installation troubleshooting section" "$BLUE"
     print_message "   • docs/TERMUX_DEPLOYMENT.md - Termux-specific guide" "$BLUE"
     echo ""
-    print_message "5. Open an issue on GitHub with error details:" "$BLUE"
+    print_message "6. Still stuck? Get help on GitHub:" "$BLUE"
     print_message "   https://github.com/vinnieboy707/Hydra-termux/issues" "$GREEN"
     echo ""
     print_message "════════════════════════════════════════════════════════" "$BLUE"
