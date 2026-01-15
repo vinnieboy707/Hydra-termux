@@ -12,9 +12,9 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+# Get script directory (use local variable to avoid collision with parent scripts)
+_LOGGER_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$_LOGGER_SCRIPT_DIR")"
 
 # Default log directory
 LOG_DIR="${LOG_DIR:-$PROJECT_ROOT/logs}"
