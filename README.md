@@ -212,6 +212,9 @@ If you prefer manual installation:
 
 2. **Install required packages:**
    ```bash
+   # Hydra lives in the Termux root repository. Install it first if you see
+   # "Unable to locate package hydra".
+   pkg install root-repo -y
    pkg install hydra git wget curl openssl nmap termux-api figlet jq -y
    ```
 
