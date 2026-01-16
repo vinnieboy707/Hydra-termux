@@ -77,7 +77,7 @@ async function initializeDefaultUsers() {
         colorLog('green', `✓ Created user: ${defaultUser.username}`);
         colorLog('blue', `  Role: ${defaultUser.role}`);
         colorLog('blue', `  Email: ${defaultUser.email}`);
-        colorLog('blue', `  Password: ${defaultUser.password}`);
+        colorLog('blue', `  Password: ${defaultUser.password.substring(0, 3)}***`);
         
         if (defaultUser.role === 'super_admin') {
           colorLog('red', `  ⚠  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!`);
@@ -99,13 +99,14 @@ async function initializeDefaultUsers() {
     console.log('');
     colorLog('green', '   Admin Account:');
     colorLog('blue', '   Username: admin');
-    colorLog('blue', '   Password: Admin@123');
+    colorLog('blue', '   Password: See documentation or initial setup output');
     console.log('');
     colorLog('green', '   Demo Account:');
     colorLog('blue', '   Username: demo');
-    colorLog('blue', '   Password: Demo@123');
+    colorLog('blue', '   Password: See documentation or initial setup output');
     console.log('');
     colorLog('red', '   ⚠  CRITICAL: Change these passwords immediately after first login!');
+    colorLog('blue', '   📖 Default passwords are in QUICKSTART_GUIDE.md');
     console.log('');
 
   } catch (error) {

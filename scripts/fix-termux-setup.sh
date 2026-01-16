@@ -1,9 +1,11 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/env bash
 # ============================================================================
 # Hydra-Termux Setup Fix Script for Android/Termux Environment
 # ============================================================================
 # This script automatically fixes common issues when running the fullstack
 # application in Termux, particularly the bcrypt compilation failure.
+#
+# Compatible with both Termux and standard Linux/Unix environments
 #
 # Features:
 # - Intelligent environment detection
@@ -46,6 +48,7 @@ SPARKLES="✨"
 SCRIPT_VERSION="2.0.0"
 SCRIPT_NAME="Hydra-Termux Setup Fix"
 LOG_FILE="/tmp/hydra-termux-setup-$(date +%Y%m%d_%H%M%S).log"
+BCRYPTJS_VERSION="^2.4.3"
 
 # ============================================================================
 # LOGGING FUNCTIONS
@@ -238,7 +241,7 @@ if grep -q '"bcrypt"' package.json; then
     
     # Update package.json
     log_step "Updating package.json..."
-    sed -i.bak 's/"bcrypt": "[^"]*"/"bcryptjs": "^2.4.3"/g' package.json
+    sed -i.bak "s/\"bcrypt\": \"[^\"]*\"/\"bcryptjs\": \"$BCRYPTJS_VERSION\"/g" package.json
     
     log_success "Updated package.json to use bcryptjs"
 else
@@ -247,7 +250,9 @@ fi
 
 # Clean npm cache to avoid issues
 log_step "Cleaning npm cache..."
-npm cache clean --force 2>&1 | tee -a "$LOG_FILE" | grep -v "deprecated" || true
+if ! npm cache clean --force 2>&1 | tee -a "$LOG_FILE" | grep -v "deprecated"; then
+    log_warning "npm cache clean failed, but continuing..."
+fi
 
 # Install backend dependencies
 echo ""

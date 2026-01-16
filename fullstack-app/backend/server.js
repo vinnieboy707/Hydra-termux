@@ -119,9 +119,11 @@ server.listen(PORT, async () => {
   `);
   
   // Initialize default users if they don't exist
+  // Wait for database to be ready
+  const DB_INIT_TIMEOUT = parseInt(process.env.DB_INIT_TIMEOUT_MS) || 1500;
   setTimeout(() => {
     initializeDefaultUsers().catch(err => console.error('Error initializing users:', err));
-  }, 1000);
+  }, DB_INIT_TIMEOUT);
 });
 
 module.exports = { app, server, wss };
