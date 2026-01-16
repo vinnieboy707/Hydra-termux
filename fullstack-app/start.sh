@@ -55,32 +55,7 @@ check_dependencies "$SCRIPT_DIR/frontend"
 echo ""
 echo "👤 Creating default admin user..."
 cd "$SCRIPT_DIR/backend"
-node << 'EOF'
-const bcrypt = require('bcryptjs');
-const { run, get } = require('./database');
-
-async function createDefaultUser() {
-  try {
-    const existing = await get('SELECT id FROM users WHERE username = ?', ['admin']);
-    if (!existing) {
-      const hashedPassword = await bcrypt.hash('admin', 10);
-      await run(
-        'INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',
-        ['admin', hashedPassword, 'admin@hydra.local', 'admin']
-      );
-      console.log('✅ Default admin user created (username: admin, password: admin)');
-      console.log('⚠️  CHANGE THE PASSWORD IMMEDIATELY!');
-    } else {
-      console.log('ℹ️  Admin user already exists');
-    }
-  } catch (error) {
-    console.error('Error creating user:', error.message);
-  }
-  process.exit(0);
-}
-
-createDefaultUser();
-EOF
+node init-users.js || echo "⚠️  Note: Admin user may already exist"
 cd "$SCRIPT_DIR"
 
 echo ""
@@ -93,7 +68,7 @@ echo "║   Frontend UI: http://localhost:3001                          ║"
 echo "║                                                               ║"
 echo "║   Default credentials:                                        ║"
 echo "║   Username: admin                                             ║"
-echo "║   Password: admin                                             ║"
+echo "║   Password: Admin@123                                         ║"
 echo "║                                                               ║"
 echo "║   ⚠️  Change the default password immediately!                ║"
 echo "║                                                               ║"
