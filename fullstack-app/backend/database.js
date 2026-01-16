@@ -45,6 +45,8 @@ if (DB_TYPE === 'postgres') {
     }
   });
 
+  let dbReady = false;
+
   function initDatabase() {
     db.serialize(() => {
       // Users table

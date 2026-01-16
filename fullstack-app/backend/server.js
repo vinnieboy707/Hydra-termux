@@ -103,7 +103,10 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
+// Initialize default users on startup
+const { initializeDefaultUsers } = require('./init-users');
+
+server.listen(PORT, async () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
@@ -114,6 +117,11 @@ server.listen(PORT, () => {
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
   `);
+  
+  // Initialize default users if they don't exist
+  setTimeout(() => {
+    initializeDefaultUsers().catch(err => console.error('Error initializing users:', err));
+  }, 1000);
 });
 
 module.exports = { app, server, wss };

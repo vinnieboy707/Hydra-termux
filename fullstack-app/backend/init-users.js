@@ -111,13 +111,20 @@ async function initializeDefaultUsers() {
   } catch (error) {
     colorLog('red', `✗ Fatal error: ${error.message}`);
     console.error(error);
-    process.exit(1);
+    if (require.main === module) {
+      process.exit(1);
+    } else {
+      throw error;
+    }
   }
 
-  // Give time for async operations to complete
-  setTimeout(() => {
-    process.exit(0);
-  }, 500);
+  // Only exit if run as main module
+  if (require.main === module) {
+    // Give time for async operations to complete
+    setTimeout(() => {
+      process.exit(0);
+    }, 500);
+  }
 }
 
 // Run if called directly
