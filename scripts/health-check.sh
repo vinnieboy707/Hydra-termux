@@ -129,7 +129,13 @@ if [ $ISSUES_FOUND -eq 0 ]; then
     echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}"
     exit 0
 else
-    echo -e "${YELLOW}║  ⚠ Found $ISSUES_FOUND issue(s). Review above for details.          ║${NC}"
+    SUMMARY_LINE="║  ⚠ Found $ISSUES_FOUND issue(s). Review above for details."
+    SUMMARY_WIDTH=64
+    PADDING_WIDTH=$((SUMMARY_WIDTH - ${#SUMMARY_LINE}))
+    if [ $PADDING_WIDTH -lt 0 ]; then
+        PADDING_WIDTH=0
+    fi
+    printf "%b%s%*s║%b\n" "${YELLOW}" "$SUMMARY_LINE" "$PADDING_WIDTH" "" "${NC}"
     echo -e "${YELLOW}╚════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${BLUE}Recommended action:${NC}"
