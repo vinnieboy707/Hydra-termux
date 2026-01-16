@@ -100,7 +100,7 @@ router.get('/timeseries', authMiddleware, async (req, res) => {
         SUM(total_credentials_found) as total_credentials_found,
         AVG(avg_success_rate) as avg_success_rate
       FROM attack_analytics
-      WHERE user_id = $1 AND date >= CURRENT_DATE - INTERVAL '$2 days'
+      WHERE user_id = $1 AND date >= CURRENT_DATE - ($2 || ' days')::INTERVAL
       GROUP BY date
       ORDER BY date ASC
     `, [req.user.id, parseInt(days)]);
@@ -328,7 +328,7 @@ router.get('/export', authMiddleware, async (req, res) => {
     
     const data = await all(`
       SELECT * FROM attack_analytics
-      WHERE user_id = $1 AND date >= CURRENT_DATE - INTERVAL '$2 days'
+      WHERE user_id = $1 AND date >= CURRENT_DATE - ($2 || ' days')::INTERVAL
       ORDER BY date DESC, hour DESC
     `, [req.user.id, parseInt(days)]);
     
