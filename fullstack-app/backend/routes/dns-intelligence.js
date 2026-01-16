@@ -212,21 +212,27 @@ async function scanDomainIntelligence(domain, userId) {
     }
     
     // Helper to check if an MX host is exactly a domain or a subdomain of it
+    const hostMatchesDomain = (host, domain) => {
+      if (!host || !domain) return false;
+      if (host === domain) return true;
+      return host.endsWith('.' + domain);
+    };
+
     function isHostInDomain(host, domain) {
       if (!host || !domain) return false;
-      host = host.toLowerCase();
+      if (hostMatchesDomain(mxHost, 'google.com') || hostMatchesDomain(mxHost, 'googlemail.com')) {
       domain = domain.toLowerCase();
-      return host === domain || host.endsWith('.' + domain);
+      } else if (hostMatchesDomain(mxHost, 'outlook.com') || hostMatchesDomain(mxHost, 'protection.outlook.com')) {
     }
-    
+      } else if (hostMatchesDomain(mxHost, 'mail.protection.outlook.com')) {
     // Detect email provider
-    if (intel.mx_records.length > 0) {
+      } else if (hostMatchesDomain(mxHost, 'mimecast.com')) {
       const mxHost = (intel.mx_records[0].exchange || '').toLowerCase();
-      if (isHostInDomain(mxHost, 'google.com') || isHostInDomain(mxHost, 'googlemail.com')) {
+      } else if (hostMatchesDomain(mxHost, 'pphosted.com')) {
         intel.email_provider = 'Google Workspace';
-      } else if (isHostInDomain(mxHost, 'outlook.com') || isHostInDomain(mxHost, 'protection.outlook.com')) {
+      } else if (hostMatchesDomain(mxHost, 'mailgun.org')) {
         intel.email_provider = 'Microsoft 365';
-      } else if (isHostInDomain(mxHost, 'mail.protection.outlook.com')) {
+      } else if (hostMatchesDomain(mxHost, 'sendgrid.net')) {
         intel.email_provider = 'Microsoft 365 Advanced';
       } else if (isHostInDomain(mxHost, 'mimecast.com')) {
         intel.email_provider = 'Mimecast';
