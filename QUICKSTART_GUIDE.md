@@ -46,14 +46,30 @@ cd ../frontend && npm start  # Terminal 2 (NEW terminal)
 
 ---
 
-## 🔐 Default Credentials
+## 🔐 Default Credentials & Security Notice
 
-| Account | Username | Password | Role |
-|---------|----------|----------|------|
-| **Admin** | `admin` | `Admin@123` | super_admin |
-| Demo | `demo` | `Demo@123` | user |
+⚠️ **CRITICAL SECURITY WARNING**: The default credentials below are **publicly documented** and must be treated as insecure. These are provided only for initial setup and testing purposes.
 
-⚠️ **CRITICAL**: Change passwords immediately after first login!
+| Account | Username | Password | Role | Notes |
+|---------|----------|----------|------|-------|
+| **Admin** | `admin` | `Admin@123` | super_admin | **Change immediately after first login** |
+| Demo | `demo` | `Demo@123` | user | **Delete or disable in production** |
+
+### 🔒 Security Best Practices
+
+1. **Immediately after first login:**
+   - Change the `admin` password to a strong, unique password
+   - Change or disable the `demo` account password
+   
+2. **For production or internet-accessible environments:**
+   - Delete the `demo` account entirely
+   - Consider implementing multi-factor authentication
+   - Use environment-specific credentials
+
+3. **Additional security measures:**
+   - Never use these default credentials in production
+   - Treat these credentials as public knowledge
+   - Monitor login attempts for suspicious activity
 
 ---
 

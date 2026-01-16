@@ -71,25 +71,37 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    console.log('[LOGIN] Attempt:', { username, passwordLength: password?.length });
+    // Only log in development mode to prevent security issues
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[LOGIN] Attempt:', { username, passwordLength: password?.length });
+    }
 
     if (!username || !password) {
-      console.log('[LOGIN] Missing credentials');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[LOGIN] Missing credentials');
+      }
       return res.status(400).json({ error: 'Username and password required' });
     }
 
     // Get user
     const user = await get('SELECT * FROM users WHERE username = ?', [username]);
     if (!user) {
-      console.log('[LOGIN] User not found:', username);
+      // Don't log username on failure to prevent account enumeration
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[LOGIN] User not found');
+      }
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    console.log('[LOGIN] User found:', { id: user.id, username: user.username });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[LOGIN] User found:', { id: user.id, username: user.username });
+    }
 
     // Verify password
     const validPassword = await bcrypt.compare(password, user.password);
-    console.log('[LOGIN] Password valid:', validPassword);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[LOGIN] Password valid:', validPassword);
+    }
     
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });

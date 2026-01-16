@@ -7,7 +7,6 @@
 
 const bcrypt = require('bcryptjs');
 const { run, get, DB_TYPE } = require('./database');
-const readline = require('readline');
 
 // Colors for terminal output
 const colors = {
@@ -46,9 +45,8 @@ async function initializeDefaultUsers() {
   console.log('');
 
   try {
-    // Wait a bit for database to initialize
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
+    // Try to query database to check if it's ready
+    // If this fails, the retry logic in server.js will handle it
     colorLog('blue', `ℹ  Using ${DB_TYPE.toUpperCase()} database`);
     console.log('');
 
@@ -69,7 +67,7 @@ async function initializeDefaultUsers() {
         const hashedPassword = await bcrypt.hash(defaultUser.password, 10);
 
         // Create user
-        const result = await run(
+        await run(
           'INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',
           [defaultUser.username, hashedPassword, defaultUser.email, defaultUser.role]
         );

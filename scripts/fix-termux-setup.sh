@@ -238,6 +238,7 @@ if grep -q '"bcrypt"' package.json; then
     # Update package.json
     log_step "Updating package.json..."
     sed -i.bak "s/\"bcrypt\": \"[^\"]*\"/\"bcryptjs\": \"$BCRYPTJS_VERSION\"/g" package.json
+    rm -f package.json.bak  # Clean up backup file created by sed
     
     log_success "Updated package.json to use bcryptjs"
 else
@@ -522,10 +523,12 @@ echo -e "     Frontend: ${BLUE}http://localhost:3001${NC}"
 echo -e "     Backend:  ${BLUE}http://localhost:3000${NC}"
 echo -e "     API Docs: ${BLUE}http://localhost:3000/api${NC}"
 echo ""
-echo -e "  ${YELLOW}4. Default login credentials:${NC}"
+echo -e "  ${YELLOW}4. Default login credentials (SECURITY WARNING):${NC}"
+echo -e "     ${RED}${WARNING} These credentials are PUBLIC and MUST be changed!${NC}"
 echo -e "     Username: ${GREEN}admin${NC}"
 echo -e "     Password: ${GREEN}Admin@123${NC}"
-echo -e "     ${RED}${WARNING} CRITICAL: Change password immediately after first login!${NC}"
+echo -e "     ${RED}${WARNING} Change password immediately after first login!${NC}"
+echo -e "     ${RED}${WARNING} Delete 'demo' account in production environments!${NC}"
 echo ""
 
 # Helpful tips
