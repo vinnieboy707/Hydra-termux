@@ -28,7 +28,6 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 WHITE='\033[1;37m'
 NC='\033[0m' # No Color
@@ -40,13 +39,9 @@ ARROW="→"
 WARNING="⚠"
 INFO="ℹ"
 ROCKET="🚀"
-WRENCH="🔧"
-PACKAGE="📦"
 SPARKLES="✨"
 
 # Script metadata
-SCRIPT_VERSION="2.0.0"
-SCRIPT_NAME="Hydra-Termux Setup Fix"
 LOG_FILE="/tmp/hydra-termux-setup-$(date +%Y%m%d_%H%M%S).log"
 BCRYPTJS_VERSION="^2.4.3"
 
@@ -157,7 +152,8 @@ detect_environment() {
 
 create_backup() {
     local file=$1
-    local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
+    local backup
+    backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
     
     if [ -f "$file" ]; then
         cp "$file" "$backup"
