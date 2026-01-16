@@ -86,7 +86,8 @@ router.post('/login', async (req, res) => {
     // Get user
     const user = await get('SELECT * FROM users WHERE username = ?', [username]);
     if (!user) {
-      // Don't log username on failure to prevent account enumeration
+      // Don't log username on failure in production to prevent account enumeration
+      // (username is logged in development mode above)
       if (process.env.NODE_ENV === 'development') {
         console.log('[LOGIN] User not found');
       }

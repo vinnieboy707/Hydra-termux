@@ -121,7 +121,8 @@ server.listen(PORT, async () => {
   // Initialize default users if they don't exist
   // Use retry logic with proper database readiness check
   const parsedTimeout = parseInt(process.env.DB_INIT_TIMEOUT_MS, 10);
-  const DB_INIT_TIMEOUT = Number.isFinite(parsedTimeout) && parsedTimeout > 0 ? parsedTimeout : 5000;
+  // Validate timeout is a positive number, otherwise use default
+  const DB_INIT_TIMEOUT = (Number.isFinite(parsedTimeout) && parsedTimeout > 0) ? parsedTimeout : 5000;
   const RETRY_INTERVAL_MS = 500;
   const startTime = Date.now();
   let intervalId;
@@ -154,12 +155,14 @@ server.listen(PORT, async () => {
     }
   };
 
-  // Start immediate attempt and schedule retries
+  // Schedule retries first, then make immediate attempt
+  // This prevents race condition where immediate success clears interval before it's set
   intervalId = setInterval(() => {
     attemptInit();
   }, RETRY_INTERVAL_MS);
   
-  attemptInit(); // First immediate attempt
+  // Make first immediate attempt
+  attemptInit();
 });
 
 module.exports = { app, server, wss };
