@@ -211,36 +211,22 @@ async function scanDomainIntelligence(domain, userId) {
       intel.dkim_records = dkimRecords;
     }
     
-    // Helper to check if an MX host is exactly a domain or a subdomain of it
-    const hostMatchesDomain = (host, domain) => {
-      if (!host || !domain) return false;
-      if (host === domain) return true;
-      return host.endsWith('.' + domain);
-    };
-
-    function isHostInDomain(host, domain) {
-      if (!host || !domain) return false;
-      if (hostMatchesDomain(mxHost, 'google.com') || hostMatchesDomain(mxHost, 'googlemail.com')) {
-      domain = domain.toLowerCase();
-      } else if (hostMatchesDomain(mxHost, 'outlook.com') || hostMatchesDomain(mxHost, 'protection.outlook.com')) {
-    }
-      } else if (hostMatchesDomain(mxHost, 'mail.protection.outlook.com')) {
     // Detect email provider
-      } else if (hostMatchesDomain(mxHost, 'mimecast.com')) {
+    if (intel.mx_records.length > 0) {
       const mxHost = (intel.mx_records[0].exchange || '').toLowerCase();
-      } else if (hostMatchesDomain(mxHost, 'pphosted.com')) {
+      if (mxHost.includes('google.com') || mxHost.includes('googlemail.com')) {
         intel.email_provider = 'Google Workspace';
-      } else if (hostMatchesDomain(mxHost, 'mailgun.org')) {
+      } else if (mxHost.includes('outlook.com') || mxHost.includes('protection.outlook.com')) {
         intel.email_provider = 'Microsoft 365';
-      } else if (hostMatchesDomain(mxHost, 'sendgrid.net')) {
+      } else if (mxHost.includes('mail.protection.outlook.com')) {
         intel.email_provider = 'Microsoft 365 Advanced';
-      } else if (isHostInDomain(mxHost, 'mimecast.com')) {
+      } else if (mxHost.includes('mimecast.com')) {
         intel.email_provider = 'Mimecast';
-      } else if (isHostInDomain(mxHost, 'pphosted.com')) {
+      } else if (mxHost.includes('pphosted.com')) {
         intel.email_provider = 'Proofpoint';
-      } else if (isHostInDomain(mxHost, 'mailgun.org')) {
+      } else if (mxHost.includes('mailgun.org')) {
         intel.email_provider = 'Mailgun';
-      } else if (isHostInDomain(mxHost, 'sendgrid.net')) {
+      } else if (mxHost.includes('sendgrid.net')) {
         intel.email_provider = 'SendGrid';
       }
     }
