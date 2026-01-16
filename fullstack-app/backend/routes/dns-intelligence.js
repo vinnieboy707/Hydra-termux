@@ -220,20 +220,30 @@ async function scanDomainIntelligence(domain, userId) {
         intel.email_provider = 'Microsoft 365';
       } else if (mxHost.includes('mail.protection.outlook.com')) {
         intel.email_provider = 'Microsoft 365 Advanced';
-      } else if (mxHost.includes('mimecast.com')) {
-        intel.email_provider = 'Mimecast';
-      } else if (mxHost.includes('pphosted.com')) {
+      const lowerHost = host.toLowerCase();
+      const lowerDomain = domain.toLowerCase();
+      return (
+        lowerHost === lowerDomain ||
+        lowerHost.endsWith('.' + lowerDomain)
+      );
         intel.email_provider = 'Proofpoint';
-      } else if (mxHost.includes('mailgun.org')) {
+
         intel.email_provider = 'Mailgun';
-      } else if (mxHost.includes('sendgrid.net')) {
+    if (intel.mx_records && intel.mx_records.length > 0) {
         intel.email_provider = 'SendGrid';
-      }
+      if (!mxHost) {
+        // No MX host available to infer provider
+      } else if (
+        hostMatchesDomain(mxHost, 'google.com') ||
+        hostMatchesDomain(mxHost, 'googlemail.com')
+      ) {
     }
-    
+      } else if (
+        hostMatchesDomain(mxHost, 'outlook.com') ||
+        hostMatchesDomain(mxHost, 'protection.outlook.com') ||
+        hostMatchesDomain(mxHost, 'mail.protection.outlook.com')
+      ) {
     // Save to database
-    const existing = await get('SELECT id FROM email_infrastructure_intel WHERE domain = $1', [domain]);
-    
     if (existing) {
       await run(`
         UPDATE email_infrastructure_intel SET
