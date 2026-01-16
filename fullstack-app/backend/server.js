@@ -125,25 +125,29 @@ server.listen(PORT, async () => {
   const RETRY_INTERVAL_MS = 500;
   const startTime = Date.now();
   let intervalId;
-  let initAttempted = false;
+  let isInitializing = false;
+  let initSuccess = false;
 
   const attemptInit = async () => {
-    if (initAttempted) return; // Prevent multiple simultaneous attempts
-    initAttempted = true;
+    if (isInitializing || initSuccess) return; // Prevent concurrent attempts and stop after success
+    isInitializing = true;
     
     try {
       await initializeDefaultUsers();
       console.log('Default users initialized successfully.');
+      initSuccess = true;
       if (intervalId) {
         clearInterval(intervalId);
+        intervalId = null;
       }
     } catch (err) {
-      initAttempted = false; // Allow retry on failure
+      isInitializing = false; // Allow retry on failure
       const elapsed = Date.now() - startTime;
       if (elapsed >= DB_INIT_TIMEOUT) {
-        console.error('Error initializing users (timeout after', elapsed, 'ms):', err.message);
+        console.error(`Error initializing users (timeout after ${elapsed}ms): ${err.message}`);
         if (intervalId) {
           clearInterval(intervalId);
+          intervalId = null;
         }
       }
       // If not timed out yet, the interval will trigger another attempt
@@ -152,9 +156,7 @@ server.listen(PORT, async () => {
 
   // Start immediate attempt and schedule retries
   intervalId = setInterval(() => {
-    if (!initAttempted) {
-      attemptInit();
-    }
+    attemptInit();
   }, RETRY_INTERVAL_MS);
   
   attemptInit(); // First immediate attempt
