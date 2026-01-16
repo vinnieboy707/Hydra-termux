@@ -230,20 +230,20 @@ async function scanDomainIntelligence(domain, userId) {
 
         intel.email_provider = 'Mailgun';
     if (intel.mx_records && intel.mx_records.length > 0) {
-        intel.email_provider = 'SendGrid';
       if (!mxHost) {
         // No MX host available to infer provider
       } else if (
         hostMatchesDomain(mxHost, 'google.com') ||
         hostMatchesDomain(mxHost, 'googlemail.com')
       ) {
-    }
+        intel.email_provider = 'Google Workspace';
       } else if (
         hostMatchesDomain(mxHost, 'outlook.com') ||
         hostMatchesDomain(mxHost, 'protection.outlook.com') ||
         hostMatchesDomain(mxHost, 'mail.protection.outlook.com')
       ) {
-    // Save to database
+        intel.email_provider = 'Microsoft 365 / Outlook';
+      }
     if (existing) {
       await run(`
         UPDATE email_infrastructure_intel SET
