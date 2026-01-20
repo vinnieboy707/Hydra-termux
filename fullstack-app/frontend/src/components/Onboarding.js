@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 
 const Onboarding = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [legalAgreed, setLegalAgreed] = useState(false);
+  const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user has completed onboarding
@@ -87,7 +91,13 @@ const Onboarding = ({ onComplete }) => {
           
           <div className="checkbox-container">
             <label className="legal-checkbox">
-              <input type="checkbox" id="legal-agreement" required />
+              <input 
+                type="checkbox" 
+                id="legal-agreement" 
+                checked={legalAgreed}
+                onChange={(e) => setLegalAgreed(e.target.checked)}
+                required 
+              />
               <span>I understand and agree to use this tool legally and ethically</span>
             </label>
           </div>
@@ -367,13 +377,12 @@ const Onboarding = ({ onComplete }) => {
 
   const handleNavigate = (path) => {
     completeOnboarding();
-    window.location.href = path;
+    navigate(path);
   };
 
   const nextStep = () => {
     if (currentStep === 1) {
-      const checkbox = document.getElementById('legal-agreement');
-      if (!checkbox || !checkbox.checked) {
+      if (!legalAgreed) {
         alert('You must agree to the legal terms to continue.');
         return;
       }
@@ -391,7 +400,12 @@ const Onboarding = ({ onComplete }) => {
   };
 
   const skipOnboarding = () => {
-    if (window.confirm('Are you sure you want to skip the onboarding tutorial? You can always access help from the dashboard.')) {
+    setShowSkipConfirm(true);
+  };
+
+  const confirmSkip = (confirmed) => {
+    setShowSkipConfirm(false);
+    if (confirmed) {
       completeOnboarding();
     }
   };
@@ -418,6 +432,23 @@ const Onboarding = ({ onComplete }) => {
 
   return (
     <div className="onboarding-overlay">
+      {showSkipConfirm && (
+        <div className="skip-confirm-modal">
+          <div className="skip-confirm-content">
+            <h3>⚠️ Skip Onboarding?</h3>
+            <p>Are you sure you want to skip the tutorial? You can always access help from the dashboard.</p>
+            <div className="skip-confirm-buttons">
+              <button className="btn-secondary" onClick={() => confirmSkip(false)}>
+                Cancel
+              </button>
+              <button className="btn-primary" onClick={() => confirmSkip(true)}>
+                Yes, Skip
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="onboarding-modal">
         <div className="onboarding-header">
           <h1>{steps[currentStep].title}</h1>

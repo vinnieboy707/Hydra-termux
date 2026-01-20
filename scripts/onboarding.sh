@@ -58,8 +58,18 @@ choose_onboarding_path() {
     
     read -p "Enter your choice [1-4]: " path_choice
     
-    echo "path=$path_choice" >> "$USER_PROFILE"
-    echo "$path_choice"
+    # Validate input to prevent file corruption
+    case "$path_choice" in
+        1|2|3|4)
+            echo "path=$path_choice" >> "$USER_PROFILE"
+            echo "$path_choice"
+            ;;
+        *)
+            log_warning "Invalid choice, defaulting to Quick Start"
+            echo "path=1" >> "$USER_PROFILE"
+            echo "1"
+            ;;
+    esac
 }
 
 # Quick start path
@@ -352,8 +362,12 @@ step_quick_setup() {
     case "$wl_choice" in
         1)
             log_info "Downloading wordlists..."
-            bash "$PROJECT_ROOT/scripts/download_wordlists.sh" --quick 2>&1 | grep -E "(Downloading|Success|Complete|Error)" | head -10
+            # Log full output to file while showing filtered output
+            local log_file="$PROJECT_ROOT/logs/wordlist_download_$(date +%Y%m%d_%H%M%S).log"
+            mkdir -p "$PROJECT_ROOT/logs"
+            bash "$PROJECT_ROOT/scripts/download_wordlists.sh" --quick 2>&1 | tee "$log_file" | grep -E "(Downloading|Success|Complete|Error)" | head -10
             log_success "✓ Basic wordlists downloaded"
+            log_info "Full log: $log_file"
             ;;
         2)
             log_info "✓ You can download wordlists later from option 9"
@@ -395,6 +409,7 @@ step_first_action_guide() {
     
     read -p "What would you like to try? [1-4]: " first_action
     
+    # Validate input before writing to file
     case "$first_action" in
         1)
             log_success "Great! The main menu will open next."
@@ -410,6 +425,10 @@ step_first_action_guide() {
             ;;
         4)
             practice_mode_intro
+            ;;
+        *)
+            log_warning "Invalid choice, defaulting to dashboard"
+            first_action="1"
             ;;
     esac
     
