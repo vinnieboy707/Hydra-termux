@@ -78,7 +78,14 @@ show_menu() {
     echo "  6)  PostgreSQL Admin Attack"
     echo "  7)  SMB Admin Attack"
     echo "  8)  Multi-Protocol Auto Attack"
-    echo "  38) 🚀 Email & IP Penetration Test (NEW!)"
+    echo ""
+    print_message "  SUPREME COMBO ATTACKS:" "$YELLOW"
+    echo "  38) 🚀 Email & IP Penetration Test"
+    echo "  39) 🏢 Corporate Stack (Email+Web+DB)"
+    echo "  40) ☁️  Cloud Infrastructure (AWS/Azure/GCP)"
+    echo "  41) 🌐 Complete Network (10 Protocols)"
+    echo "  42) 🏛️  Active Directory (Enterprise)"
+    echo "  43) 🌍 Web Apps & APIs (CMS+REST)"
     echo ""
     print_message "  UTILITIES:" "$MAGENTA"
     echo "  9)  Download Wordlists"
@@ -120,6 +127,32 @@ show_menu() {
     # Show contextual AI hint
     get_contextual_hint "main_menu"
     echo ""
+}
+
+# Function to run supreme combo scripts
+run_supreme_combo() {
+    local script_name="$1"
+    local title="$2"
+    
+    print_banner "$title"
+    echo ""
+    
+    local script_path="$SCRIPT_DIR/Library/$script_name"
+    if [ ! -f "$script_path" ]; then
+        log_error "Script not found: $script_path"
+        read -r -p "Press Enter to continue..."
+        return 1
+    fi
+    
+    echo "📝 This script will perform a comprehensive multi-protocol attack."
+    echo "   Edit the TARGET variable in: Library/$script_name"
+    echo ""
+    read -r -p "Press Enter to run (Ctrl+C to cancel)..."
+    
+    bash "$script_path"
+    
+    echo ""
+    read -r -p "Attack completed. Press Enter to continue..."
 }
 
 # Function to run email-IP attack
@@ -726,6 +759,21 @@ main() {
                 ;;
             38)
                 run_email_ip_attack
+                ;;
+            39)
+                run_supreme_combo "combo_supreme_email_web_db.sh" "🏢 Corporate Stack Attack"
+                ;;
+            40)
+                run_supreme_combo "combo_supreme_cloud_infra.sh" "☁️ Cloud Infrastructure Attack"
+                ;;
+            41)
+                run_supreme_combo "combo_supreme_network_complete.sh" "🌐 Complete Network Attack"
+                ;;
+            42)
+                run_supreme_combo "combo_supreme_active_directory.sh" "🏛️ Active Directory Attack"
+                ;;
+            43)
+                run_supreme_combo "combo_supreme_webapp_api.sh" "🌍 Web Apps & APIs Attack"
                 ;;
             88)
                 interactive_help
