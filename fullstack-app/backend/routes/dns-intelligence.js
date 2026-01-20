@@ -212,38 +212,31 @@ async function scanDomainIntelligence(domain, userId) {
     }
     
     // Detect email provider
-    if (intel.mx_records.length > 0) {
+    if (intel.mx_records && intel.mx_records.length > 0) {
       const mxHost = (intel.mx_records[0].exchange || '').toLowerCase();
+      
       if (mxHost.includes('google.com') || mxHost.includes('googlemail.com')) {
         intel.email_provider = 'Google Workspace';
-      } else if (mxHost.includes('outlook.com') || mxHost.includes('protection.outlook.com')) {
+      } else if (mxHost.includes('outlook.com') || mxHost.includes('protection.outlook.com') || mxHost.includes('mail.protection.outlook.com')) {
         intel.email_provider = 'Microsoft 365';
-      } else if (mxHost.includes('mail.protection.outlook.com')) {
-        intel.email_provider = 'Microsoft 365 Advanced';
-      const lowerHost = host.toLowerCase();
-      const lowerDomain = domain.toLowerCase();
-      return (
-        lowerHost === lowerDomain ||
-        lowerHost.endsWith('.' + lowerDomain)
-      );
+      } else if (mxHost.includes('proofpoint.com')) {
         intel.email_provider = 'Proofpoint';
-
+      } else if (mxHost.includes('mailgun.org')) {
         intel.email_provider = 'Mailgun';
-    if (intel.mx_records && intel.mx_records.length > 0) {
-      if (!mxHost) {
-        // No MX host available to infer provider
-      } else if (
-        hostMatchesDomain(mxHost, 'google.com') ||
-        hostMatchesDomain(mxHost, 'googlemail.com')
-      ) {
-        intel.email_provider = 'Google Workspace';
-      } else if (
-        hostMatchesDomain(mxHost, 'outlook.com') ||
-        hostMatchesDomain(mxHost, 'protection.outlook.com') ||
-        hostMatchesDomain(mxHost, 'mail.protection.outlook.com')
-      ) {
-        intel.email_provider = 'Microsoft 365 / Outlook';
+      } else if (mxHost.includes('sendgrid.net')) {
+        intel.email_provider = 'SendGrid';
+      } else if (mxHost.includes('amazonses.com')) {
+        intel.email_provider = 'Amazon SES';
+      } else if (mxHost.includes('mimecast.com')) {
+        intel.email_provider = 'Mimecast';
+      } else {
+        intel.email_provider = 'Other';
       }
+    }
+    
+    // Store or update in database
+    const existing = await get('SELECT * FROM email_infrastructure_intel WHERE domain = $1', [domain]);
+    
     if (existing) {
       await run(`
         UPDATE email_infrastructure_intel SET
