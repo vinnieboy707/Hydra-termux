@@ -12,11 +12,42 @@
 
 **A powerful brute-force tool suite optimized for Termux on Android devices**
 
+**🆕 NEW: AI-Powered Onboarding System** - Interactive tutorial guides you through your first login and teaches you how to use the app efficiently!
+
 **🚀 NEW: Full-Stack Web Application** - Professional web interface with real-time monitoring, attack orchestration, and comprehensive management features. See [fullstack-app/README.md](fullstack-app/README.md)
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**AI Onboarding**](#-ai-onboarding-system-new) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
 
 </div>
+
+---
+
+## 🤖 AI Onboarding System (NEW!)
+
+### Get Started in Minutes with AI Guidance!
+
+First time using Hydra-Termux? Our intelligent onboarding system will guide you through everything:
+
+**✨ Features:**
+- 🎯 **Choose Your Path**: Quick Start, Complete Tutorial, Interactive Practice, or Skip
+- 🤖 **AI Assistant**: Contextual hints and smart suggestions throughout
+- 🎓 **Practice Exercises**: Learn safely with guided hands-on activities
+- 📚 **Legal & Ethical Education**: Understand requirements before you start
+- 🌐 **Web & CLI**: Onboarding available on both interfaces
+
+**Automatic Launch:**
+```bash
+# First time you run hydra.sh, onboarding starts automatically!
+./hydra.sh
+```
+
+**Web Interface:**
+- Opens automatically on first login
+- Interactive 7-step guided tour
+- Visual walkthrough of all features
+- Progress tracking and quick links
+
+**Learn More:** [AI Onboarding Guide](docs/AI_ONBOARDING_GUIDE.md)
 
 ---
 
@@ -409,6 +440,8 @@ See **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** for complete documentation.
 
 ## 📚 Documentation
 
+### Getting Started
+- **[AI Onboarding Guide](docs/AI_ONBOARDING_GUIDE.md)** - 🆕 **NEW!** Complete guide to the AI-powered onboarding system
 - **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** - 🆕 **NEW!** Complete guide to attack reports and prevention recommendations
 - **[WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md)** - 🌟 **NEW!** Complete web interface feature guide
 - **[CLI_WEB_MAPPING.md](docs/CLI_WEB_MAPPING.md)** - 🌟 **NEW!** Quick reference for CLI to web mapping
