@@ -19,21 +19,21 @@ Hydra-Termux/
 
 ### Main Attack Script
 - **Location**: `scripts/email_ip_attack.sh`
-- **Size**: 48KB (1,227 lines)
+- **Size**: 48KB (1,268 lines)
 - **Features**: 5 attack modes, 6+ protocols
 - **Menu Option**: 38
 - **Protocols**: IMAP, POP3, SMTP, IMAPS, POP3S, SMTPS
 
 ### Quick Library Scripts
 - **Location**: `Library/email_ip_pentest_quick.sh`
-- **Size**: 16KB
+- **Size**: 20KB (359 lines)
 - **Features**: 2-line configuration, auto-detection
 - **Execution**: 3-10 minutes
 - **Usage**: Edit TARGET and EMAIL, then run
 
 ### Domain-Wide Script
 - **Location**: `Library/combo_email_domain.sh`
-- **Size**: 12KB
+- **Size**: 12KB (266 lines)
 - **Features**: 4-phase workflow, complete domain assessment
 - **Execution**: 15-30 minutes
 
@@ -41,7 +41,7 @@ Hydra-Termux/
 
 ### 1. Corporate Stack
 - **Location**: `Library/combo_supreme_email_web_db.sh`
-- **Size**: 13KB
+- **Size**: 16KB (238 lines)
 - **Menu Option**: 39
 - **Protocols**: 7 (SMTP, IMAP, POP3, HTTP, HTTPS, MySQL, PostgreSQL)
 - **Best For**: Corporate infrastructure audits
@@ -49,7 +49,7 @@ Hydra-Termux/
 
 ### 2. Cloud Infrastructure
 - **Location**: `Library/combo_supreme_cloud_infra.sh`
-- **Size**: 13KB
+- **Size**: 16KB (269 lines)
 - **Menu Option**: 40
 - **Protocols**: 8+ (SSH, RDP, MySQL/RDS, PostgreSQL, Redis, MongoDB, APIs)
 - **Best For**: AWS/Azure/GCP cloud services
@@ -57,7 +57,7 @@ Hydra-Termux/
 
 ### 3. Complete Network
 - **Location**: `Library/combo_supreme_network_complete.sh`
-- **Size**: 15KB
+- **Size**: 16KB (283 lines)
 - **Menu Option**: 41
 - **Protocols**: 10 (SSH, Telnet, FTP, SMB, HTTP, HTTPS, MySQL, PostgreSQL, RDP, VNC)
 - **Best For**: Full network infrastructure assessment
@@ -65,7 +65,7 @@ Hydra-Termux/
 
 ### 4. Active Directory
 - **Location**: `Library/combo_supreme_active_directory.sh`
-- **Size**: 15KB
+- **Size**: 16KB (270 lines)
 - **Menu Option**: 42
 - **Protocols**: 7+ (LDAP, LDAPS, SMB, RDP, MSSQL, OWA, SharePoint, DNS)
 - **Best For**: Windows domain environments
@@ -73,7 +73,7 @@ Hydra-Termux/
 
 ### 5. Web Apps & APIs
 - **Location**: `Library/combo_supreme_webapp_api.sh`
-- **Size**: 17KB
+- **Size**: 20KB (332 lines)
 - **Menu Option**: 43
 - **Protocols**: 10+ (Forms, REST APIs, WordPress, Joomla, Drupal, Admin panels)
 - **Best For**: Modern web application testing
