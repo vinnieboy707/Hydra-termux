@@ -6,14 +6,14 @@ Complete enterprise-grade penetration testing platform with modern web interface
 
 ```bash
 cd fullstack-app
-./quickstart.sh
+./start.sh
 ```
 
 **That's it!** The script will:
 - ✅ Check prerequisites and install dependencies
 - ✅ Configure backend and frontend automatically
 - ✅ Initialize database with proper schema
-- ✅ Create your super admin account interactively
+- ✅ Create your admin account (username: admin, password: admin)
 - ✅ Start both backend (port 3000) and frontend (port 3001)
 - ✅ Ready to use in under 2 minutes!
 

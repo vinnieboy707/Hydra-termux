@@ -371,7 +371,7 @@ recommend_scripts() {
         done
         
         print_message "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" "$CYAN"
-        log_info "💡 Usage: ${CYAN}bash Library/<script_name>${NC}"
+        log_info "💡 Usage: ${CYAN}bash scripts/<script_name>${NC}"
         log_warning "⚠️  Remember: Edit TARGET variable in script before running!"
         log_info "🎯 Pro Tip: Start with highest success rate services (Redis, MongoDB, IoT) for quick wins"
         echo ""
@@ -413,7 +413,7 @@ recommend_scripts() {
     print_message "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" "$CYAN"
     echo ""
     log_success "✨ OPTIMIZATION COMPLETE: All protocols analyzed with detailed attack strategies"
-    log_info "💡 Quick Start: ${CYAN}bash Library/<script_name>${NC}"
+    log_info "💡 Quick Start: ${CYAN}bash scripts/<script_name>${NC}"
     log_warning "⚠️  LEGAL: Only attack systems you own or have written authorization to test"
     log_info "🎯 Recommended Workflow: 1) Vuln Scan → 2) Service-Specific Attack → 3) Post-Exploitation"
     echo ""

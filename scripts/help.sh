@@ -121,7 +121,7 @@ case $problem_choice in
         fi
         
         print_message "  • Making Library scripts executable..." "$BLUE"
-        if chmod +x Library/*.sh 2>/dev/null; then
+        if chmod +x scripts/*.sh 2>/dev/null; then
             print_message "    ✅ Done" "$GREEN"
         else
             print_message "    ❌ Failed" "$RED"

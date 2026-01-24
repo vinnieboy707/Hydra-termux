@@ -14,7 +14,7 @@
 
 **🚀 NEW: Full-Stack Web Application** - Professional web interface with real-time monitoring, attack orchestration, and comprehensive management features. See [fullstack-app/README.md](fullstack-app/README.md)
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Library**](#-quick-library-new) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Scripts**](#-quick-attack-scripts) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
 
 </div>
 
@@ -23,21 +23,21 @@
 ## 🆘 **HAVING PROBLEMS? RUN THIS FIRST:**
 
 ```bash
-# One command to diagnose and fix 99% of issues:
-./fix-hydra.sh
+# One command to diagnose issues:
+bash scripts/system_diagnostics.sh   # Full health check with A-F grade
+bash scripts/auto_fix.sh             # Auto-install hydra
+bash scripts/check_dependencies.sh    # Quick dependency check
 ```
 
-This interactive tool will:
+This will:
 - ✅ Identify what's wrong with your installation
 - ✅ Automatically fix common issues (like missing hydra)
 - ✅ Provide step-by-step solutions for your specific problem
 - ✅ Guide you to working setup in minutes
 
-**Alternative diagnostic commands:**
+**For help, run:**
 ```bash
-bash scripts/system_diagnostics.sh   # Full health check with A-F grade
-bash scripts/auto_fix.sh             # Auto-install hydra
-bash scripts/check_dependencies.sh    # Quick dependency check
+bash scripts/help.sh
 ```
 
 ---
@@ -117,7 +117,6 @@ bash scripts/check_dependencies.sh    # Quick dependency check
 - **Platform Comparison Guide** - Understand differences between protocols
 - **Copy-Paste Ready** - Simplified scripts for instant use
 - **Real Results** - Fully functional, tested attack templates
-- See [Library.md](Library.md) for complete documentation
 
 ### 🌐 Full-Stack Web Application (NEW!)
 - **Modern Web Interface** - Professional React-based UI with dark theme
@@ -237,26 +236,19 @@ If you prefer manual installation:
 **Want the easiest method?** Use our one-line-change scripts:
 
 ```bash
-# 1. Pick a script from Library/
 # 2. Edit ONE line (change TARGET)
 # 3. Run it!
 
-bash Library/ssh_quick.sh        # SSH attack
-bash Library/web_quick.sh        # Web admin attack
-bash Library/auto_attack_quick.sh # Full auto-attack
 ```
 
 **Example:**
 ```bash
-# Edit Library/ssh_quick.sh
 TARGET="192.168.1.100"  # <-- Change only this
 
 # Run it
-bash Library/ssh_quick.sh
 # Done! Results saved automatically
 ```
 
-📖 **See [Library.md](Library.md)** for all 12 quick scripts and platform comparisons!
 
 ---
 
@@ -415,8 +407,6 @@ See **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** for complete documentation.
 - **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** - 🆕 **NEW!** Complete guide to attack reports and prevention recommendations
 - **[WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md)** - 🌟 **NEW!** Complete web interface feature guide
 - **[CLI_WEB_MAPPING.md](docs/CLI_WEB_MAPPING.md)** - 🌟 **NEW!** Quick reference for CLI to web mapping
-- **[Library.md](Library.md)** - 🔥 Quick-use scripts with platform comparisons
-- **[Library/README.md](Library/README.md)** - Quick reference for one-line-change scripts
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
 - **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios
 
@@ -441,8 +431,6 @@ Hydra-termux/
 ├── hydra.sh                    # Main launcher with interactive menu
 ├── install.sh                  # Enhanced installation script
 ├── need.txt                    # Required packages list
-├── Library.md                  # 🔥 Complete script library documentation
-├── Library/                    # 🔥 Quick-use one-line-change scripts
 │   ├── README.md              # Quick reference guide
 │   ├── ssh_quick.sh           # SSH one-liner
 │   ├── ftp_quick.sh           # FTP one-liner
@@ -530,7 +518,7 @@ Hydra supports these protocols through the attack scripts:
 ### 🚨 **HYDRA NOT WORKING? RUN THIS ONE COMMAND:**
 
 ```bash
-./fix-hydra.sh
+bash scripts/help.sh
 ```
 
 This interactive help tool will:
@@ -561,7 +549,7 @@ This is the **#1 most common issue**. Without hydra, **NOTHING will work**.
 
 **Fastest Fix:**
 ```bash
-./fix-hydra.sh
+bash scripts/help.sh
 # Select option 1 when prompted
 ```
 

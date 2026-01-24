@@ -66,8 +66,8 @@ check "Backend package.json" "[ -f backend/package.json ]"
 check "Frontend package.json" "[ -f frontend/package.json ]"
 check "Backend .env.example" "[ -f backend/.env.example ]"
 check "Frontend .env.example" "[ -f frontend/.env.example ]"
-check "Quickstart script" "[ -f quickstart.sh ]"
-check "Quickstart executable" "[ -x quickstart.sh ]"
+check "Startup script (start.sh)" "[ -f start.sh ]"
+check "Startup script executable" "[ -x start.sh ]"
 echo ""
 
 # Core files

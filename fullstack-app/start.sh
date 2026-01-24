@@ -174,7 +174,7 @@ else
 fi
 
 # Create admin user
-node << 'CREATE_ADMIN_EOF'
+cat << 'CREATE_ADMIN_EOF' | ADMIN_USER="$ADMIN_USER" ADMIN_PASS="$ADMIN_PASS" ADMIN_EMAIL="$ADMIN_EMAIL" node
 const bcrypt = require('bcryptjs');
 const { run, get } = require('./database');
 
@@ -217,7 +217,6 @@ async function createAdminUser() {
 
 createAdminUser();
 CREATE_ADMIN_EOF
-ADMIN_USER="$ADMIN_USER" ADMIN_PASS="$ADMIN_PASS" ADMIN_EMAIL="$ADMIN_EMAIL" node -e "$(cat)"
 cd "$SCRIPT_DIR"
 
 echo ""
@@ -228,9 +227,9 @@ echo "║                                                               ║"
 echo "║   Backend API: http://localhost:3000                          ║"
 echo "║   Frontend UI: http://localhost:3001                          ║"
 echo "║                                                               ║"
-echo "║   Default credentials:                                        ║"
-echo "║   Username: ${ADMIN_USER}                                     ║"
-echo "║   Password: ${ADMIN_PASS}                                     ║"
+printf "║   Default credentials:                                        ║\n"
+printf "║   Username: %-50s║\n" "$ADMIN_USER"
+printf "║   Password: %-50s║\n" "$ADMIN_PASS"
 echo "║                                                               ║"
 if [ "$ADMIN_PASS" = "admin" ]; then
     echo "║   ⚠️  Change the default password immediately!                ║"

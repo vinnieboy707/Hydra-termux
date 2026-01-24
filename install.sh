@@ -384,7 +384,7 @@ else
     print_message "   bash scripts/auto_fix.sh" "$GREEN"
     echo ""
     print_message "Or use the interactive help center:" "$GREEN"
-    print_message "   ./fix-hydra.sh" "$GREEN"
+    print_message "   bash scripts/help.sh" "$GREEN"
     echo ""
     print_message "═══ NEXT STEPS ═══" "$CYAN"
     echo ""

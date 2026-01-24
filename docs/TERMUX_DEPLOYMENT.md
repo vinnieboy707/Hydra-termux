@@ -103,7 +103,7 @@ ls -lh ~/wordlists/
 # Should show: common_passwords.txt, admin_passwords.txt, etc.
 
 # Verify scripts are executable
-ls -l Library/*.sh
+ls -l scripts/*.sh
 # All scripts should show: -rwxr-xr-x
 ```
 
@@ -127,13 +127,13 @@ curl ifconfig.me
 ### Example 1: Attack Your Own WordPress Site
 ```bash
 # 1. Edit the quick script
-nano Library/wordpress_quick.sh
+nano scripts/wordpress_quick.sh
 
 # 2. Change ONLY this line (use YOUR site):
 TARGET="http://192.168.1.100"  # Your test WordPress installation
 
 # 3. Run the REAL attack
-bash Library/wordpress_quick.sh
+bash scripts/wordpress_quick.sh
 
 # 4. Watch REAL Hydra output:
 # [DATA] attacking http-post-form://192.168.1.100:80/wp-login.php
@@ -162,7 +162,7 @@ cat > targets.txt << EOF
 EOF
 
 # Run multi-target attack (uses REAL Hydra on each target)
-bash Library/multi_target_ssh.sh -t targets.txt
+bash scripts/multi_target_ssh.sh -t targets.txt
 
 # Results saved to: ~/hydra-logs/results_ssh.json
 # Each entry is a REAL successful login
@@ -372,7 +372,7 @@ EOF
 ### Verify Script Authenticity
 ```bash
 # Check scripts call real Hydra (not fake)
-for script in scripts/*.sh Library/*.sh; do
+for script in scripts/*.sh scripts/*.sh; do
     if grep -q "hydra " "$script" 2>/dev/null; then
         echo "✅ $script uses real Hydra"
     fi

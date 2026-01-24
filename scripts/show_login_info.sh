@@ -59,7 +59,7 @@ show_web_app_info() {
     echo -e "  Password: ${GREEN}${BOLD}admin${NC}"
     echo -e "  Role:     ${CYAN}admin${NC}"
     echo ""
-    echo -e "${BOLD}Super Admin Credentials:${NC} ${YELLOW}(if using quickstart.sh)${NC}"
+    echo -e "${BOLD}Super Admin Credentials:${NC} ${YELLOW}(if using start.sh)${NC}"
     echo -e "  Username: ${GREEN}${BOLD}[you chose during setup]${NC}"
     echo -e "  Password: ${GREEN}${BOLD}[you chose during setup]${NC}"
     echo -e "  Role:     ${CYAN}super_admin${NC}"
@@ -104,7 +104,7 @@ show_reset_password() {
     echo ""
     echo -e "${BOLD}Method 1: Re-run Setup Script${NC}"
     echo -e "  ${CYAN}cd fullstack-app${NC}"
-    echo -e "  ${CYAN}bash quickstart.sh${NC}"
+    echo -e "  ${CYAN}bash start.sh${NC}"
     echo -e "  (Follow prompts to create new admin account)"
     echo ""
     echo -e "${BOLD}Method 2: Create New Admin/Super Admin User${NC}"
@@ -184,7 +184,7 @@ check_super_admin_info() {
     
     if [ ! -f "$db_path" ]; then
         echo -e "  ${YELLOW}⚠ Database not found${NC}"
-        echo -e "  Run setup first: ${CYAN}cd fullstack-app && bash quickstart.sh${NC}"
+        echo -e "  Run setup first: ${CYAN}cd fullstack-app && bash start.sh${NC}"
         echo ""
         return
     fi
