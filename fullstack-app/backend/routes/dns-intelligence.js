@@ -214,20 +214,31 @@ async function scanDomainIntelligence(domain, userId) {
     // Helper to safely match MX host to a provider domain or its subdomains
     function matchesProvider(mxHost, providerDomain) {
       if (!mxHost) {
-        return false;
-      }
-      // Exact match or subdomain match (e.g., mail.mimecast.com)
-      return mxHost === providerDomain || mxHost.endsWith('.' + providerDomain);
-    }
 
-    // Detect email provider
-    if (intel.mx_records && intel.mx_records.length > 0) {
-      const mxHost = (intel.mx_records[0].exchange || '').toLowerCase();
-      
-      if (matchesProvider(mxHost, 'google.com') || matchesProvider(mxHost, 'googlemail.com')) {
-        intel.email_provider = 'Google Workspace';
+      const isHostForProvider = (host, providerDomain) => {
+        if (!host || !providerDomain) return false;
+        host = host.toLowerCase();
+        providerDomain = providerDomain.toLowerCase();
+        return host === providerDomain || host.endsWith('.' + providerDomain);
+      };
+        return false;
+      if (isHostForProvider(mxHost, 'google.com') || isHostForProvider(mxHost, 'googlemail.com')) {
+      // Exact match or subdomain match (e.g., mail.mimecast.com)
       } else if (
-        matchesProvider(mxHost, 'outlook.com') ||
+        isHostForProvider(mxHost, 'outlook.com') ||
+        isHostForProvider(mxHost, 'protection.outlook.com') ||
+        isHostForProvider(mxHost, 'mail.protection.outlook.com')
+      ) {
+    }
+      } else if (isHostForProvider(mxHost, 'proofpoint.com')) {
+    // Detect email provider
+      } else if (isHostForProvider(mxHost, 'mailgun.org')) {
+      const mxHost = (intel.mx_records[0].exchange || '').toLowerCase();
+      } else if (isHostForProvider(mxHost, 'sendgrid.net')) {
+      if (matchesProvider(mxHost, 'google.com') || matchesProvider(mxHost, 'googlemail.com')) {
+      } else if (isHostForProvider(mxHost, 'amazonses.com')) {
+      } else if (
+      } else if (isHostForProvider(mxHost, 'mimecast.com')) {
         matchesProvider(mxHost, 'protection.outlook.com') ||
         matchesProvider(mxHost, 'mail.protection.outlook.com')
       ) {
