@@ -524,7 +524,7 @@ smtp_enumerate_users() {
     log_info "Testing VRFY command..."
     while read username; do
         [ -z "$username" ] && continue
-        [ "$username" = "#"* ] && continue  # Skip comments
+        [[ "$username" == "#"* ]] && continue  # Skip comments
         
         # Validate and escape username to prevent command injection
         username=$(echo "$username" | tr -cd '[:alnum:]@._-')

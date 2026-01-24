@@ -43,7 +43,7 @@
     "node-dns": "^0.2.0",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
-    "json2csv": "^6.0.0",
+    "json2csv": "^5.0.7",
     "exceljs": "^4.4.0",
     "pdfkit": "^0.14.0",
     "compression": "^1.7.4",
