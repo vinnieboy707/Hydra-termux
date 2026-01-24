@@ -211,23 +211,36 @@ async function scanDomainIntelligence(domain, userId) {
       intel.dkim_records = dkimRecords;
     }
     
+    // Helper to safely match MX host to a provider domain or its subdomains
+    function matchesProvider(mxHost, providerDomain) {
+      if (!mxHost) {
+        return false;
+      }
+      // Exact match or subdomain match (e.g., mail.mimecast.com)
+      return mxHost === providerDomain || mxHost.endsWith('.' + providerDomain);
+    }
+
     // Detect email provider
     if (intel.mx_records && intel.mx_records.length > 0) {
       const mxHost = (intel.mx_records[0].exchange || '').toLowerCase();
       
-      if (mxHost.includes('google.com') || mxHost.includes('googlemail.com')) {
+      if (matchesProvider(mxHost, 'google.com') || matchesProvider(mxHost, 'googlemail.com')) {
         intel.email_provider = 'Google Workspace';
-      } else if (mxHost.includes('outlook.com') || mxHost.includes('protection.outlook.com') || mxHost.includes('mail.protection.outlook.com')) {
+      } else if (
+        matchesProvider(mxHost, 'outlook.com') ||
+        matchesProvider(mxHost, 'protection.outlook.com') ||
+        matchesProvider(mxHost, 'mail.protection.outlook.com')
+      ) {
         intel.email_provider = 'Microsoft 365';
-      } else if (mxHost.includes('proofpoint.com')) {
+      } else if (matchesProvider(mxHost, 'proofpoint.com')) {
         intel.email_provider = 'Proofpoint';
-      } else if (mxHost.includes('mailgun.org')) {
+      } else if (matchesProvider(mxHost, 'mailgun.org')) {
         intel.email_provider = 'Mailgun';
-      } else if (mxHost.includes('sendgrid.net')) {
+      } else if (matchesProvider(mxHost, 'sendgrid.net')) {
         intel.email_provider = 'SendGrid';
-      } else if (mxHost.includes('amazonses.com')) {
+      } else if (matchesProvider(mxHost, 'amazonses.com')) {
         intel.email_provider = 'Amazon SES';
-      } else if (mxHost.includes('mimecast.com')) {
+      } else if (matchesProvider(mxHost, 'mimecast.com')) {
         intel.email_provider = 'Mimecast';
       } else {
         intel.email_provider = 'Other';
