@@ -1,6 +1,7 @@
 const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
 const { run, get, all } = require('../database');
+const { sanitizePath, sanitizeFilename, sanitizeLogMessage, sanitizeError, check2FARequirement } = require('../utils/sanitizer');
 const fs = require('fs').promises;
 const path = require('path');
 const multer = require('multer');
@@ -84,8 +85,24 @@ router.post('/upload', authMiddleware, upload.single('wordlist'), async (req, re
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const filePath = req.file.path;
-    const fileName = req.file.filename;
+    const wordlistsPath = process.env.WORDLISTS_PATH || path.join(__dirname, '../../../wordlists');
+    
+    // Sanitize filename to prevent path traversal
+    const sanitizedName = sanitizeFilename(req.file.filename);
+    if (!sanitizedName) {
+      await fs.unlink(req.file.path).catch(() => {});
+      return res.status(400).json({ error: 'Invalid filename' });
+    }
+    
+    // Validate file path is within wordlists directory
+    const safePath = sanitizePath(req.file.path, wordlistsPath);
+    if (!safePath) {
+      await fs.unlink(req.file.path).catch(() => {});
+      return res.status(400).json({ error: 'Invalid file path' });
+    }
+    
+    const filePath = safePath;
+    const fileName = sanitizedName;
     
     // Count lines
     const content = await fs.readFile(filePath, 'utf-8');
@@ -180,9 +197,21 @@ router.post('/generate', authMiddleware, async (req, res) => {
       entries.sort();
     }
 
-    // Save to file
-    const fileName = name.endsWith('.txt') ? name : `${name}.txt`;
-    const filePath = path.join(wordlistsPath, fileName);
+    // Save to file with sanitized filename
+    const sanitizedName = sanitizeFilename(name);
+    if (!sanitizedName) {
+      return res.status(400).json({ error: 'Invalid wordlist name' });
+    }
+    const fileName = sanitizedName.endsWith('.txt') ? sanitizedName : `${sanitizedName}.txt`;
+    const targetPath = path.join(wordlistsPath, fileName);
+    
+    // Validate path is within wordlists directory
+    const safePath = sanitizePath(targetPath, wordlistsPath);
+    if (!safePath) {
+      return res.status(400).json({ error: 'Invalid file path' });
+    }
+    
+    const filePath = safePath;
     const content = entries.join('\n');
     await fs.writeFile(filePath, content);
 
@@ -294,22 +323,36 @@ router.post('/scan', authMiddleware, async (req, res) => {
     const wordlistFiles = files.filter(f => f.endsWith('.txt'));
     
     for (const file of wordlistFiles) {
-      const filePath = path.join(wordlistsPath, file);
-      const stats = await fs.stat(filePath);
+      // Sanitize filename
+      const sanitizedFile = sanitizeFilename(file);
+      if (!sanitizedFile) continue;
       
-      // Count lines
-      const content = await fs.readFile(filePath, 'utf-8');
-      const lineCount = content.split('\n').length;
+      const targetPath = path.join(wordlistsPath, sanitizedFile);
+      const safePath = sanitizePath(targetPath, wordlistsPath);
+      if (!safePath) continue;
       
-      // Check if already in database
-      const existing = await get('SELECT id FROM wordlists WHERE name = ?', [file]);
+      const filePath = safePath;
       
-      if (!existing) {
-        await run(
-          `INSERT INTO wordlists (name, type, path, size, line_count)
-           VALUES (?, ?, ?, ?, ?)`,
-          [file, 'password', filePath, stats.size, lineCount]
-        );
+      // Use single read operation to avoid race condition
+      try {
+        const content = await fs.readFile(filePath, 'utf-8');
+        const stats = await fs.stat(filePath);
+        const lineCount = content.split('\n').length;
+      
+        // Check if already in database
+        const existing = await get('SELECT id FROM wordlists WHERE name = ?', [sanitizedFile]);
+        
+        if (!existing) {
+          await run(
+            `INSERT INTO wordlists (name, type, path, size, line_count)
+             VALUES (?, ?, ?, ?, ?)`,
+            [sanitizedFile, 'password', filePath, stats.size, lineCount]
+          );
+        }
+      } catch (fileError) {
+        // Skip files that can't be read
+        console.error(sanitizeLogMessage(`Error processing wordlist ${sanitizedFile}: ${sanitizeError(fileError)}`));
+        continue;
       }
     }
     

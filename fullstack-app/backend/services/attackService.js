@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const { sanitizePath, sanitizeFilename, sanitizeLogMessage, sanitizeError, check2FARequirement } = require('../utils/sanitizer');
 const { run, get } = require('../database');
 
 class AttackService {
@@ -183,14 +184,14 @@ class AttackService {
       });
 
     } catch (error) {
-      console.error('Execute attack error:', error);
+      console.error(sanitizeLogMessage(`Execute attack error: ${sanitizeError(error)}`));
       
       await run(
         'UPDATE attacks SET status = ?, error = ?, completed_at = CURRENT_TIMESTAMP WHERE id = ?',
-        ['failed', error.message, id]
+        ['failed', sanitizeError(error), id]
       );
       
-      await this.addLog(id, 'error', error.message);
+      await this.addLog(id, 'error', sanitizeError(error));
       
       if (global.broadcast) {
         global.broadcast({
