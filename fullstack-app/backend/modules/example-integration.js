@@ -5,6 +5,7 @@
  */
 
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const modules = require('./modules');
 
 const {
@@ -36,6 +37,13 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(httpLogger()); // HTTP request logging
+
+// Rate limiter for file downloads
+const downloadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 requests per windowMs
+  message: 'Too many download requests, please try again later'
+});
 
 /**
  * Initialize modules on startup
@@ -225,11 +233,11 @@ app.get('/api/credentials',
   }
 );
 
-// Get specific credential (with password)
-app.get('/api/credentials/:id', async (req, res) => {
+// Get specific credential (with password) - Changed to POST for sensitive data
+app.post('/api/credentials/:id/details', async (req, res) => {
   try {
     const { id } = req.params;
-    const includePassword = req.query.password === 'true';
+    const includePassword = req.body.includePassword === true;
     
     const credential = await credentialManager.getCredential(id, includePassword);
     
@@ -387,8 +395,8 @@ app.post('/api/export/credentials',
   }
 );
 
-// Download export file
-app.get('/api/export/download/:filename', async (req, res) => {
+// Download export file - with rate limiting
+app.get('/api/export/download/:filename', downloadLimiter, async (req, res) => {
   try {
     const { filename } = req.params;
     const exports = await exportManager.listExports();

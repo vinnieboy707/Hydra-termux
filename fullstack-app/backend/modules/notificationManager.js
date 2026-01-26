@@ -261,7 +261,7 @@ class NotificationManager {
         to,
         subject: `[Hydra-Termux] ${subject}`,
         html: body,
-        text: body.replace(/<[^>]*>/g, '') // Strip HTML for text version
+        text: body.replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<[^>]*>/g, '') // Remove script tags completely, then strip HTML for text version
       };
 
       const info = await this.emailTransporter.sendMail(mailOptions);

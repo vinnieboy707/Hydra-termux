@@ -23,9 +23,9 @@ const WAF_PATTERNS = {
   
   xss: {
     patterns: [
-      /<script[\s\S]*?<\/script>/gi,  // Fixed: Use [\s\S] instead of . to properly match multiline
-      /<iframe[\s\S]*?<\/iframe>/gi,  // Fixed: Use [\s\S] for proper multiline matching
-      /<object[\s\S]*?<\/object>/gi,  // Fixed: Use [\s\S] for proper multiline matching
+      /<script[\s\S]*?<\/script\s*>/gi,  // Fixed: Match script end tags with optional spaces
+      /<iframe[\s\S]*?<\/iframe\s*>/gi,  // Fixed: Match iframe end tags with optional spaces
+      /<object[\s\S]*?<\/object\s*>/gi,  // Fixed: Match object end tags with optional spaces
       /<embed[^>]*>/gi,
       /on\w+\s*=\s*["'][^"']*["']/gi,
       /javascript:/gi,

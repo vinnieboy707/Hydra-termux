@@ -11,6 +11,8 @@ jobs:
   validate-compliance:
     name: 100% Compliance Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -46,6 +48,8 @@ jobs:
   syntax-validation:
     name: Syntax Validation (159 files)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -123,6 +127,8 @@ jobs:
   security-check:
     name: Security Vulnerability Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -170,6 +176,8 @@ jobs:
   wiring-validation:
     name: Component Wiring Validation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -240,6 +248,8 @@ jobs:
   build-validation:
     name: Build Validation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     strategy:
       matrix:
@@ -283,6 +293,8 @@ jobs:
   consistency-check:
     name: Consistency Validation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -326,6 +338,8 @@ jobs:
   environment-validation:
     name: Environment Variables Validation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -360,6 +374,8 @@ jobs:
   final-report:
     name: Generate Final Report
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [validate-compliance, syntax-validation, security-check, wiring-validation, build-validation, consistency-check, environment-validation]
     if: always()
     
