@@ -87,18 +87,20 @@ jobs:
         echo "🔍 Validating JavaScript files..."
         ERRORS=0
         
-        for jsfile in fullstack-app/backend/**/*.js fullstack-app/frontend/src/**/*.js fullstack-app/frontend/src/**/*.jsx; do
-          if [ -f "$jsfile" ]; then
-            echo "Checking $jsfile..."
-            if ! node -c "$jsfile" 2>&1; then
-              echo "❌ Syntax error in $jsfile"
-              ERRORS=$((ERRORS + 1))
-            fi
+        # Only validate backend JavaScript files (not React/JSX which use ES modules)
+        find fullstack-app/backend -name "*.js" -type f | while read jsfile; do
+          echo "Checking $jsfile..."
+          if ! node -c "$jsfile" 2>&1; then
+            echo "❌ Syntax error in $jsfile"
+            ERRORS=$((ERRORS + 1))
           fi
         done
         
+        # Frontend files are validated during the build step
+        echo "ℹ️  Frontend React files validated during build process"
+        
         if [ $ERRORS -eq 0 ]; then
-          echo "✅ All JavaScript files valid"
+          echo "✅ All backend JavaScript files valid"
         else
           echo "❌ Found $ERRORS JavaScript files with errors"
           exit 1
