@@ -9,7 +9,7 @@
 # ════════════════════════════════════════════════════════════════
 # ⚡ CONFIGURATION - Replace with actual target ⚡
 # ════════════════════════════════════════════════════════════════
-TARGET="10.0.0.1"    # Target IP or hostname - REPLACE WITH ACTUAL TARGET
+TARGET="192.0.2.1"    # Target IP or hostname - REPLACE WITH ACTUAL TARGET
 # ════════════════════════════════════════════════════════════════
 
 set -euo pipefail
