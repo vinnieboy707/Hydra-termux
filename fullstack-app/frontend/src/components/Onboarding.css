@@ -313,6 +313,16 @@
   cursor: pointer;
 }
 
+.legal-error {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
 /* Dashboard Tour */
 .dashboard-tour {
   margin-top: 30px;
@@ -581,6 +591,15 @@
   background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
+  border: none;
+  padding: 0;
+}
+
+.step-dot:hover,
+.step-dot:focus {
+  background: rgba(255, 255, 255, 0.4);
+  outline: 2px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
 }
 
 .step-dot.active {

@@ -7,6 +7,7 @@ const Onboarding = ({ onComplete }) => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [legalAgreed, setLegalAgreed] = useState(false);
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const [showLegalError, setShowLegalError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,6 +101,9 @@ const Onboarding = ({ onComplete }) => {
               />
               <span>I understand and agree to use this tool legally and ethically</span>
             </label>
+            {showLegalError && (
+              <p className="legal-error">You must agree to the legal terms to continue.</p>
+            )}
           </div>
         </div>
       )
@@ -383,11 +387,12 @@ const Onboarding = ({ onComplete }) => {
   const nextStep = () => {
     if (currentStep === 1) {
       if (!legalAgreed) {
-        alert('You must agree to the legal terms to continue.');
+        setShowLegalError(true);
         return;
       }
     }
     
+    setShowLegalError(false);
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -475,10 +480,13 @@ const Onboarding = ({ onComplete }) => {
           
           <div className="step-indicators">
             {steps.map((_, index) => (
-              <span 
-                key={index} 
+              <button
+                key={index}
+                type="button"
                 className={`step-dot ${index === currentStep ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
                 onClick={() => setCurrentStep(index)}
+                aria-label={`Go to step ${index + 1}`}
+                aria-current={index === currentStep ? 'step' : undefined}
               />
             ))}
           </div>
