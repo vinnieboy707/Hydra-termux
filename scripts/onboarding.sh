@@ -365,7 +365,8 @@ step_quick_setup() {
         1)
             log_info "Downloading wordlists..."
             # Log full (unfiltered) output to file while only showing filtered output to user
-            local log_file="$PROJECT_ROOT/logs/wordlist_download_$(date +%Y%m%d_%H%M%S).log"
+            local log_file
+            log_file="$PROJECT_ROOT/logs/wordlist_download_$(date +%Y%m%d_%H%M%S).log"
             mkdir -p "$PROJECT_ROOT/logs"
             bash "$PROJECT_ROOT/scripts/download_wordlists.sh" --quick 2>&1 | tee "$log_file" | grep -E "(Downloading|Success|Complete|Error)" | head -10
             log_success "✓ Basic wordlists downloaded"

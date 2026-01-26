@@ -67,9 +67,7 @@ SMTPS_PORT=465
 
 # Results tracking
 RESULTS_DIR="$PROJECT_ROOT/logs"
-RESUME_FILE="$RESULTS_DIR/email_resume.txt"
 RESULTS_JSON="$RESULTS_DIR/email_results_$(date +%Y%m%d_%H%M%S).json"
-DNS_CACHE_FILE="$RESULTS_DIR/email_dns_cache.json"
 
 # Ensure directories exist
 mkdir -p "$RESULTS_DIR"
@@ -276,7 +274,8 @@ perform_dns_analysis() {
     
     # MX Records - Mail Server Discovery
     log_info "📧 Querying MX (Mail Exchange) records..."
-    local mx_records=$(dig +short MX "$domain" 2>/dev/null | sort -n)
+    local mx_records
+    mx_records=$(dig +short MX "$domain" 2>/dev/null | sort -n)
     if [ -n "$mx_records" ]; then
         echo "$mx_records" | while read priority server; do
             # Remove trailing dot
@@ -291,7 +290,8 @@ perform_dns_analysis() {
     
     # SPF Records - Sender Policy Framework
     log_info "🛡️  Querying SPF (Sender Policy Framework) records..."
-    local spf_record=$(dig +short TXT "$domain" 2>/dev/null | grep -i "v=spf1")
+    local spf_record
+    spf_record=$(dig +short TXT "$domain" 2>/dev/null | grep -i "v=spf1")
     if [ -n "$spf_record" ]; then
         log_success "  SPF Record found:"
         echo "    $spf_record" | sed 's/"//g'
@@ -307,13 +307,15 @@ perform_dns_analysis() {
     
     # DMARC Records
     log_info "📋 Querying DMARC (Domain-based Message Authentication) records..."
-    local dmarc_record=$(dig +short TXT "_dmarc.$domain" 2>/dev/null | grep -i "v=DMARC1")
+    local dmarc_record
+    dmarc_record=$(dig +short TXT "_dmarc.$domain" 2>/dev/null | grep -i "v=DMARC1")
     if [ -n "$dmarc_record" ]; then
         log_success "  DMARC Record found:"
         echo "    $dmarc_record" | sed 's/"//g'
         
         # Parse DMARC policy
-        local policy=$(echo "$dmarc_record" | grep -oP 'p=\K[^;]+')
+        local policy
+        policy=$(echo "$dmarc_record" | grep -oP 'p=\K[^;]+')
         case "$policy" in
             none)
                 log_warning "    Policy: none (monitoring only - weak security)"
@@ -334,7 +336,8 @@ perform_dns_analysis() {
     log_info "🔑 Checking for DKIM (DomainKeys Identified Mail) records..."
     local dkim_found=false
     for selector in default mail dkim google; do
-        local dkim_record=$(dig +short TXT "$selector._domainkey.$domain" 2>/dev/null | grep -i "v=DKIM1")
+        local dkim_record
+        dkim_record=$(dig +short TXT "$selector._domainkey.$domain" 2>/dev/null | grep -i "v=DKIM1")
         if [ -n "$dkim_record" ]; then
             log_success "  DKIM Record found (selector: $selector)"
             [ "$VERBOSE" = "true" ] && echo "    ${dkim_record:0:80}..." | sed 's/"//g'
@@ -352,9 +355,11 @@ perform_dns_analysis() {
     if [ -f "$analysis_file" ]; then
         while read server; do
             [ -z "$server" ] && continue
-            local ip=$(dig +short A "$server" 2>/dev/null | head -1)
+            local ip
+            ip=$(dig +short A "$server" 2>/dev/null | head -1)
             if [ -n "$ip" ]; then
-                local ptr=$(dig +short -x "$ip" 2>/dev/null | head -1)
+                local ptr
+                ptr=$(dig +short -x "$ip" 2>/dev/null | head -1)
                 if [ -n "$ptr" ]; then
                     log_success "  $server ($ip) -> PTR: ${ptr%.}"
                 else
@@ -370,7 +375,8 @@ perform_dns_analysis() {
     if [ -f "$analysis_file" ]; then
         while read server; do
             [ -z "$server" ] && continue
-            local ips=$(dig +short A "$server" 2>/dev/null)
+            local ips
+            ips=$(dig +short A "$server" 2>/dev/null)
             if [ -n "$ips" ]; then
                 log_success "  $server:"
                 echo "$ips" | while read ip; do
@@ -462,7 +468,8 @@ smtp_capability_check() {
     
     # Use openssl s_client or nc for SMTP capability detection
     local response=""
-    local client_hostname=$(hostname 2>/dev/null || echo "client")
+    local client_hostname
+    client_hostname=$(hostname 2>/dev/null || echo "client")
     if command -v openssl &>/dev/null && [ "$port" = "465" ]; then
         response=$(timeout 15 sh -c "echo -e 'EHLO ${client_hostname}\r\nQUIT\r\n' | openssl s_client -connect $target:$port -quiet 2>/dev/null" 2>/dev/null)
     elif command -v nc &>/dev/null; then
@@ -480,7 +487,8 @@ smtp_capability_check() {
             done
         fi
         if echo "$response" | grep -qi "SIZE"; then
-            local size=$(echo "$response" | grep -i "SIZE" | grep -oP '\d+' | head -1)
+            local size
+            size=$(echo "$response" | grep -i "SIZE" | grep -oP '\d+' | head -1)
             [ -n "$size" ] && log_info "  Max message size: $((size/1024/1024)) MB"
         fi
         return 0
@@ -874,8 +882,10 @@ execute_protocol_attack() {
         
         # Check for successful login
         if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
-            local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p' | xargs)
-            local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p' | xargs)
+            local login
+            local password
+            login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p' | xargs)
+            password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p' | xargs)
             
             log_success "🎯 CREDENTIALS FOUND: $login:$password"
             save_result "$protocol" "$target:$port" "$login" "$password"
@@ -892,8 +902,6 @@ execute_protocol_attack() {
             return 0
         fi
     done
-    
-    local exit_code=$?
     
     # Check output file for any results
     if [ -f "$output_file" ] && grep -q "host:" "$output_file" 2>/dev/null; then
@@ -925,7 +933,8 @@ save_result_json() {
     local password="$5"
     
     # Create simple JSON entry and append to results
-    local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    local timestamp
+    timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     local result_entry="{\"timestamp\":\"$timestamp\",\"protocol\":\"$protocol\",\"target\":\"$target\",\"port\":$port,\"username\":\"$username\",\"password\":\"$password\",\"success\":true}"
     
     # Append to a simple JSON lines file for easy parsing
@@ -1037,8 +1046,10 @@ run_email_attack() {
         # Calculate threads and timeout based on protocol and multipliers
         # Use bash arithmetic to avoid bc dependency
         local threads timeout
-        local thread_mult=$(echo "$THREAD_MULTIPLIER" | awk '{printf "%.0f", $1 * 100}')
-        local timeout_mult=$(echo "$TIMEOUT_MULTIPLIER" | awk '{printf "%.0f", $1 * 100}')
+        local thread_mult
+        local timeout_mult
+        thread_mult=$(echo "$THREAD_MULTIPLIER" | awk '{printf "%.0f", $1 * 100}')
+        timeout_mult=$(echo "$TIMEOUT_MULTIPLIER" | awk '{printf "%.0f", $1 * 100}')
         
         case "$proto" in
             imap) threads=$(( (IMAP_THREADS * thread_mult) / 100 )); timeout=$(( (IMAP_TIMEOUT * timeout_mult) / 100 )) ;;
