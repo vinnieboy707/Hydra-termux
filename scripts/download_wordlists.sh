@@ -5,6 +5,7 @@
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC2034
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Source logger
@@ -207,6 +208,7 @@ verify_wordlists() {
 # Parse command line arguments
 DOWNLOAD_ALL=false
 LIST_ONLY=false
+# shellcheck disable=SC2034
 VERBOSE=false
 
 while [[ $# -gt 0 ]]; do

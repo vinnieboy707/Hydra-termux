@@ -177,6 +177,7 @@ run_attack() {
     
     local total_wordlists=${#wordlists[@]}
     local current_wordlist=0
+    # shellcheck disable=SC2034
     local found_credentials=0
     
     for wordlist in "${wordlists[@]}"; do

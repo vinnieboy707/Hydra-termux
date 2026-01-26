@@ -257,6 +257,7 @@ EOF
 EOF
     
     log_success "Report generated: $report_file"
+    # shellcheck disable=SC2034
     REPORT_FILE="$report_file"
 }
 

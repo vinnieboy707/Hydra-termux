@@ -297,6 +297,7 @@ recommend_scripts() {
     declare -A script_categories
     
     # Define categories for organization
+    # shellcheck disable=SC2034
     declare -A category_priority=(
         ["Remote Access"]="1"
         ["Database"]="2"
@@ -440,6 +441,7 @@ recommend_scripts() {
 }
 
 # Parse command line arguments
+# shellcheck disable=SC2034
 VERBOSE=false
 CUSTOM_PORTS=""
 
