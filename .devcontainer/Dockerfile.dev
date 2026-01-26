@@ -1,0 +1,166 @@
+# Hydra-Termux Development Dockerfile
+# Optimized for VS Code Dev Containers with full development tools
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set development environment
+ENV NODE_ENV=development \
+    DEVELOPMENT_MODE=true \
+    LOG_LEVEL=debug
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    # Core utilities
+    curl \
+    wget \
+    git \
+    nano \
+    vim \
+    sudo \
+    build-essential \
+    software-properties-common \
+    # Node.js and npm
+    nodejs \
+    npm \
+    # Python development
+    python3 \
+    python3-pip \
+    python3-dev \
+    python3-venv \
+    # Penetration testing tools
+    hydra \
+    nmap \
+    sqlmap \
+    nikto \
+    john \
+    hashcat \
+    aircrack-ng \
+    metasploit-framework \
+    # Network utilities
+    netcat-openbsd \
+    netcat-traditional \
+    nc \
+    dnsutils \
+    whois \
+    traceroute \
+    tcpdump \
+    iproute2 \
+    iputils-ping \
+    # Development tools
+    strace \
+    ltrace \
+    gdb \
+    valgrind \
+    shellcheck \
+    jq \
+    tree \
+    htop \
+    iftop \
+    # Database clients
+    sqlite3 \
+    postgresql-client \
+    redis-tools \
+    # Security and SSL
+    openssl \
+    ca-certificates \
+    # Documentation
+    man-db \
+    manpages \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install additional Python packages for development
+RUN pip3 install --no-cache-dir \
+    # Security tools
+    requests \
+    beautifulsoup4 \
+    dnspython \
+    impacket \
+    pwntools \
+    paramiko \
+    # Development tools
+    ipython \
+    pytest \
+    black \
+    pylint \
+    flake8 \
+    mypy \
+    # Utilities
+    python-dotenv \
+    pyyaml
+
+# Install Node.js 20 LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install global npm packages for development
+RUN npm install -g \
+    nodemon \
+    pm2 \
+    typescript \
+    ts-node \
+    eslint \
+    prettier \
+    npm-check-updates \
+    @types/node
+
+# Create non-root user (vscode) for development
+RUN groupadd --gid 1000 vscode && \
+    useradd --uid 1000 --gid 1000 -m -s /bin/bash vscode && \
+    echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/vscode && \
+    chmod 0440 /etc/sudoers.d/vscode
+
+# Create necessary directories
+RUN mkdir -p \
+    /workspace \
+    /workspace/results \
+    /workspace/wordlists \
+    /workspace/logs \
+    /data \
+    /commandhistory \
+    && chown -R vscode:vscode /workspace /data /commandhistory
+
+# Set up bash history persistence
+RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
+    && echo "$SNIPPET" >> "/home/vscode/.bashrc"
+
+# Configure git for the container
+RUN git config --system core.autocrlf input && \
+    git config --system core.fileMode false && \
+    git config --system safe.directory '*'
+
+# Switch to vscode user
+USER vscode
+
+# Set working directory
+WORKDIR /workspace
+
+# Create user-level directories
+RUN mkdir -p \
+    ~/.local/bin \
+    ~/.npm-global \
+    ~/.cache
+
+# Configure npm to use user directory
+RUN npm config set prefix '~/.npm-global' && \
+    echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+
+# Set up shell prompt
+RUN echo 'PS1="\[\e[36m\]hydra-dev\[\e[m\] \[\e[33m\]\w\[\e[m\] \[\e[32m\]\\$\[\e[m\] "' >> ~/.bashrc
+
+# Add helpful aliases
+RUN echo 'alias ll="ls -alF"' >> ~/.bashrc && \
+    echo 'alias la="ls -A"' >> ~/.bashrc && \
+    echo 'alias l="ls -CF"' >> ~/.bashrc && \
+    echo 'alias ..="cd .."' >> ~/.bashrc && \
+    echo 'alias ...="cd ../.."' >> ~/.bashrc
+
+# Health check (runs as root via sudo)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health 2>/dev/null || exit 0
+
+# Keep container running
+CMD ["sleep", "infinity"]
