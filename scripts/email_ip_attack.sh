@@ -902,7 +902,7 @@ execute_protocol_attack() {
             return 0
         fi
     done
-    
+
     # Check output file for any results
     if [ -f "$output_file" ] && grep -q "host:" "$output_file" 2>/dev/null; then
         log_success "Attack completed with results - check output file"
