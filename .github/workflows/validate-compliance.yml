@@ -37,7 +37,7 @@ jobs:
     
     - name: Upload Compliance Report
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: compliance-report
         path: |
@@ -271,13 +271,21 @@ jobs:
     - name: Build Backend
       working-directory: ./fullstack-app/backend
       run: |
-        npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+        if [ -f package-lock.json ]; then
+          npm ci --legacy-peer-deps 2>&1 || npm install --legacy-peer-deps 2>&1
+        else
+          npm install --legacy-peer-deps 2>&1
+        fi
         echo "✅ Backend build successful"
     
     - name: Build Frontend
       working-directory: ./fullstack-app/frontend
       run: |
-        npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+        if [ -f package-lock.json ]; then
+          npm ci --legacy-peer-deps 2>&1 || npm install --legacy-peer-deps 2>&1
+        else
+          npm install --legacy-peer-deps 2>&1
+        fi
         npm run build
         echo "✅ Frontend build successful"
     
