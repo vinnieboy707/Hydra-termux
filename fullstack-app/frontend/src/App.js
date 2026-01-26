@@ -13,6 +13,7 @@ import ScriptGenerator from './pages/ScriptGenerator';
 import WordlistGenerator from './pages/WordlistGenerator';
 import TargetScanner from './pages/TargetScanner';
 import Layout from './components/Layout';
+import Onboarding from './components/Onboarding';
 import './App.css';
 
 function PrivateRoute({ children }) {
@@ -29,6 +30,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <Onboarding />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route

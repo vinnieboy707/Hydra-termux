@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Hydra-Termux Onboarding Script
-# Step-by-step guide for new users
+# Hydra-Termux AI-Powered Onboarding Script
+# Interactive step-by-step guide for new users with AI assistance
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,61 +10,232 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 # Source logger
 source "$SCRIPT_DIR/logger.sh"
 
+# Track user choices for AI learning
+USER_PROFILE="$PROJECT_ROOT/.user_profile"
+touch "$USER_PROFILE"
+
 # Welcome banner
 show_welcome() {
     clear
     cat << "EOF"
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║            🎓 WELCOME TO HYDRA-TERMUX 🎓                     ║
-║                  Ultimate Edition                             ║
+║         🤖 AI-POWERED ONBOARDING SYSTEM 🤖                   ║
+║            HYDRA-TERMUX Ultimate Edition                      ║
 ║                                                               ║
-║               Step-by-Step Onboarding Guide                   ║
+║         Your Intelligent Guide to Ethical Hacking             ║
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
 EOF
     echo ""
-    print_message "          Let's get you started! 🚀" "$CYAN"
+    print_message "          🚀 Welcome! I'm your AI assistant! 🚀" "$CYAN"
+    echo ""
+    print_message "I'll guide you through everything you need to know." "$GREEN"
     echo ""
     sleep 2
 }
 
-# Step 1: Introduction
-step_introduction() {
+# Choose onboarding path
+choose_onboarding_path() {
     clear
-    print_banner "Step 1: Introduction"
+    print_banner "🎯 Choose Your Path"
     echo ""
     
-    print_message "What is Hydra-Termux?" "$CYAN"
+    print_message "How would you like to proceed?" "$CYAN"
     echo ""
-    echo "Hydra-Termux is a powerful ethical hacking toolkit that includes:"
+    echo "  1) 🚀 Quick Start (5 minutes)"
+    echo "     Perfect for experienced users who want to start immediately"
     echo ""
-    echo "  ✓ Network attack tools (SSH, FTP, RDP, SMB, etc.)"
-    echo "  ✓ Web application security testing"
-    echo "  ✓ Database penetration testing"
-    echo "  ✓ Additional hacking tools from ALHacking suite"
-    echo "  ✓ Wordlist management and generation"
-    echo "  ✓ Comprehensive reporting and logging"
+    echo "  2) 📚 Complete Tutorial (15-20 minutes)"
+    echo "     Comprehensive walkthrough of all features"
+    echo ""
+    echo "  3) 🎮 Interactive Practice Mode"
+    echo "     Learn by doing with guided exercises"
+    echo ""
+    echo "  4) ⏭️  Skip Onboarding"
+    echo "     Go directly to main menu (not recommended for first-time users)"
     echo ""
     
-    print_message "⚠️  IMPORTANT LEGAL NOTICE ⚠️" "$RED"
+    read -p "Enter your choice [1-4]: " path_choice
+    
+    # Validate input to prevent file corruption
+    local validated_choice
+    case "$path_choice" in
+        1|2|3|4)
+            validated_choice="$path_choice"
+            ;;
+        *)
+            log_warning "Invalid choice, defaulting to Quick Start"
+            validated_choice="1"
+            ;;
+    esac
+    
+    echo "path=$validated_choice" >> "$USER_PROFILE"
+    echo "$validated_choice"
+}
+
+# Quick start path
+quick_start_path() {
+    clear
+    print_banner "🚀 Quick Start Guide"
+    echo ""
+    
+    print_message "🤖 AI Assistant says:" "$CYAN"
+    echo "Here's everything you need to get started quickly!"
+    echo ""
+    
+    print_message "✅ Essential Steps:" "$GREEN"
+    echo ""
+    echo "1️⃣  Legal Agreement - Review terms and conditions"
+    echo "2️⃣  System Check - Verify dependencies are installed"
+    echo "3️⃣  Quick Setup - Get wordlists and configure"
+    echo "4️⃣  First Task - Try your first safe scan"
+    echo ""
+    
+    read -p "Ready to continue? (press Enter)" _
+    
+    # Run essential steps
+    step_introduction_quick
+    step_system_check
+    step_quick_setup
+    step_first_action_guide
+}
+
+# Complete tutorial path
+complete_tutorial_path() {
+    # Run all detailed steps
+    step_introduction
+    step_system_check
+    step_tool_categories
+    step_first_setup
+    step_how_to_use
+    step_alhacking_guide
+    step_best_practices
+    step_quick_start
+}
+
+# Interactive practice mode
+interactive_practice_mode() {
+    clear
+    print_banner "🎮 Interactive Practice Mode"
+    echo ""
+    
+    print_message "🤖 AI Assistant:" "$CYAN"
+    echo "I'll guide you through hands-on exercises!"
+    echo ""
+    echo "Let's start with the basics and work our way up."
+    echo ""
+    
+    # Run through practice exercises
+    practice_exercise_1_setup
+    practice_exercise_2_scanning
+    practice_exercise_3_wordlists
+    practice_exercise_4_safe_attack
+}
+
+# Step 1: Introduction (Quick Version)
+step_introduction_quick() {
+    clear
+    print_banner "Step 1/4: Legal Agreement"
+    echo ""
+    
+    print_message "⚠️  CRITICAL LEGAL NOTICE ⚠️" "$RED"
     echo ""
     echo "This tool is for EDUCATIONAL and AUTHORIZED TESTING ONLY!"
     echo ""
-    echo "  • Only use on systems you own or have permission to test"
-    echo "  • Unauthorized access to computer systems is ILLEGAL"
-    echo "  • You are responsible for your actions"
-    echo "  • The developers assume NO liability for misuse"
+    echo "  • ✅ Only test systems YOU OWN or have WRITTEN PERMISSION"
+    echo "  • ❌ Unauthorized access is ILLEGAL (jail time + fines)"
+    echo "  • ⚖️  You are 100% RESPONSIBLE for your actions"
     echo ""
     
-    read -p "Do you understand and agree? (yes/no): " agree
+    read -p "I understand and agree to use this tool legally (yes/no): " agree
     
     if [[ ! "$agree" =~ ^[Yy][Ee][Ss]$ ]]; then
         log_error "You must agree to the terms to continue."
         exit 1
     fi
     
-    log_success "Great! Let's continue..."
+    log_success "✓ Agreement accepted"
+    sleep 1
+}
+
+# Step 1: Introduction (Detailed Version)
+step_introduction() {
+    clear
+    print_banner "Step 1: Introduction"
+    echo ""
+    
+    print_message "🤖 AI Assistant: Let me tell you about Hydra-Termux" "$CYAN"
+    echo ""
+    
+    print_message "What is Hydra-Termux?" "$GREEN"
+    echo ""
+    echo "A comprehensive ethical hacking toolkit that includes:"
+    echo ""
+    echo "  🔐 Network Attack Tools"
+    echo "     → SSH, FTP, RDP, SMB, Telnet brute-forcing"
+    echo ""
+    echo "  🌐 Web Application Testing"
+    echo "     → Admin panel discovery and credential testing"
+    echo ""
+    echo "  💾 Database Penetration"
+    echo "     → MySQL, PostgreSQL security assessment"
+    echo ""
+    echo "  🛠️ Additional Tools (ALHacking Suite)"
+    echo "     → Phishing, DDoS, reconnaissance, and more"
+    echo ""
+    echo "  📊 Management Features"
+    echo "     → Wordlist generation, reporting, logging"
+    echo ""
+    
+    read -p "Press Enter to review legal requirements..." _
+    
+    clear
+    print_banner "⚠️  LEGAL REQUIREMENTS ⚠️"
+    echo ""
+    
+    print_message "WHAT IS LEGAL:" "$GREEN"
+    echo "  ✓ Testing systems you own"
+    echo "  ✓ Testing with written authorization"
+    echo "  ✓ Educational labs and practice environments"
+    echo "  ✓ Bug bounty programs with proper scope"
+    echo "  ✓ Authorized penetration testing contracts"
+    echo ""
+    
+    print_message "WHAT IS ILLEGAL:" "$RED"
+    echo "  ✗ Testing systems without permission"
+    echo "  ✗ Accessing others' accounts or data"
+    echo "  ✗ Causing damage or disruption"
+    echo "  ✗ Exceeding authorized scope"
+    echo "  ✗ Not disclosing found vulnerabilities"
+    echo ""
+    
+    print_message "CONSEQUENCES:" "$YELLOW"
+    echo "  • Criminal prosecution"
+    echo "  • Heavy fines (up to \$250,000+)"
+    echo "  • Prison time (up to 20 years)"
+    echo "  • Civil lawsuits"
+    echo "  • Permanent criminal record"
+    echo ""
+    
+    print_message "YOUR RESPONSIBILITY:" "$CYAN"
+    echo "  • Get WRITTEN authorization before testing"
+    echo "  • Stay within defined scope"
+    echo "  • Document all activities"
+    echo "  • Report vulnerabilities responsibly"
+    echo "  • Use VPN for anonymity"
+    echo ""
+    
+    read -p "Do you understand and agree to these terms? (yes/no): " agree
+    
+    if [[ ! "$agree" =~ ^[Yy][Ee][Ss]$ ]]; then
+        log_error "You must agree to the terms to continue."
+        exit 1
+    fi
+    
+    log_success "✓ Legal agreement accepted"
+    echo "skill_level=beginner" >> "$USER_PROFILE"
+    echo "legal_agreement=$(date +%Y-%m-%d)" >> "$USER_PROFILE"
     sleep 2
 }
 
@@ -156,6 +327,290 @@ step_tool_categories() {
     echo ""
     
     read -p "Press Enter to continue..."
+}
+
+# Quick setup helper
+step_quick_setup() {
+    clear
+    print_banner "Step 3/4: Quick Setup"
+    echo ""
+    
+    print_message "🤖 AI Assistant:" "$CYAN"
+    echo "Let me help you set up the essentials!"
+    echo ""
+    
+    # Create directories
+    log_info "Creating necessary directories..."
+    mkdir -p "$PROJECT_ROOT/logs"
+    mkdir -p "$PROJECT_ROOT/reports"
+    mkdir -p "$PROJECT_ROOT/results"
+    mkdir -p "$HOME/wordlists"
+    log_success "✓ Directories created"
+    echo ""
+    
+    print_message "📚 Wordlists Setup" "$GREEN"
+    echo ""
+    echo "Wordlists contain common usernames and passwords."
+    echo "They're essential for penetration testing."
+    echo ""
+    echo "Options:"
+    echo "  1) Download now (recommended, ~5 minutes)"
+    echo "  2) Download later (menu option 9)"
+    echo "  3) Skip wordlists"
+    echo ""
+    
+    read -p "Your choice [1-3]: " wl_choice
+    
+    case "$wl_choice" in
+        1)
+            log_info "Downloading wordlists..."
+            # Log full (unfiltered) output to file while only showing filtered output to user
+            local log_file="$PROJECT_ROOT/logs/wordlist_download_$(date +%Y%m%d_%H%M%S).log"
+            mkdir -p "$PROJECT_ROOT/logs"
+            bash "$PROJECT_ROOT/scripts/download_wordlists.sh" --quick 2>&1 | tee "$log_file" | grep -E "(Downloading|Success|Complete|Error)" | head -10
+            log_success "✓ Basic wordlists downloaded"
+            log_info "Full log: $log_file"
+            ;;
+        2)
+            log_info "✓ You can download wordlists later from option 9"
+            ;;
+        3)
+            log_warning "⚠ Skipping wordlists (attacks may not work without them)"
+            ;;
+    esac
+    
+    echo ""
+    read -p "Press Enter to continue..." _
+}
+
+# First action guide
+step_first_action_guide() {
+    clear
+    print_banner "Step 4/4: Your First Task"
+    echo ""
+    
+    print_message "🤖 AI Assistant: Let's try something safe!" "$CYAN"
+    echo ""
+    
+    print_message "🎯 Safe First Steps:" "$GREEN"
+    echo ""
+    echo "I recommend starting with these safe actions:"
+    echo ""
+    echo "  1) 📊 View the Dashboard"
+    echo "     See what features are available"
+    echo ""
+    echo "  2) 📖 Read Help & Documentation"
+    echo "     Learn about all the tools"
+    echo ""
+    echo "  3) 🔍 Try IP Info Tool (Safe!)"
+    echo "     Look up information about an IP address"
+    echo ""
+    echo "  4) 🎮 Practice Mode"
+    echo "     Set up a safe test environment"
+    echo ""
+    
+    read -p "What would you like to try? [1-4]: " first_action
+    
+    # Validate input before writing to file
+    case "$first_action" in
+        1)
+            log_success "Great! The main menu will open next."
+            ;;
+        2)
+            log_info "Opening help documentation..."
+            if [ -f "$PROJECT_ROOT/README.md" ]; then
+                less "$PROJECT_ROOT/README.md" 2>/dev/null || cat "$PROJECT_ROOT/README.md"
+            fi
+            ;;
+        3)
+            log_info "The IP Info tool will be available in the main menu (Option 26)"
+            ;;
+        4)
+            practice_mode_intro
+            ;;
+        *)
+            log_warning "Invalid choice, defaulting to dashboard"
+            first_action="1"
+            ;;
+    esac
+    
+    echo ""
+    echo "first_action=$first_action" >> "$USER_PROFILE"
+    read -p "Press Enter to continue to main menu..." _
+}
+
+# Practice mode introduction
+practice_mode_intro() {
+    clear
+    print_banner "🎮 Practice Mode"
+    echo ""
+    
+    print_message "🤖 AI Assistant: Let me teach you the basics!" "$CYAN"
+    echo ""
+    
+    echo "In practice mode, you'll learn:"
+    echo ""
+    echo "  ✓ How to set up safe test environments"
+    echo "  ✓ How to scan targets for open ports"
+    echo "  ✓ How to manage wordlists"
+    echo "  ✓ How to launch your first safe attack"
+    echo ""
+    
+    read -p "Start practice mode now? (y/n): " start_practice
+    
+    if [[ "$start_practice" =~ ^[Yy]$ ]]; then
+        practice_exercise_1_setup
+    else
+        log_info "You can start practice mode anytime from the AI Assistant menu (Option 88)"
+    fi
+}
+
+# Practice Exercise 1: Setup
+practice_exercise_1_setup() {
+    clear
+    print_banner "🎮 Practice Exercise 1: Understanding the Layout"
+    echo ""
+    
+    print_message "🤖 AI Instructor:" "$CYAN"
+    echo "Let's understand where everything is stored!"
+    echo ""
+    
+    print_message "📁 Directory Structure:" "$GREEN"
+    echo ""
+    echo "  ~/wordlists/         - Password and username lists"
+    echo "  $PROJECT_ROOT/logs/         - Attack logs and histories"
+    echo "  $PROJECT_ROOT/reports/      - Detailed attack reports"
+    echo "  $PROJECT_ROOT/results/      - Discovered credentials"
+    echo "  $PROJECT_ROOT/scripts/      - All attack scripts"
+    echo "  $PROJECT_ROOT/config/       - Configuration files"
+    echo ""
+    
+    print_message "💡 Pro Tip:" "$YELLOW"
+    echo "Always check logs/ and reports/ folders after an attack!"
+    echo ""
+    
+    read -p "Ready for next exercise? (press Enter)" _
+    practice_exercise_2_scanning
+}
+
+# Practice Exercise 2: Scanning
+practice_exercise_2_scanning() {
+    clear
+    print_banner "🎮 Practice Exercise 2: Safe Scanning"
+    echo ""
+    
+    print_message "🤖 AI Instructor:" "$CYAN"
+    echo "Let's learn about scanning WITHOUT attacking!"
+    echo ""
+    
+    print_message "What is Scanning?" "$GREEN"
+    echo ""
+    echo "Scanning helps you discover:"
+    echo "  • What ports are open on a target"
+    echo "  • What services are running"
+    echo "  • What protocols are available"
+    echo ""
+    
+    print_message "Safe Scanning Practice:" "$YELLOW"
+    echo ""
+    echo "You can safely scan your own network:"
+    echo ""
+    echo "  Example: 192.168.1.1 (your router)"
+    echo "  Example: 127.0.0.1 (your own computer)"
+    echo ""
+    
+    echo "In the main menu, use Option 11 (Scan Target)"
+    echo "to practice scanning safely!"
+    echo ""
+    
+    read -p "Ready for next exercise? (press Enter)" _
+    practice_exercise_3_wordlists
+}
+
+# Practice Exercise 3: Wordlists
+practice_exercise_3_wordlists() {
+    clear
+    print_banner "🎮 Practice Exercise 3: Wordlists"
+    echo ""
+    
+    print_message "🤖 AI Instructor:" "$CYAN"
+    echo "Wordlists are the key to successful testing!"
+    echo ""
+    
+    print_message "What are Wordlists?" "$GREEN"
+    echo ""
+    echo "Lists of common:"
+    echo "  • Passwords (password, 123456, admin, etc.)"
+    echo "  • Usernames (admin, root, user, etc.)"
+    echo "  • Email addresses"
+    echo "  • URLs and paths"
+    echo ""
+    
+    print_message "How to Get Wordlists:" "$YELLOW"
+    echo ""
+    echo "  Option 9: Download from SecLists (comprehensive)"
+    echo "  Option 10: Generate custom wordlists"
+    echo ""
+    
+    print_message "💡 Pro Tips:" "$CYAN"
+    echo "  • Bigger wordlists = more time but better coverage"
+    echo "  • Targeted wordlists = faster and more effective"
+    echo "  • Combine multiple wordlists for best results"
+    echo ""
+    
+    read -p "Ready for next exercise? (press Enter)" _
+    practice_exercise_4_safe_attack
+}
+
+# Practice Exercise 4: Safe Attack
+practice_exercise_4_safe_attack() {
+    clear
+    print_banner "🎮 Practice Exercise 4: Your First Safe Attack"
+    echo ""
+    
+    print_message "🤖 AI Instructor:" "$CYAN"
+    echo "Let's talk about safe practice environments!"
+    echo ""
+    
+    print_message "Safe Testing Options:" "$GREEN"
+    echo ""
+    echo "  1️⃣  Local Test Environments"
+    echo "     • Docker containers"
+    echo "     • Virtual machines (VirtualBox, VMware)"
+    echo "     • Local services (your own server)"
+    echo ""
+    echo "  2️⃣  Legal Practice Platforms"
+    echo "     • HackTheBox (hackthebox.eu)"
+    echo "     • TryHackMe (tryhackme.com)"
+    echo "     • OverTheWire (overthewire.org)"
+    echo "     • PentesterLab (pentesterlab.com)"
+    echo ""
+    echo "  3️⃣  Intentionally Vulnerable Apps"
+    echo "     • DVWA (Damn Vulnerable Web App)"
+    echo "     • Metasploitable"
+    echo "     • WebGoat"
+    echo ""
+    
+    print_message "⚠️  NEVER:" "$RED"
+    echo "  • Test public websites without permission"
+    echo "  • Test your work/school networks"
+    echo "  • Test your ISP or cloud providers"
+    echo "  • Test anything you don't explicitly own"
+    echo ""
+    
+    print_message "✅ When You're Ready:" "$CYAN"
+    echo "  1. Set up a safe environment"
+    echo "  2. Use Option 11 to scan it"
+    echo "  3. Choose appropriate attack (Options 1-8)"
+    echo "  4. Review results (Option 12)"
+    echo "  5. Check reports (Option 15)"
+    echo ""
+    
+    log_success "🎓 Practice exercises complete!"
+    echo ""
+    echo "You're ready to start using Hydra-Termux safely!"
+    echo ""
+    read -p "Press Enter to continue to main menu..." _
 }
 
 # Step 4: First Time Setup
@@ -363,6 +818,8 @@ step_quick_start() {
     echo "  3. Try option 11 (Scan Target) on your own system"
     echo "  4. Review the results and logs"
     echo ""
+    
+    read -p "Press Enter to continue..."
 }
 
 # Final step
@@ -371,40 +828,86 @@ step_completion() {
     print_banner "🎉 Onboarding Complete!"
     echo ""
     
-    log_success "You're all set up and ready to go!"
+    print_message "🤖 AI Assistant:" "$CYAN"
+    echo "Congratulations! You're all set up and ready to go!"
     echo ""
     
-    print_message "Remember:" "$YELLOW"
+    print_message "✅ What You've Learned:" "$GREEN"
+    echo "  • Legal and ethical requirements"
+    echo "  • System setup and dependencies"
+    echo "  • Tool categories and features"
+    echo "  • Safe practice environments"
+    echo "  • How to use the main menu"
+    echo ""
+    
+    print_message "🚀 Next Steps:" "$YELLOW"
+    echo "  1. The main menu will open in 3 seconds"
+    echo "  2. Try Option 18 for Help & Documentation"
+    echo "  3. Use Option 88 for AI Assistant anytime"
+    echo "  4. Check Option 89 for Workflow Guides"
+    echo ""
+    
+    print_message "💡 AI Tips:" "$CYAN"
+    echo "  • I'm always here to help (Option 88)"
+    echo "  • Check your progress anytime (Option 90)"
+    echo "  • Get smart suggestions (Option 91)"
+    echo "  • Watch for contextual hints throughout"
+    echo ""
+    
+    print_message "🛡️ Remember:" "$RED"
     echo "  • Always act legally and ethically"
-    echo "  • Test only on authorized systems"
-    echo "  • Keep learning and stay curious"
-    echo "  • Use these tools responsibly"
+    echo "  • Test only authorized systems"
+    echo "  • Document your activities"
+    echo "  • Use VPN for anonymity"
     echo ""
     
-    print_message "Need Help?" "$CYAN"
-    echo "  • Option 18: Help & Documentation"
-    echo "  • Option 36: ALHacking Usage Tutorial"
-    echo "  • GitHub Issues: Report bugs or ask questions"
+    log_success "🎓 Onboarding completed successfully!"
     echo ""
-    
     log_info "Launching main menu in 3 seconds..."
-    sleep 3
     
     # Mark onboarding as complete
     touch "$PROJECT_ROOT/.onboarding_complete"
+    echo "completed=$(date +%Y-%m-%d_%H:%M:%S)" >> "$USER_PROFILE"
+    
+    sleep 3
 }
 
 # Main onboarding flow
 main() {
     show_welcome
-    step_introduction
-    step_system_check
-    step_tool_categories
-    step_first_setup
-    step_how_to_use
-    step_alhacking_guide
-    step_best_practices
-    step_quick_start
+    
+    # Choose path
+    local path
+    path=$(choose_onboarding_path)
+    
+    case "$path" in
+        1)
+            # Quick Start
+            quick_start_path
+            ;;
+        2)
+            # Complete Tutorial
+            complete_tutorial_path
+            ;;
+        3)
+            # Interactive Practice
+            interactive_practice_mode
+            ;;
+        4)
+            # Skip Onboarding
+            log_info "Skipping onboarding..."
+            touch "$PROJECT_ROOT/.onboarding_complete"
+            echo "skipped=$(date +%Y-%m-%d_%H:%M:%S)" >> "$USER_PROFILE"
+            return 0
+            ;;
+        *)
+            # Default to quick start
+            log_warning "Invalid choice, using Quick Start..."
+            quick_start_path
+            ;;
+    esac
+    
+    # Complete onboarding
     step_completion
 }
 
