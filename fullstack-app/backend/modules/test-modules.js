@@ -11,7 +11,9 @@ const {
   exportManager,
   cacheManager,
   logger,
-  schemas
+  schemas,
+  resultParser,
+  notificationManager
 } = modules;
 
 /**

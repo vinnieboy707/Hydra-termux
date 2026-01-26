@@ -1,6 +1,6 @@
 const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
-const { run, get, all } = require('../database-pg');
+const { run, get, all } = require('../database');
 
 const router = express.Router();
 

@@ -9,8 +9,8 @@
 # ════════════════════════════════════════════════════════════════
 # ⚡ CONFIGURATION - Replace with actual target ⚡
 # ════════════════════════════════════════════════════════════════
-TARGET="corporate.yourtarget.com"      # Main target domain/IP - REPLACE THIS
-EMAIL="admin@corporate.yourtarget.com" # Test email account - REPLACE THIS
+TARGET="corporate.example.com"         # Main target domain/IP - REPLACE THIS
+EMAIL="admin@corporate.example.com"    # Test email account - REPLACE THIS
 WEB_PATH="/admin"                      # Web admin path
 # ════════════════════════════════════════════════════════════════
 
