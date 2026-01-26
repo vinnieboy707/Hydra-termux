@@ -40,7 +40,6 @@
     "@supabase/supabase-js": "^2.39.3",
     "dns-packet": "^5.6.1",
     "native-dns": "^0.7.0",
-    "node-dns": "^0.2.0",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "json2csv": "^5.0.7",
