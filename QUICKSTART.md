@@ -3,7 +3,7 @@
 ## 🆘 **HAVING PROBLEMS? RUN THIS FIRST:**
 
 ```bash
-./fix-hydra.sh
+bash scripts/help.sh
 ```
 
 This ONE command diagnoses and fixes 99% of issues automatically!
@@ -29,7 +29,7 @@ This ONE command diagnoses and fixes 99% of issues automatically!
 
 **Use the interactive help system:**
 ```bash
-./fix-hydra.sh
+bash scripts/help.sh
 # or
 bash scripts/help.sh
 ```
@@ -61,17 +61,17 @@ Pick one based on your target:
 
 | Target Type | Script to Use |
 |-------------|---------------|
-| 🌐 WordPress site | `Library/wordpress_quick.sh` |
-| 🌐 Any website | `Library/web_quick.sh` |
-| 🔐 SSH server | `Library/ssh_quick.sh` |
-| 📧 Email-based | `Library/email_quick.sh` |
-| 🖥️ Windows RDP | `Library/rdp_quick.sh` |
-| 🗄️ MySQL database | `Library/mysql_quick.sh` |
-| 🌍 Full network | `Library/combo_full_infrastructure.sh` |
+| 🌐 WordPress site | `scripts/wordpress_quick.sh` |
+| 🌐 Any website | `scripts/web_quick.sh` |
+| 🔐 SSH server | `scripts/ssh_quick.sh` |
+| 📧 Email-based | `scripts/email_quick.sh` |
+| 🖥️ Windows RDP | `scripts/rdp_quick.sh` |
+| 🗄️ MySQL database | `scripts/mysql_quick.sh` |
+| 🌍 Full network | `scripts/combo_full_infrastructure.sh` |
 
 ### Step 3: Edit ONE Line (30 seconds)
 ```bash
-nano Library/wordpress_quick.sh
+nano scripts/wordpress_quick.sh
 
 # Change line 4:
 TARGET="http://your-target.com"  # <-- Only edit this!
@@ -81,7 +81,7 @@ TARGET="http://your-target.com"  # <-- Only edit this!
 
 ### Step 4: Run It (2 minutes)
 ```bash
-bash Library/wordpress_quick.sh
+bash scripts/wordpress_quick.sh
 ```
 
 ### Step 5: Get Results (instant)
@@ -103,7 +103,7 @@ cat ~/hydra-logs/results_web.json
 
 ```bash
 # 1. Open the WordPress script
-nano Library/wordpress_quick.sh
+nano scripts/wordpress_quick.sh
 
 # 2. Edit ONLY this line (line 4):
 TARGET="http://example.com"
@@ -111,7 +111,7 @@ TARGET="http://example.com"
 # 3. Save and exit (Ctrl+X, Y, Enter)
 
 # 4. Run the attack
-bash Library/wordpress_quick.sh
+bash scripts/wordpress_quick.sh
 
 # 5. Wait for results (usually 2-10 minutes)
 # Output will show:
@@ -141,14 +141,14 @@ bash scripts/results_viewer.sh --protocol web
 
 ```bash
 # 1. Open email attack script
-nano Library/email_quick.sh
+nano scripts/email_quick.sh
 
 # 2. Edit TWO lines:
 EMAIL="webmaster@example.com"  # Line 4
 TARGET="http://example.com"    # Line 5
 
 # 3. Save and run
-bash Library/email_quick.sh
+bash scripts/email_quick.sh
 
 # 4. Get results
 bash scripts/results_viewer.sh
@@ -160,13 +160,13 @@ bash scripts/results_viewer.sh
 
 ```bash
 # 1. Use web quick script
-nano Library/web_quick.sh
+nano scripts/web_quick.sh
 
 # 2. Change target
 TARGET="http://example.com"  # Script will find admin panel
 
 # 3. Run
-bash Library/web_quick.sh
+bash scripts/web_quick.sh
 
 # Script automatically:
 # - Finds /admin, /wp-admin, /login.php, etc.
@@ -195,13 +195,13 @@ EOF
 
 ```bash
 # 1. Open any quick script
-nano Library/web_quick.sh
+nano scripts/web_quick.sh
 
 # 2. Point to your file
 TARGET="targets.txt"
 
 # 3. Run bulk attack
-bash Library/web_quick.sh
+bash scripts/web_quick.sh
 
 # Results saved per-target!
 ```
@@ -217,7 +217,7 @@ All scripts check VPN automatically:
 bash scripts/vpn_check.sh
 
 # Skip VPN check (testing only)
-bash Library/ssh_quick.sh --skip-vpn
+bash scripts/ssh_quick.sh --skip-vpn
 ```
 
 ---
@@ -269,12 +269,12 @@ bash scripts/ssh_admin_attack.sh -t TARGET -T 32
 
 ```bash
 # Attack entire subnet
-nano Library/ssh_quick.sh
+nano scripts/ssh_quick.sh
 
 # Change to:
 TARGET="192.168.1.0/24"  # Attacks 254 IPs!
 
-bash Library/ssh_quick.sh
+bash scripts/ssh_quick.sh
 ```
 
 ---
@@ -296,7 +296,7 @@ Covers:
 
 ### Quick Library (One-Line-Change)
 
-Located in `Library/`:
+Located in `scripts/`:
 
 **Basic Protocols** (12):
 - `ssh_quick.sh` - SSH brute-force
@@ -378,7 +378,7 @@ Unauthorized access = Federal crime = Prison time
 
 **ONE COMMAND to fix everything:**
 ```bash
-./fix-hydra.sh
+bash scripts/help.sh
 ```
 
 **Interactive help center:**
@@ -405,11 +405,11 @@ bash scripts/check_dependencies.sh
 
 | Problem | Quick Solution | Detailed Solution |
 |---------|---------------|-------------------|
-| "Hydra not found" | `./fix-hydra.sh` → option 1 | `bash scripts/auto_fix.sh` |
-| "Permission denied" | `./fix-hydra.sh` → option 2 | `chmod +x *.sh scripts/*.sh` |
+| "Hydra not found" | `bash scripts/help.sh` → option 1 | `bash scripts/auto_fix.sh` |
+| "Permission denied" | `bash scripts/help.sh` → option 2 | `chmod +x *.sh scripts/*.sh` |
 | "VPN not detected" | Add `--skip-vpn` flag | `bash scripts/vpn_check.sh` |
 | "No results" | Run diagnostics | `bash scripts/system_diagnostics.sh` |
-| Script won't run | Check permissions | `./fix-hydra.sh` |
+| Script won't run | Check permissions | `bash scripts/help.sh` |
 | Installation failed | Auto-fix | `bash scripts/auto_fix.sh` |
 | Unknown issue | Interactive help | `bash scripts/help.sh` |
 
@@ -426,7 +426,7 @@ cat docs/TROUBLESHOOTING.md
 ## 💡 Pro Tips
 
 1. **Start VPN first**: Always connect before attacking
-2. **Use diagnostic tools**: Run `./fix-hydra.sh` if anything fails
+2. **Use diagnostic tools**: Run `bash scripts/help.sh` if anything fails
 3. **Check system health**: `bash scripts/system_diagnostics.sh` before major attacks
 4. **Use small wordlists first**: Test with 100 passwords before trying 14M
 5. **Reduce threads for stealth**: `-T 4` instead of `-T 32`
@@ -441,7 +441,7 @@ cat docs/TROUBLESHOOTING.md
 ## 📞 Need Help?
 
 ### New Diagnostic Tools (Start Here!)
-1. **Interactive help**: `./fix-hydra.sh` or `bash scripts/help.sh`
+1. **Interactive help**: `bash scripts/help.sh` or `bash scripts/help.sh`
 2. **System diagnostics**: `bash scripts/system_diagnostics.sh`
 3. **Auto-repair**: `bash scripts/auto_fix.sh`
 4. **Setup wizard**: `bash scripts/setup_wizard.sh`
@@ -450,7 +450,7 @@ cat docs/TROUBLESHOOTING.md
 1. **Help flag**: `bash script.sh --help`
 2. **Full troubleshooting**: `docs/TROUBLESHOOTING.md` (10,000+ words!)
 3. **Full tutorial**: `docs/STEP_BY_STEP_TUTORIAL.md`
-4. **Protocol guide**: `Library/PROTOCOL_GUIDE.md`
+4. **Protocol guide**: `scripts/PROTOCOL_GUIDE.md`
 4. **Usage docs**: `docs/USAGE.md`
 5. **Examples**: `docs/EXAMPLES.md`
 
@@ -462,11 +462,11 @@ cat docs/TROUBLESHOOTING.md
 
 ```bash
 # 1. Edit
-nano Library/wordpress_quick.sh
+nano scripts/wordpress_quick.sh
 # Change: TARGET="http://your-site.com"
 
 # 2. Run
-bash Library/wordpress_quick.sh
+bash scripts/wordpress_quick.sh
 
 # 3. Get result
 bash scripts/results_viewer.sh --protocol web

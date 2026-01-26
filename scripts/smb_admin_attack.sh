@@ -119,8 +119,10 @@ run_attack() {
     "${hydra_cmd[@]}" "smb://$TARGET:$PORT" 2>&1 | while IFS= read -r line; do
         if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
             # Parse successful login (support credentials with spaces)
-            local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
-            local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
+            local login
+            local password
+            login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
+            password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
             
             save_result "smb" "$TARGET" "$login" "$password" "$PORT"
             log_success "Valid credentials found: $login:$password"

@@ -158,9 +158,13 @@ parse_results() {
     
     # Extract open ports
     if [ "$OUTPUT_FORMAT" = "xml" ]; then
-        local open_ports=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | wc -l)
+        local open_ports
+
+        open_ports=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | wc -l)
     else
-        local open_ports=$(grep -c "^[0-9]*/.*open" "$scan_file" 2>/dev/null || echo 0)
+        local open_ports
+
+        open_ports=$(grep -c "^[0-9]*/.*open" "$scan_file" 2>/dev/null || echo 0)
     fi
     
     log_info "Open ports found: $open_ports"
@@ -170,7 +174,9 @@ parse_results() {
         echo ""
         log_info "Services detected:"
         grep -oP 'portid="\K[0-9]+' "$scan_file" 2>/dev/null | while read -r port; do
-            local service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
+            local service
+
+            service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
             [ -n "$service" ] && printf "  ${GREEN}Port $port${NC}: $service\n"
         done
     else
@@ -263,7 +269,9 @@ recommend_scripts() {
     if [ "$OUTPUT_FORMAT" = "xml" ]; then
         # Parse XML format
         while read -r port; do
-            local service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
+            local service
+
+            service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
             if [ -n "$service" ]; then
                 services_found+=("$service:$port")
             fi
@@ -271,8 +279,12 @@ recommend_scripts() {
     else
         # Parse normal text format
         while read -r line; do
-            local port=$(echo "$line" | awk '{print $1}' | cut -d'/' -f1)
-            local service=$(echo "$line" | awk '{print $3}')
+            local port
+
+            port=$(echo "$line" | awk '{print $1}' | cut -d'/' -f1)
+            local service
+
+            service=$(echo "$line" | awk '{print $3}')
             if [ -n "$service" ]; then
                 services_found+=("$service:$port")
             fi
@@ -285,6 +297,7 @@ recommend_scripts() {
     declare -A script_categories
     
     # Define categories for organization
+    # shellcheck disable=SC2034
     declare -A category_priority=(
         ["Remote Access"]="1"
         ["Database"]="2"
@@ -296,13 +309,21 @@ recommend_scripts() {
     )
     
     for service_port in "${services_found[@]}"; do
-        local service=$(echo "$service_port" | cut -d':' -f1)
-        local port=$(echo "$service_port" | cut -d':' -f2)
+        local service
+
+        service=$(echo "$service_port" | cut -d':' -f1)
+        local port
+
+        port=$(echo "$service_port" | cut -d':' -f2)
         
         # Check if we have a script for this service
         if [ -n "${service_map[$service]}" ]; then
-            local script=$(echo "${service_map[$service]}" | cut -d'|' -f1)
-            local desc=$(echo "${service_map[$service]}" | cut -d'|' -f2)
+            local script
+
+            script=$(echo "${service_map[$service]}" | cut -d'|' -f1)
+            local desc
+
+            desc=$(echo "${service_map[$service]}" | cut -d'|' -f2)
             
             # Avoid duplicate recommendations
             if [ -z "${recommended_scripts[$script]}" ]; then
@@ -371,7 +392,7 @@ recommend_scripts() {
         done
         
         print_message "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" "$CYAN"
-        log_info "💡 Usage: ${CYAN}bash Library/<script_name>${NC}"
+        log_info "💡 Usage: ${CYAN}bash scripts/<script_name>${NC}"
         log_warning "⚠️  Remember: Edit TARGET variable in script before running!"
         log_info "🎯 Pro Tip: Start with highest success rate services (Redis, MongoDB, IoT) for quick wins"
         echo ""
@@ -413,13 +434,14 @@ recommend_scripts() {
     print_message "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" "$CYAN"
     echo ""
     log_success "✨ OPTIMIZATION COMPLETE: All protocols analyzed with detailed attack strategies"
-    log_info "💡 Quick Start: ${CYAN}bash Library/<script_name>${NC}"
+    log_info "💡 Quick Start: ${CYAN}bash scripts/<script_name>${NC}"
     log_warning "⚠️  LEGAL: Only attack systems you own or have written authorization to test"
     log_info "🎯 Recommended Workflow: 1) Vuln Scan → 2) Service-Specific Attack → 3) Post-Exploitation"
     echo ""
 }
 
 # Parse command line arguments
+# shellcheck disable=SC2034
 VERBOSE=false
 CUSTOM_PORTS=""
 

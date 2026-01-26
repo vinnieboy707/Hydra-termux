@@ -35,7 +35,7 @@ fi
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing Auto_Tor_IP_changer... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit 1
     
     # Install Python dependencies
     pip3 install requests 2>/dev/null || true
@@ -47,7 +47,7 @@ if [ ! -d "$TOOL_DIR" ]; then
         exit 1
     fi
     
-    cd "$TOOL_DIR"
+    cd "$TOOL_DIR" || exit 1
     log_info "Running installer..."
     python3 install.py 2>/dev/null || true
 fi
@@ -57,7 +57,7 @@ echo ""
 sleep 3
 
 log_info "Launching Auto IP Changer..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit 1
 # Try multiple possible commands
 if [ -f "Auto_IP_changer.py" ]; then
     python3 Auto_IP_changer.py 2>/dev/null

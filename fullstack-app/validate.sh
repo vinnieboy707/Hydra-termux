@@ -66,8 +66,8 @@ check "Backend package.json" "[ -f backend/package.json ]"
 check "Frontend package.json" "[ -f frontend/package.json ]"
 check "Backend .env.example" "[ -f backend/.env.example ]"
 check "Frontend .env.example" "[ -f frontend/.env.example ]"
-check "Quickstart script" "[ -f quickstart.sh ]"
-check "Quickstart executable" "[ -x quickstart.sh ]"
+check "Startup script (start.sh)" "[ -f start.sh ]"
+check "Startup script executable" "[ -x start.sh ]"
 echo ""
 
 # Core files
@@ -160,6 +160,27 @@ DOCS=(GETTING_STARTED.md API_DOCUMENTATION.md SECURITY_PROTOCOLS.md ONBOARDING_T
 for doc in "${DOCS[@]}"; do
     check "$doc" "[ -f $doc ]"
 done
+echo ""
+
+# Menu Items Mapping
+echo -e "${BLUE}=== Menu Items to API Mapping ===${NC}"
+echo "Menu 1: SSH Attack          → POST /api/attacks (type: ssh)"
+echo "Menu 2: FTP Attack          → POST /api/attacks (type: ftp)"
+echo "Menu 3: Web Attack          → POST /api/attacks (type: http)"
+echo "Menu 4: RDP Attack          → POST /api/attacks (type: rdp)"
+echo "Menu 5: MySQL Attack        → POST /api/attacks (type: mysql)"
+echo "Menu 6: PostgreSQL Attack   → POST /api/attacks (type: postgres)"
+echo "Menu 7: SMB Attack          → POST /api/attacks (type: smb)"
+echo "Menu 8: Auto Attack         → POST /api/attacks (type: auto)"
+echo "Menu 9: Download Wordlists  → POST /api/wordlists/scan"
+echo "Menu 11: Scan Target        → POST /api/targets"
+echo "Menu 12: View Results       → GET /api/results"
+echo "Menu 13: View Config        → GET /api/config"
+echo "Menu 14: View Logs          → GET /api/logs"
+echo "Menu 15: Export Results     → GET /api/results/export"
+echo "Menu 16: Update System      → GET/POST /api/system/update/*"
+echo "Menu 17: Help               → GET /api/system/help"
+echo "Menu 18: About              → GET /api/system/about"
 echo ""
 
 # Summary

@@ -151,8 +151,12 @@ ui_print() {
 ui_print_center() {
     local text="$1"
     local color="${2:-NC}"
-    local cols=$(ui_get_cols)
-    local padding=$(( (cols - ${#text}) / 2 ))
+    local cols
+
+    cols=$(ui_get_cols)
+    local padding
+
+    padding=$(( (cols - ${#text}) / 2 ))
     printf "%${padding}s" ""
     echo -e "${COLORS[$color]}${text}${COLORS[NC]}"
 }
@@ -168,7 +172,9 @@ ui_box() {
     
     # Title if provided
     if [ -n "$title" ]; then
-        local padding=$(( (width - ${#title} - 4) / 2 ))
+        local padding
+
+        padding=$(( (width - ${#title} - 4) / 2 ))
         printf "${COLORS[$color]}║${COLORS[NC]}"
         printf "%${padding}s" ""
         echo -e "${COLORS[BOLD]}${COLORS[BRIGHT_WHITE]}${title}${COLORS[NC]}"
@@ -201,9 +207,16 @@ ui_progress_bar() {
     local width=${3:-50}
     local label="${4:-Progress}"
     
-    local percent=$((current * 100 / total))
-    local filled=$((current * width / total))
-    local empty=$((width - filled))
+    local percent
+
+    
+    percent=$((current * 100 / total))
+    local filled
+
+    filled=$((current * width / total))
+    local empty
+
+    empty=$((width - filled))
     
     # Color based on percentage
     local color="RED"
@@ -243,7 +256,9 @@ ui_loading() {
     
     ui_cursor_hide
     for ((i=0; i<=$width; i++)); do
-        local percent=$((i * 100 / width))
+        local percent
+
+        percent=$((i * 100 / width))
         printf "\r${COLORS[CYAN]}${message}${COLORS[NC]} ["
         printf "${COLORS[BRIGHT_CYAN]}%${i}s${COLORS[NC]}" | tr ' ' '▓'
         printf "%$((width-i))s" | tr ' ' '░'
@@ -524,7 +539,9 @@ ui_badge() {
 
 # Divider
 ui_divider() {
-    local width=$(ui_get_cols)
+    local width
+
+    width=$(ui_get_cols)
     local char="${1:-─}"
     local color="${2:-DIM}"
     

@@ -22,7 +22,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing subscan... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit 1
     git clone https://github.com/zidansec/subscan
     
     if [ $? -ne 0 ]; then
@@ -40,5 +40,5 @@ if [ -z "$domain" ]; then
 fi
 
 log_info "Scanning subdomains for $domain..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit 1
 ./subscan "$domain"

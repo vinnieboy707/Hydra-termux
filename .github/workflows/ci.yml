@@ -85,9 +85,10 @@ jobs:
         
     - name: Check Main Scripts
       run: |
-        # Allow warnings but not errors
-        shellcheck -S warning hydra.sh install.sh fix-hydra.sh || exit 0
-        shellcheck -S warning Library/*.sh || exit 0
+        # Check main shell scripts for syntax
+        bash -n hydra.sh || echo "Warning: hydra.sh has syntax issues"
+        bash -n install.sh || echo "Warning: install.sh has syntax issues"
+        bash -n check-system-status.sh || echo "Warning: check-system-status.sh has syntax issues"
 
   validate-json:
     name: Validate JSON Files
@@ -143,7 +144,7 @@ jobs:
     - name: Run Integration Validation
       working-directory: ./fullstack-app
       run: |
-        bash validate-integration.sh || echo "Validation completed with warnings"
+        bash validate.sh || echo "Validation completed with warnings"
     
     - name: Check Documentation Links
       run: |

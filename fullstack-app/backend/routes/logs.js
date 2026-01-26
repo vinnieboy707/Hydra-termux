@@ -10,27 +10,41 @@ const router = express.Router();
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { level, limit = 100, offset = 0, attackId } = req.query;
+    const parsedLimit = parseInt(limit);
+    const parsedOffset = parseInt(offset);
     
-    let sql = `
-      SELECT l.*, a.attack_type, a.target_host 
-      FROM attack_logs l
-      JOIN attacks a ON l.attack_id = a.id
-      WHERE a.user_id = ?
-    `;
-    const params = [req.user.id];
+    // Build query based on filters to avoid dynamic SQL concatenation
+    let sql, params;
     
-    if (level) {
-      sql += ' AND l.level = ?';
-      params.push(level);
+    if (level && attackId) {
+      sql = `SELECT l.*, a.attack_type, a.target_host 
+             FROM attack_logs l
+             JOIN attacks a ON l.attack_id = a.id
+             WHERE a.user_id = ? AND l.level = ? AND l.attack_id = ?
+             ORDER BY l.timestamp DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, level, attackId, parsedLimit, parsedOffset];
+    } else if (level) {
+      sql = `SELECT l.*, a.attack_type, a.target_host 
+             FROM attack_logs l
+             JOIN attacks a ON l.attack_id = a.id
+             WHERE a.user_id = ? AND l.level = ?
+             ORDER BY l.timestamp DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, level, parsedLimit, parsedOffset];
+    } else if (attackId) {
+      sql = `SELECT l.*, a.attack_type, a.target_host 
+             FROM attack_logs l
+             JOIN attacks a ON l.attack_id = a.id
+             WHERE a.user_id = ? AND l.attack_id = ?
+             ORDER BY l.timestamp DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, attackId, parsedLimit, parsedOffset];
+    } else {
+      sql = `SELECT l.*, a.attack_type, a.target_host 
+             FROM attack_logs l
+             JOIN attacks a ON l.attack_id = a.id
+             WHERE a.user_id = ?
+             ORDER BY l.timestamp DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, parsedLimit, parsedOffset];
     }
-    
-    if (attackId) {
-      sql += ' AND l.attack_id = ?';
-      params.push(attackId);
-    }
-    
-    sql += ' ORDER BY l.timestamp DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
     
     const logs = await all(sql, params);
     res.json({ logs });

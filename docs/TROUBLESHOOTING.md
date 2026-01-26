@@ -112,7 +112,7 @@ Make scripts executable:
 cd Hydra-termux
 chmod +x hydra.sh install.sh
 chmod +x scripts/*.sh
-chmod +x Library/*.sh
+chmod +x scripts/*.sh
 ```
 
 Verify permissions:
@@ -203,7 +203,7 @@ bash scripts/ssh_admin_attack.sh -t 192.168.1.100 --skip-vpn
 
 **For Library scripts, edit the file:**
 ```bash
-nano Library/ssh_quick.sh
+nano scripts/ssh_quick.sh
 
 # Change line near top:
 SKIP_VPN="--skip-vpn"

@@ -31,7 +31,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing fast-mail-bomber... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit 1
     git clone https://github.com/juzeon/fast-mail-bomber.git
     
     if [ $? -ne 0 ]; then
@@ -39,7 +39,7 @@ if [ ! -d "$TOOL_DIR" ]; then
         exit 1
     fi
     
-    cd "$TOOL_DIR"
+    cd "$TOOL_DIR" || exit 1
     mv config.example.php config.php 2>/dev/null || true
     
     log_info "Updating providers..."
@@ -51,7 +51,7 @@ if [ ! -d "$TOOL_DIR" ]; then
     php index.php refine-nodes
 fi
 
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit 1
 echo ""
 read -p "Enter email address to target: " email
 
