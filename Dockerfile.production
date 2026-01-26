@@ -46,7 +46,6 @@ LABEL maintainer="Hydra-Termux Team" \
 ENV DEBIAN_FRONTEND=noninteractive \
     NODE_ENV=production \
     PORT=3000 \
-    DATABASE_URL=postgresql://hydra:hydra_secure_pass@postgres:5432/hydra_db \
     TZ=UTC \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8

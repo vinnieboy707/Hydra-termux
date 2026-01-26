@@ -101,7 +101,7 @@ EOF
 echo "📝 Creating convenience commands..."
 cat > ~/.local/bin/onboard-dev << 'EOF'
 #!/bin/bash
-bash /workspace/scripts/onboarding.sh --dev-mode
+bash /workspace/scripts/onboarding.sh
 EOF
 chmod +x ~/.local/bin/onboard-dev
 
