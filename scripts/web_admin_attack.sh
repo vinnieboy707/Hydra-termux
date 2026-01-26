@@ -101,7 +101,8 @@ detect_admin_panel() {
     
     for path in "${COMMON_PATHS[@]}"; do
         local url="${PROTOCOL}://${TARGET}:${PORT}${path}"
-        local status=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "$url" 2>/dev/null)
+        local status
+        status=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "$url" 2>/dev/null)
         
         if [ "$status" = "200" ] || [ "$status" = "401" ] || [ "$status" = "403" ]; then
             log_success "Found admin panel: $path (HTTP $status)"
@@ -119,7 +120,8 @@ run_attack() {
     # Start tracking attack for reporting
     start_attack_tracking
     
-    local username_file=$(mktemp)
+    local username_file
+    username_file=$(mktemp)
     
     # Get usernames
     if [ -n "$CUSTOM_USERLIST" ] && [ -f "$CUSTOM_USERLIST" ]; then

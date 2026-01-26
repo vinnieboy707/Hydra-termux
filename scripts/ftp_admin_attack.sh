@@ -80,7 +80,8 @@ run_attack() {
     # Start tracking attack for reporting
     start_attack_tracking
     
-    local username_file=$(mktemp)
+    local username_file
+    username_file=$(mktemp)
     
     # Get usernames
     if [ -n "$CUSTOM_USERLIST" ] && [ -f "$CUSTOM_USERLIST" ]; then

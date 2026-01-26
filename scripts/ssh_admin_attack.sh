@@ -130,8 +130,11 @@ get_usernames() {
 
 # Function to run SSH attack
 run_attack() {
-    local username_file=$(get_usernames)
-    local wordlists=($(get_wordlists))
+    local username_file
+    username_file=$(get_usernames)
+    local wordlists
+    # shellcheck disable=SC2207
+    wordlists=($(get_wordlists))
     
     if [ ${#wordlists[@]} -eq 0 ]; then
         log_error "No password wordlists found"
