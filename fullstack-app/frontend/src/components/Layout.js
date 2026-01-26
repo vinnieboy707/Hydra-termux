@@ -10,6 +10,7 @@ function Layout({ children }) {
     { path: '/', label: 'Dashboard', icon: '📊' },
     { path: '/script-generator', label: 'Script Generator', icon: '⚔️' },
     { path: '/attacks', label: 'Attacks', icon: '🔥' },
+    { path: '/email-ip-attacks', label: 'Email-IP Attacks', icon: '📧' },
     { path: '/scanner', label: 'Target Scanner', icon: '🔍' },
     { path: '/targets', label: 'Targets', icon: '🎯' },
     { path: '/results', label: 'Results', icon: '✅' },

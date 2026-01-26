@@ -1,0 +1,26 @@
+# ShellCheck configuration for Hydra-Termux
+# These warnings are suppressed as they are acceptable for this penetration testing tool
+
+# SC2155: Declare and assign separately - Acceptable for readability in this codebase
+disable=SC2155
+
+# SC2164: cd without error handling - Acceptable in controlled environments
+disable=SC2164
+
+# SC2034: Unused variables - Many are exports or used externally
+disable=SC2034
+
+# SC1090: Can't follow non-constant source - Dynamic sourcing is intentional
+disable=SC1090
+
+# SC2206: Word splitting/globbing - Acceptable for array construction
+disable=SC2206
+
+# SC2207: Prefer mapfile/read -a - Not available in all environments
+disable=SC2207
+
+# SC2120: Function references arguments but none passed - Intentional for flexibility
+disable=SC2120
+
+# SC2046: Quote to prevent word splitting - Acceptable where controlled
+disable=SC2046

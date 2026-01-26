@@ -79,6 +79,14 @@ show_menu() {
     echo "  7)  SMB Admin Attack"
     echo "  8)  Multi-Protocol Auto Attack"
     echo ""
+    print_message "  SUPREME COMBO ATTACKS:" "$YELLOW"
+    echo "  38) 🚀 Email & IP Penetration Test"
+    echo "  39) 🏢 Corporate Stack (Email+Web+DB)"
+    echo "  40) ☁️  Cloud Infrastructure (AWS/Azure/GCP)"
+    echo "  41) 🌐 Complete Network (10 Protocols)"
+    echo "  42) 🏛️  Active Directory (Enterprise)"
+    echo "  43) 🌍 Web Apps & APIs (CMS+REST)"
+    echo ""
     print_message "  UTILITIES:" "$MAGENTA"
     echo "  9)  Download Wordlists"
     echo "  10) Generate Custom Wordlist"
@@ -119,6 +127,97 @@ show_menu() {
     # Show contextual AI hint
     get_contextual_hint "main_menu"
     echo ""
+}
+
+# Function to run supreme combo scripts
+run_supreme_combo() {
+    local script_name="$1"
+    local title="$2"
+    
+    print_banner "$title"
+    echo ""
+    
+    local script_path="$SCRIPT_DIR/Library/$script_name"
+    if [ ! -f "$script_path" ]; then
+        log_error "Script not found: $script_path"
+        read -r -p "Press Enter to continue..."
+        return 1
+    fi
+    
+    echo "📝 This script will perform a comprehensive multi-protocol attack."
+    echo "   Edit the TARGET variable in: Library/$script_name"
+    echo ""
+    read -r -p "Press Enter to run (Ctrl+C to cancel)..."
+    
+    bash "$script_path"
+    
+    echo ""
+    read -r -p "Attack completed. Press Enter to continue..."
+}
+
+# Function to run email-IP attack
+run_email_ip_attack() {
+    print_banner "🚀 Email & IP Penetration Test"
+    echo ""
+    
+    get_contextual_hint "target_entry"
+    echo ""
+    
+    read -r -p "Enter email address (e.g., admin@example.com) [optional]: " email
+    read -r -p "Enter IP/hostname (e.g., mail.example.com): " ip
+    
+    if [ -z "$email" ] && [ -z "$ip" ]; then
+        log_error "At least one of email or IP is required"
+        read -r -p "Press Enter to continue..."
+        return 1
+    fi
+    
+    echo ""
+    print_message "Attack Mode:" "$CYAN"
+    echo "  1) Quick (3 protocols, ~5 min)"
+    echo "  2) Full (6+ protocols, comprehensive)"
+    echo "  3) Aggressive (maximum speed)"
+    echo "  4) Stealth (slow, evasive)"
+    read -r -p "Select mode [1-4] (default: 1): " mode_choice
+    
+    local mode="quick"
+    case $mode_choice in
+        2) mode="full" ;;
+        3) mode="aggressive" ;;
+        4) mode="stealth" ;;
+        *) mode="quick" ;;
+    esac
+    
+    echo ""
+    log_info "Starting email-IP attack..."
+    log_info "Mode: $mode"
+    [ -n "$email" ] && log_info "Email: $email"
+    [ -n "$ip" ] && log_info "IP: $ip"
+    log_action "email_ip_attack_started:$mode:$email:$ip"
+    
+    get_contextual_hint "attack_started"
+    echo ""
+    
+    # Build command
+    local cmd="bash \"$SCRIPT_DIR/scripts/email_ip_attack.sh\" -m \"$mode\" -v"
+    [ -n "$email" ] && cmd+=" -e \"$email\""
+    [ -n "$ip" ] && cmd+=" -i \"$ip\""
+    
+    eval "$cmd"
+    
+    local exit_code=$?
+    
+    echo ""
+    if [ $exit_code -eq 0 ]; then
+        log_info "Attack completed. Check logs for results."
+        log_action "email_ip_attack_completed:$mode:$email:$ip"
+        get_contextual_hint "attack_completed"
+    else
+        log_warning "Attack ended with errors. Check logs."
+        get_contextual_hint "error_occurred"
+    fi
+    echo ""
+    read -r -p "Press Enter to continue..."
 }
 
 # Function to run attack script
@@ -544,7 +643,7 @@ main() {
         show_banner
         show_menu
         
-        read -r -p "Enter your choice [0-37, 88-91]: " choice
+        read -r -p "Enter your choice [0-38, 88-91]: " choice
         
         case $choice in
             1)
@@ -657,6 +756,24 @@ main() {
                 ;;
             37)
                 run_utility "alhacking_uninstall.sh" "Uninstall ALHacking Tools"
+                ;;
+            38)
+                run_email_ip_attack
+                ;;
+            39)
+                run_supreme_combo "combo_supreme_email_web_db.sh" "🏢 Corporate Stack Attack"
+                ;;
+            40)
+                run_supreme_combo "combo_supreme_cloud_infra.sh" "☁️ Cloud Infrastructure Attack"
+                ;;
+            41)
+                run_supreme_combo "combo_supreme_network_complete.sh" "🌐 Complete Network Attack"
+                ;;
+            42)
+                run_supreme_combo "combo_supreme_active_directory.sh" "🏛️ Active Directory Attack"
+                ;;
+            43)
+                run_supreme_combo "combo_supreme_webapp_api.sh" "🌍 Web Apps & APIs Attack"
                 ;;
             88)
                 interactive_help

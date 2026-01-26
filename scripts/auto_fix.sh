@@ -85,7 +85,7 @@ echo ""
 
 # Fix attempts counter
 ATTEMPTS=0
-MAX_ATTEMPTS=6
+MAX_ATTEMPTS=5
 
 # Attempt 1: Update package repositories and install via package manager
 ATTEMPTS=$((ATTEMPTS + 1))
@@ -140,32 +140,7 @@ fi
 print_message "⚠️  Package manager installation failed. Trying alternative methods..." "$YELLOW"
 echo ""
 
-# Attempt 2: Try root repository (Termux specific)
-ATTEMPTS=$((ATTEMPTS + 1))
-print_message "═══ FIX ATTEMPT $ATTEMPTS/$MAX_ATTEMPTS: Try root repository ═══" "$CYAN"
-echo ""
-
-if [ "$IS_TERMUX" = true ]; then
-    print_message "📦 Installing root-repo (may contain hydra)..." "$BLUE"
-    pkg install root-repo -y 2>&1 | grep -i "Installing\|Setting\|root-repo" || true
-    echo ""
-    
-    print_message "📥 Updating package lists..." "$BLUE"
-    pkg update -y 2>&1 | grep -i "Reading\|Updating" | head -5 || true
-    echo ""
-    
-    print_message "📥 Trying to install hydra from root-repo..." "$BLUE"
-    pkg install hydra -y 2>&1 | grep -i "Installing\|Setting\|Unpacking\|hydra" || true
-    echo ""
-    
-    if check_hydra; then
-        print_message "✅ SUCCESS! Hydra installed from root repository!" "$GREEN"
-        echo ""
-        exit 0
-    fi
-fi
-
-# Attempt 3: Try alternative package names
+# Attempt 2: Try alternative package names
 ATTEMPTS=$((ATTEMPTS + 1))
 print_message "═══ FIX ATTEMPT $ATTEMPTS/$MAX_ATTEMPTS: Try alternative package names ═══" "$CYAN"
 echo ""
@@ -191,7 +166,7 @@ if check_hydra; then
     exit 0
 fi
 
-# Attempt 4: Compile from source
+# Attempt 3: Compile from source
 ATTEMPTS=$((ATTEMPTS + 1))
 print_message "═══ FIX ATTEMPT $ATTEMPTS/$MAX_ATTEMPTS: Compile from source ═══" "$CYAN"
 echo ""
@@ -263,7 +238,7 @@ fi
 print_message "⚠️  Source compilation failed. Trying final methods..." "$YELLOW"
 echo ""
 
-# Attempt 5: Try downloading pre-built binary
+# Attempt 4: Try downloading pre-built binary
 ATTEMPTS=$((ATTEMPTS + 1))
 print_message "═══ FIX ATTEMPT $ATTEMPTS/$MAX_ATTEMPTS: Download pre-built binary ═══" "$CYAN"
 echo ""
@@ -289,7 +264,7 @@ fi
 print_message "⚠️  Pre-built binary download failed." "$YELLOW"
 echo ""
 
-# Attempt 6: Manual troubleshooting guide
+# Attempt 5: Manual troubleshooting guide
 ATTEMPTS=$((ATTEMPTS + 1))
 print_message "═══ FIX ATTEMPT $ATTEMPTS/$MAX_ATTEMPTS: Manual intervention needed ═══" "$CYAN"
 echo ""

@@ -23,9 +23,9 @@ const WAF_PATTERNS = {
   
   xss: {
     patterns: [
-      /<script[^>]*>.*?<\/script>/gi,
-      /<iframe[^>]*>.*?<\/iframe>/gi,
-      /<object[^>]*>.*?<\/object>/gi,
+      /<script[\s\S]*?<\/script>/gi,  // Fixed: Use [\s\S] instead of . to properly match multiline
+      /<iframe[\s\S]*?<\/iframe>/gi,  // Fixed: Use [\s\S] for proper multiline matching
+      /<object[\s\S]*?<\/object>/gi,  // Fixed: Use [\s\S] for proper multiline matching
       /<embed[^>]*>/gi,
       /on\w+\s*=\s*["'][^"']*["']/gi,
       /javascript:/gi,
