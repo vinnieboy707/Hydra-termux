@@ -24,7 +24,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing DDoS-Ripper... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit 1
     git clone https://github.com/palahsu/DDoS-Ripper.git
     
     if [ $? -ne 0 ]; then
@@ -34,5 +34,5 @@ if [ ! -d "$TOOL_DIR" ]; then
 fi
 
 log_info "Launching DDoS-Ripper..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit 1
 python3 DRipper.py

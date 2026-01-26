@@ -28,7 +28,7 @@ fi
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing track-ip... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit 1
     git clone https://github.com/htr-tech/track-ip.git
     
     if [ $? -ne 0 ]; then
@@ -38,5 +38,5 @@ if [ ! -d "$TOOL_DIR" ]; then
 fi
 
 log_info "Launching track-ip..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit 1
 bash trackip

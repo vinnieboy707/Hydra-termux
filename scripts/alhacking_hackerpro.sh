@@ -28,7 +28,7 @@ fi
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing HackerPro... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit 1
     git clone https://github.com/jaykali/hackerpro.git
     
     if [ $? -ne 0 ]; then
@@ -36,13 +36,13 @@ if [ ! -d "$TOOL_DIR" ]; then
         exit 1
     fi
     
-    cd "$TOOL_DIR"
+    cd "$TOOL_DIR" || exit 1
     log_info "Running installer..."
     bash install.sh 2>/dev/null || true
 fi
 
 log_info "Launching HackerPro..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit 1
 log_warning "⚠️  Note: This tool uses Python 2 (deprecated and unmaintained)"
 log_warning "Security updates are no longer available for Python 2"
 echo ""
