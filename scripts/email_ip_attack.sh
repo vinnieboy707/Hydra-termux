@@ -772,14 +772,25 @@ test_protocol_availability() {
     
     [ "$VERBOSE" = "true" ] && log_info "Testing $protocol on $target:$port"
     
-    # Quick TCP connection test
-    if timeout 5 bash -c "exec 3<>/dev/tcp/$target/$port 2>/dev/null" 2>/dev/null; then
-        log_success "✓ $protocol ($port) - OPEN"
-        return 0
-    else
-        [ "$VERBOSE" = "true" ] && log_warning "✗ $protocol ($port) - CLOSED/FILTERED"
+    # Validate inputs to prevent command injection
+    if ! [[ "$target" =~ ^[a-zA-Z0-9.-]+$ ]] || ! [[ "$port" =~ ^[0-9]+$ ]]; then
+        log_error "Invalid target or port format"
         return 1
     fi
+    
+    # Quick TCP connection test using nc if available, fallback to /dev/tcp
+    if command -v nc &> /dev/null; then
+        if timeout 5 nc -zv "$target" "$port" 2>/dev/null; then
+            log_success "✓ $protocol ($port) - OPEN"
+            return 0
+        fi
+    elif timeout 5 bash -c "exec 3<>/dev/tcp/$target/$port 2>/dev/null" 2>/dev/null; then
+        log_success "✓ $protocol ($port) - OPEN"
+        return 0
+    fi
+    
+    [ "$VERBOSE" = "true" ] && log_warning "✗ $protocol ($port) - CLOSED/FILTERED"
+    return 1
 }
 
 detect_available_protocols() {

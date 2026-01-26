@@ -10,8 +10,9 @@ fail() { echo -e "${RED}❌${NC} $1"; ((ERRORS++)); }
 warn() { echo -e "${YELLOW}⚠️${NC} $1"; ((WARNINGS++)); }
 echo "🎯 Compliance Validation"; echo ""
 echo "## SYNTAX VALIDATION"; echo ""
-for file in fullstack-app/backend/**/*.js; do [ -f "$file" ] && ((TOTAL_FILES++)) && node -c "$file" 2>/dev/null || fail "Error: $file"; done
-for file in fullstack-app/frontend/src/**/*.{js,jsx}; do [ -f "$file" ] && ((TOTAL_FILES++)) && node -c "$file" 2>/dev/null || fail "Error: $file"; done
+# Use find for reliable recursive file discovery
+while IFS= read -r file; do ((TOTAL_FILES++)) && node -c "$file" 2>/dev/null || fail "Error: $file"; done < <(find fullstack-app/backend -name "*.js" -type f 2>/dev/null)
+while IFS= read -r file; do ((TOTAL_FILES++)) && node -c "$file" 2>/dev/null || fail "Error: $file"; done < <(find fullstack-app/frontend/src -name "*.js" -o -name "*.jsx" -type f 2>/dev/null)
 for file in scripts/*.sh Library/*.sh; do [ -f "$file" ] && ((TOTAL_FILES++)) && bash -n "$file" 2>/dev/null || fail "Error: $file"; done
 pass "$TOTAL_FILES files validated"
 echo ""; echo "## SECURITY"; echo ""
