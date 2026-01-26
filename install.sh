@@ -265,6 +265,26 @@ if [ "$HYDRA_OK" = true ]; then
     print_message "   • Close other apps to free memory" "$BLUE"
     print_message "   • Keep Termux running in foreground" "$BLUE"
     echo ""
+    
+    # Offer to launch main dashboard
+    echo ""
+    read -r -p "Would you like to launch the Hydra-Termux dashboard now? (y/n): " launch_choice
+    
+    if [ "$launch_choice" = "y" ] || [ "$launch_choice" = "Y" ] || [ "$launch_choice" = "yes" ]; then
+        print_message "🏠 Launching main dashboard..." "$GREEN"
+        echo ""
+        sleep 1
+        
+        # Launch main dashboard
+        if [ -f "./hydra.sh" ]; then
+            exec bash ./hydra.sh
+        else
+            print_message "⚠️  Main dashboard not found. Run './hydra.sh' manually." "$YELLOW"
+        fi
+    else
+        print_message "Run './hydra.sh' anytime to start the dashboard." "$CYAN"
+    fi
+    
     exit 0
 else
     print_message "╔═══════════════════════════════════════════════════════╗" "$RED"

@@ -42,6 +42,73 @@ init_assistant
 # Version
 VERSION="2.0.0 Ultimate Edition"
 
+# Legal Disclaimer Check
+show_legal_disclaimer() {
+    clear
+    cat << 'EOF'
+╔═══════════════════════════════════════════════════════════════╗
+║                  ⚖️  LEGAL DISCLAIMER ⚖️                      ║
+╚═══════════════════════════════════════════════════════════════╝
+
+🚨 CRITICAL - READ CAREFULLY BEFORE PROCEEDING 🚨
+
+This is a PENETRATION TESTING tool for AUTHORIZED use ONLY.
+
+✅ ALLOWED:
+   • Testing YOUR OWN systems
+   • Authorized penetration testing with WRITTEN permission
+   • Educational purposes in controlled environments
+   • Authorized security research
+
+🚫 STRICTLY PROHIBITED:
+   • Unauthorized access to ANY computer system
+   • Attacking systems without explicit written permission
+   • Violating computer fraud and abuse laws (CFAA, etc.)
+   • Any illegal or unethical activities
+
+⚠️  LEGAL CONSEQUENCES:
+   • Criminal prosecution
+   • Fines up to $500,000+ USD
+   • Imprisonment up to 20+ years
+   • Civil lawsuits & permanent criminal record
+
+📋 BY PROCEEDING, YOU CERTIFY THAT:
+   ☑️  You will ONLY use this for legal, authorized purposes
+   ☑️  You have or will obtain written authorization
+   ☑️  You understand the legal consequences of misuse
+   ☑️  You accept FULL responsibility for your actions
+   ☑️  You will comply with ALL applicable laws
+
+📄 Full legal disclaimer: LEGAL_DISCLAIMER.md
+
+⚠️  UNAUTHORIZED ACCESS TO COMPUTER SYSTEMS IS A CRIME ⚠️
+
+EOF
+    echo ""
+    read -r -p "Do you accept these terms and conditions? (yes/no): " accept
+    
+    if [ "$accept" = "yes" ] || [ "$accept" = "YES" ]; then
+        touch "$SCRIPT_DIR/.disclaimer_accepted"
+        echo ""
+        print_message "✅ Terms accepted. Proceeding..." "$GREEN"
+        sleep 2
+        return 0
+    else
+        echo ""
+        print_message "❌ Terms not accepted. Exiting..." "$RED"
+        echo ""
+        print_message "If you wish to use this tool, you must accept the terms." "$YELLOW"
+        print_message "For questions, review LEGAL_DISCLAIMER.md" "$BLUE"
+        echo ""
+        exit 1
+    fi
+}
+
+# Check if disclaimer has been accepted
+if [ ! -f "$SCRIPT_DIR/.disclaimer_accepted" ]; then
+    show_legal_disclaimer
+fi
+
 # Function to display ASCII banner
 show_banner() {
     clear

@@ -77,6 +77,27 @@ if check_hydra; then
     print_message "   Version: $hydra_version" "$GREEN"
     echo ""
     print_message "No fixes needed. Your installation is working!" "$GREEN"
+    echo ""
+    
+    # Offer to launch main dashboard
+    read -r -p "Would you like to launch the main Hydra-Termux dashboard? (y/n): " launch_choice
+    
+    if [ "$launch_choice" = "y" ] || [ "$launch_choice" = "Y" ] || [ "$launch_choice" = "yes" ]; then
+        print_message "🏠 Launching main dashboard..." "$GREEN"
+        sleep 1
+        
+        # Get script directory
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+        
+        # Launch main dashboard
+        if [ -f "$SCRIPT_DIR/hydra.sh" ]; then
+            exec bash "$SCRIPT_DIR/hydra.sh"
+        else
+            print_message "⚠️  Main dashboard not found at: $SCRIPT_DIR/hydra.sh" "$YELLOW"
+            echo ""
+        fi
+    fi
+    
     exit 0
 fi
 
@@ -330,5 +351,29 @@ echo ""
 # Cleanup
 cd /
 rm -rf "$TEMP_DIR" 2>/dev/null || true
+
+# Offer to return to main menu
+echo ""
+print_message "═══════════════════════════════════════════════════════════" "$CYAN"
+echo ""
+read -r -p "Would you like to return to the main Hydra-Termux dashboard? (y/n): " return_choice
+
+if [ "$return_choice" = "y" ] || [ "$return_choice" = "Y" ] || [ "$return_choice" = "yes" ]; then
+    print_message "🏠 Returning to main dashboard..." "$GREEN"
+    sleep 1
+    
+    # Get script directory
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    
+    # Launch main dashboard
+    if [ -f "$SCRIPT_DIR/hydra.sh" ]; then
+        exec bash "$SCRIPT_DIR/hydra.sh"
+    else
+        print_message "⚠️  Main dashboard not found at: $SCRIPT_DIR/hydra.sh" "$YELLOW"
+        echo ""
+    fi
+else
+    print_message "Exiting. Run './hydra.sh' to access the main dashboard anytime." "$BLUE"
+fi
 
 exit 1
