@@ -1,6 +1,7 @@
 const express = require('express');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 const { run, get, all } = require('../database');
+const { sanitizePath, sanitizeFilename, sanitizeLogMessage, sanitizeError, check2FARequirement, sanitize2FAToken } = require('../utils/sanitizer');
 const crypto = require('crypto');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
@@ -45,8 +46,10 @@ router.post('/2fa/verify-setup', authMiddleware, async (req, res) => {
     const { token } = req.body;
     const userId = req.user.id;
     
-    if (!token) {
-      return res.status(400).json({ error: 'Token required' });
+    // Sanitize and validate token
+    const sanitizedToken = sanitize2FAToken(token);
+    if (!sanitizedToken) {
+      return res.status(400).json({ error: 'Valid 6-digit token required' });
     }
     
     // Get user's 2FA secret
@@ -60,7 +63,7 @@ router.post('/2fa/verify-setup', authMiddleware, async (req, res) => {
     const verified = speakeasy.totp.verify({
       secret: user.twofa_secret,
       encoding: 'base32',
-      token,
+      token: sanitizedToken,
       window: 2
     });
     
@@ -92,23 +95,40 @@ router.post('/2fa/disable', authMiddleware, async (req, res) => {
     const { password, token } = req.body;
     const userId = req.user.id;
     
-    if (!password || !token) {
-      return res.status(400).json({ error: 'Password and token required' });
+    if (!password) {
+      return res.status(400).json({ error: 'Password required' });
     }
     
-    // Verify password (would need bcrypt compare in real implementation)
-    const user = await get('SELECT twofa_secret FROM users WHERE id = ?', [userId]);
+    // Get user with 2FA settings
+    const user = await get('SELECT twofa_enabled, twofa_secret, password FROM users WHERE id = ?', [userId]);
     
-    // Verify 2FA token
-    const verified = speakeasy.totp.verify({
-      secret: user.twofa_secret,
-      encoding: 'base32',
-      token,
-      window: 2
-    });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
-    if (!verified) {
-      return res.status(400).json({ error: 'Invalid token' });
+    // Check if 2FA is actually enabled
+    const twoFACheck = check2FARequirement(user, token);
+    if (twoFACheck.required && !twoFACheck.valid) {
+      return res.status(400).json({ error: twoFACheck.reason });
+    }
+    
+    // If 2FA is enabled, verify the token
+    if (user.twofa_enabled && user.twofa_secret) {
+      const sanitizedToken = sanitize2FAToken(token);
+      if (!sanitizedToken) {
+        return res.status(400).json({ error: 'Valid 6-digit 2FA token required' });
+      }
+      
+      const verified = speakeasy.totp.verify({
+        secret: user.twofa_secret,
+        encoding: 'base32',
+        token: sanitizedToken,
+        window: 2
+      });
+      
+      if (!verified) {
+        return res.status(400).json({ error: 'Invalid 2FA token' });
+      }
     }
     
     // Disable 2FA
@@ -289,21 +309,25 @@ router.get('/audit-log', authMiddleware, async (req, res) => {
   try {
     const { limit = 50, offset = 0, eventType } = req.query;
     const userId = req.user.id;
+    const parsedLimit = parseInt(limit);
+    const parsedOffset = parseInt(offset);
     
-    let sql = `
-      SELECT event_type, details, ip_address, user_agent, created_at
-      FROM security_events
-      WHERE user_id = ?
-    `;
-    const params = [userId];
+    // Build query based on filters to avoid dynamic SQL concatenation
+    let sql, params;
     
     if (eventType) {
-      sql += ' AND event_type = ?';
-      params.push(eventType);
+      sql = `SELECT event_type, details, ip_address, user_agent, created_at
+             FROM security_events
+             WHERE user_id = ? AND event_type = ?
+             ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+      params = [userId, eventType, parsedLimit, parsedOffset];
+    } else {
+      sql = `SELECT event_type, details, ip_address, user_agent, created_at
+             FROM security_events
+             WHERE user_id = ?
+             ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+      params = [userId, parsedLimit, parsedOffset];
     }
-    
-    sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
     
     const events = await all(sql, params);
     
@@ -330,21 +354,36 @@ router.post('/change-password', authMiddleware, async (req, res) => {
       [userId]
     );
     
-    // Verify 2FA if enabled
-    if (user.twofa_enabled) {
-      if (!token2fa) {
-        return res.status(400).json({ error: '2FA token required' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // ALWAYS check 2FA requirement - cannot be bypassed
+    const twoFACheck = check2FARequirement(user, token2fa);
+    if (twoFACheck.required && !twoFACheck.valid) {
+      return res.status(403).json({ error: '2FA token required for password change' });
+    }
+    
+    // Verify 2FA if enabled (strict enforcement)
+    if (user.twofa_enabled === 1 || user.twofa_enabled === true) {
+      const sanitizedToken = sanitize2FAToken(token2fa);
+      if (!sanitizedToken) {
+        return res.status(400).json({ error: 'Valid 6-digit 2FA token required' });
+      }
+      
+      if (!user.twofa_secret) {
+        return res.status(400).json({ error: '2FA configuration error' });
       }
       
       const verified = speakeasy.totp.verify({
         secret: user.twofa_secret,
         encoding: 'base32',
-        token: token2fa,
+        token: sanitizedToken,
         window: 2
       });
       
       if (!verified) {
-        return res.status(400).json({ error: 'Invalid 2FA token' });
+        return res.status(403).json({ error: 'Invalid 2FA token' });
       }
     }
     

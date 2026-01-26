@@ -8,27 +8,42 @@ const router = express.Router();
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { protocol, success, limit = 100, offset = 0 } = req.query;
+    const parsedLimit = parseInt(limit);
+    const parsedOffset = parseInt(offset);
+    const successValue = success === 'true' ? 1 : 0;
     
-    let sql = `
-      SELECT r.*, a.user_id 
-      FROM results r
-      JOIN attacks a ON r.attack_id = a.id
-      WHERE a.user_id = ?
-    `;
-    const params = [req.user.id];
+    // Build query based on filters to avoid dynamic SQL concatenation
+    let sql, params;
     
-    if (protocol) {
-      sql += ' AND r.protocol = ?';
-      params.push(protocol);
+    if (protocol && success !== undefined) {
+      sql = `SELECT r.*, a.user_id 
+             FROM results r
+             JOIN attacks a ON r.attack_id = a.id
+             WHERE a.user_id = ? AND r.protocol = ? AND r.success = ?
+             ORDER BY r.created_at DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, protocol, successValue, parsedLimit, parsedOffset];
+    } else if (protocol) {
+      sql = `SELECT r.*, a.user_id 
+             FROM results r
+             JOIN attacks a ON r.attack_id = a.id
+             WHERE a.user_id = ? AND r.protocol = ?
+             ORDER BY r.created_at DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, protocol, parsedLimit, parsedOffset];
+    } else if (success !== undefined) {
+      sql = `SELECT r.*, a.user_id 
+             FROM results r
+             JOIN attacks a ON r.attack_id = a.id
+             WHERE a.user_id = ? AND r.success = ?
+             ORDER BY r.created_at DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, successValue, parsedLimit, parsedOffset];
+    } else {
+      sql = `SELECT r.*, a.user_id 
+             FROM results r
+             JOIN attacks a ON r.attack_id = a.id
+             WHERE a.user_id = ?
+             ORDER BY r.created_at DESC LIMIT ? OFFSET ?`;
+      params = [req.user.id, parsedLimit, parsedOffset];
     }
-    
-    if (success !== undefined) {
-      sql += ' AND r.success = ?';
-      params.push(success === 'true' ? 1 : 0);
-    }
-    
-    sql += ' ORDER BY r.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
     
     const results = await all(sql, params);
     res.json({ results });

@@ -122,7 +122,8 @@ get_usernames() {
         echo "$PROJECT_ROOT/config/admin_usernames.txt"
     else
         # Create temp file with default usernames
-        local temp_users=$(mktemp)
+        local temp_users
+        temp_users=$(mktemp)
         printf "%s\n" "${DEFAULT_USERNAMES[@]}" > "$temp_users"
         echo "$temp_users"
     fi
@@ -130,8 +131,11 @@ get_usernames() {
 
 # Function to run SSH attack
 run_attack() {
-    local username_file=$(get_usernames)
-    local wordlists=($(get_wordlists))
+    local username_file
+    username_file=$(get_usernames)
+    local wordlists
+    # shellcheck disable=SC2207
+    wordlists=($(get_wordlists))
     
     if [ ${#wordlists[@]} -eq 0 ]; then
         log_error "No password wordlists found"
@@ -173,11 +177,13 @@ run_attack() {
     
     local total_wordlists=${#wordlists[@]}
     local current_wordlist=0
+    # shellcheck disable=SC2034
     local found_credentials=0
     
     for wordlist in "${wordlists[@]}"; do
         current_wordlist=$((current_wordlist + 1))
-        local wordlist_name=$(basename "$wordlist")
+        local wordlist_name
+        wordlist_name=$(basename "$wordlist")
         
         # Update wordlist tracking for report
         update_wordlist_count
@@ -191,7 +197,8 @@ run_attack() {
             continue
         fi
         
-        local word_count=$(wc -l < "$wordlist")
+        local word_count
+        word_count=$(wc -l < "$wordlist")
         realtime_status "running" "Testing $word_count passwords with $THREADS threads..."
         log_info "Testing $word_count passwords..."
         
@@ -199,8 +206,10 @@ run_attack() {
         update_attack_attempts $word_count
         
         # Run hydra with enhanced error capture
-        local output_file=$(mktemp)
-        local error_file=$(mktemp)
+        local output_file
+        local error_file
+        output_file=$(mktemp)
+        error_file=$(mktemp)
         
         realtime_status "running" "Hydra attack initiated - watch for real-time results..."
         
@@ -218,8 +227,10 @@ run_attack() {
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
                 # Parse successful login (support credentials with spaces)
-                local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
-                local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
+                local login
+                local password
+                login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
+                password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
                 
                 realtime_status "success" "CREDENTIALS FOUND: $login:$password"
                 save_result "ssh" "$TARGET" "$login" "$password" "$PORT"

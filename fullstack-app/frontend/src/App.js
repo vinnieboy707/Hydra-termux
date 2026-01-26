@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Attacks from './pages/Attacks';
+import EmailIPAttacks from './pages/EmailIPAttacks';
 import Targets from './pages/Targets';
 import Results from './pages/Results';
 import Wordlists from './pages/Wordlists';
@@ -40,6 +41,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/attacks/*" element={<Attacks />} />
+                    <Route path="/email-ip-attacks" element={<EmailIPAttacks />} />
                     <Route path="/script-generator" element={<ScriptGenerator />} />
                     <Route path="/targets" element={<Targets />} />
                     <Route path="/results" element={<Results />} />

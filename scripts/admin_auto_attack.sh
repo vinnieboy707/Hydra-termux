@@ -127,7 +127,9 @@ parse_scan_results() {
     print_header "Analyzing Scan Results"
     
     # Extract open ports and services
-    local services=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | sort -n)
+    local services
+
+    services=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | sort -n)
     
     if [ -z "$services" ]; then
         log_warning "No open ports found"
@@ -140,7 +142,9 @@ parse_scan_results() {
     declare -gA DISCOVERED_SERVICES
     
     while IFS= read -r port; do
-        local service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
+        local service
+
+        service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
         
         if [ -n "$service" ]; then
             DISCOVERED_SERVICES["$port"]="$service"
@@ -253,6 +257,7 @@ EOF
 EOF
     
     log_success "Report generated: $report_file"
+    # shellcheck disable=SC2034
     REPORT_FILE="$report_file"
 }
 
@@ -262,7 +267,9 @@ run_auto_attack() {
     echo ""
     
     # Step 1: Scan target
-    local scan_file=$(scan_target)
+    local scan_file
+
+    scan_file=$(scan_target)
     if [ -z "$scan_file" ]; then
         log_error "Scanning failed"
         return 1

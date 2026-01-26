@@ -110,6 +110,18 @@ install_hydra() {
         return 0
     fi
     
+    # Ensure Termux has access to the repository that provides hydra
+    if [ -d "/data/data/com.termux" ]; then
+        if ! pkg list-installed 2>/dev/null | grep -q "root-repo"; then
+            print_message "   Enabling Termux root repository (hydra is located here)..." "$CYAN"
+            if pkg install root-repo -y > /dev/null 2>&1; then
+                print_message "   ✓ root repository enabled" "$GREEN"
+            else
+                print_message "   ⚠ Failed to enable root repository; continuing without it" "$YELLOW"
+            fi
+        fi
+    fi
+    
     # Create secure temporary log file
     local hydra_log=$(mktemp)
     
@@ -372,7 +384,7 @@ else
     print_message "   bash scripts/auto_fix.sh" "$GREEN"
     echo ""
     print_message "Or use the interactive help center:" "$GREEN"
-    print_message "   ./fix-hydra.sh" "$GREEN"
+    print_message "   bash scripts/help.sh" "$GREEN"
     echo ""
     print_message "═══ NEXT STEPS ═══" "$CYAN"
     echo ""

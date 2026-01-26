@@ -336,7 +336,7 @@ nano config/optimized_attack_profiles.conf
 ### 1. Reconnaissance First (10% time, 90% success)
 ```bash
 # Always scan for vulnerabilities FIRST
-bash Library/nmap_vuln_scan.sh
+bash scripts/nmap_vuln_scan.sh
 # May find CVEs that bypass authentication entirely!
 
 # Check for default credentials
@@ -357,7 +357,7 @@ bash Library/nmap_vuln_scan.sh
 # Attack multiple protocols simultaneously
 # Use combo_* scripts for coordinated attacks
 # Monitor all attacks in tmux/screen
-bash Library/combo_full_infrastructure.sh
+bash scripts/combo_full_infrastructure.sh
 ```
 
 ### 4. Internal Networks
@@ -439,7 +439,7 @@ bash scripts/ssh_admin_attack.sh --tips
 
 - **Target Scanner Guide**: See detected services and get script recommendations
 - **Library Scripts**: 35+ pre-configured attack scripts in `/Library`
-- **Protocol Guide**: Detailed protocol info in `/Library/PROTOCOL_GUIDE.md`
+- **Protocol Guide**: Detailed protocol info in `/scripts/PROTOCOL_GUIDE.md`
 - **Success Stories**: Check `/logs` for credential discoveries
 
 ---

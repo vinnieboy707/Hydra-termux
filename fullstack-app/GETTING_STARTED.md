@@ -6,7 +6,7 @@
 
 ```bash
 cd fullstack-app
-./quickstart.sh
+./start.sh
 ```
 
 This single script will:
@@ -417,7 +417,7 @@ cd frontend && npm start
 
 ## Quick Reference Card
 
-**Start Platform**: `./quickstart.sh`
+**Start Platform**: `./start.sh`
 
 **Backend Only**: `cd backend && npm start`
 

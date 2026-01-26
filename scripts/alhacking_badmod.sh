@@ -30,7 +30,7 @@ fi
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing BadMod... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit 1
     git clone https://github.com/MrSqar-Ye/BadMod.git
     
     if [ $? -ne 0 ]; then
@@ -38,11 +38,11 @@ if [ ! -d "$TOOL_DIR" ]; then
         exit 1
     fi
     
-    cd "$TOOL_DIR"
+    cd "$TOOL_DIR" || exit 1
     chmod u+x INSTALL 2>/dev/null || true
     chmod u+x BadMod.php 2>/dev/null || true
 fi
 
 log_info "Launching BadMod..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit 1
 php BadMod.php

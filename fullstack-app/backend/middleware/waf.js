@@ -23,9 +23,12 @@ const WAF_PATTERNS = {
   
   xss: {
     patterns: [
-      /<script[^>]*>.*?<\/script>/gi,
-      /<iframe[^>]*>.*?<\/iframe>/gi,
-      /<object[^>]*>.*?<\/object>/gi,
+      // Match any opening script tag followed by anything until closing tag
+      /<script\b[^>]*>[\s\S]*?<\/script[^>]*>/gi,
+      // Match iframe tags
+      /<iframe\b[^>]*>[\s\S]*?<\/iframe[^>]*>/gi,
+      // Match object tags
+      /<object\b[^>]*>[\s\S]*?<\/object[^>]*>/gi,
       /<embed[^>]*>/gi,
       /on\w+\s*=\s*["'][^"']*["']/gi,
       /javascript:/gi,

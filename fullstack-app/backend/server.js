@@ -26,6 +26,12 @@ const webhookRoutes = require('./routes/webhooks');
 const securityRoutes = require('./routes/security');
 const scanRoutes = require('./routes/scan');
 const vpnRoutes = require('./routes/vpn');
+// Supreme feature routes
+const emailIPAttacksRoutes = require('./routes/email-ip-attacks');
+const supremeCombosRoutes = require('./routes/supreme-combos');
+const dnsIntelligenceRoutes = require('./routes/dns-intelligence');
+const attackAnalyticsRoutes = require('./routes/attack-analytics');
+const credentialVaultRoutes = require('./routes/credential-vault');
 
 // Middleware
 app.use(helmet());
@@ -55,6 +61,12 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/security', securityRoutes);
 app.use('/api/scan', scanRoutes);
 app.use('/api/vpn', vpnRoutes);
+// Supreme feature routes
+app.use('/api/email-ip-attacks', emailIPAttacksRoutes);
+app.use('/api/supreme-combos', supremeCombosRoutes);
+app.use('/api/dns-intelligence', dnsIntelligenceRoutes);
+app.use('/api/attack-analytics', attackAnalyticsRoutes);
+app.use('/api/credential-vault', credentialVaultRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -103,7 +115,10 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
+// Initialize default users on startup
+const { initializeDefaultUsers } = require('./init-users');
+
+server.listen(PORT, async () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
@@ -114,6 +129,52 @@ server.listen(PORT, () => {
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
   `);
+  
+  // Initialize default users if they don't exist
+  // Use retry logic with proper database readiness check
+  const parsedTimeout = parseInt(process.env.DB_INIT_TIMEOUT_MS, 10);
+  // Validate timeout is a positive number, otherwise use default
+  const DB_INIT_TIMEOUT = (Number.isFinite(parsedTimeout) && parsedTimeout > 0) ? parsedTimeout : 5000;
+  const RETRY_INTERVAL_MS = 500;
+  const startTime = Date.now();
+  let intervalId;
+  let isInitializing = false;
+  let initSuccess = false;
+
+  const attemptInit = async () => {
+    if (isInitializing || initSuccess) return; // Prevent concurrent attempts and stop after success
+    isInitializing = true;
+    
+    try {
+      await initializeDefaultUsers();
+      console.log('Default users initialized successfully.');
+      initSuccess = true;
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    } catch (err) {
+      isInitializing = false; // Allow retry on failure
+      const elapsed = Date.now() - startTime;
+      if (elapsed >= DB_INIT_TIMEOUT) {
+        console.error(`Error initializing users (timeout after ${elapsed}ms): ${err.message}`);
+        if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      }
+      // If not timed out yet, the interval will trigger another attempt
+    }
+  };
+
+  // Schedule retries first, then make immediate attempt
+  // This prevents race condition where immediate success clears interval before it's set
+  intervalId = setInterval(() => {
+    attemptInit();
+  }, RETRY_INTERVAL_MS);
+  
+  // Make first immediate attempt
+  attemptInit();
 });
 
 module.exports = { app, server, wss };

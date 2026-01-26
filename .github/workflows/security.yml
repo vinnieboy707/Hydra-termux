@@ -150,7 +150,7 @@ jobs:
         echo "Checking for dangerous shell patterns..."
         
         # Check for eval usage (dangerous)
-        if grep -r "eval " scripts/ Library/ --include="*.sh"; then
+        if grep -r "eval " scripts/ --include="*.sh"; then
           echo "⚠ Warning: eval found - potential security risk"
         fi
         
