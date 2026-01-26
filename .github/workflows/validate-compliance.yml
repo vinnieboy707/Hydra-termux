@@ -143,9 +143,10 @@ jobs:
           echo "⚠️ Warning: /dev/tcp found - ensure proper sanitization"
         fi
         
-        # Check for eval usage
-        if grep -rn "eval " scripts/ Library/ --include="*.sh"; then
-          echo "❌ ERROR: eval found - security risk!"
+        # Check for eval usage (word boundary to avoid false positives like "retrieval")
+        # Exclude comments and security validation checks
+        if grep -rn '\beval\b' scripts/ Library/ --include="*.sh" | grep -v "# " | grep -v "grep -qE"; then
+          echo "❌ ERROR: eval command found - security risk!"
           exit 1
         fi
         
