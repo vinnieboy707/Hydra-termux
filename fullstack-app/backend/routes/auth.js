@@ -72,8 +72,9 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     // Only log in development mode to prevent security issues
+    // Note: Sensitive data like usernames and passwords should never be logged
     if (process.env.NODE_ENV === 'development') {
-      console.log('[LOGIN] Attempt:', { username, passwordLength: password?.length });
+      console.log('[LOGIN] Login attempt received');
     }
 
     if (!username || !password) {
@@ -86,23 +87,19 @@ router.post('/login', async (req, res) => {
     // Get user
     const user = await get('SELECT * FROM users WHERE username = ?', [username]);
     if (!user) {
-      // Don't log username on failure in production to prevent account enumeration
-      // (username is logged in development mode above)
+      // Don't log any user information to prevent account enumeration
       if (process.env.NODE_ENV === 'development') {
-        console.log('[LOGIN] User not found');
+        console.log('[LOGIN] Authentication failed - invalid credentials');
       }
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('[LOGIN] User found:', { id: user.id, username: user.username });
+      console.log('[LOGIN] User record found, verifying password');
     }
 
     // Verify password
     const validPassword = await bcrypt.compare(password, user.password);
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[LOGIN] Password valid:', validPassword);
-    }
     
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });

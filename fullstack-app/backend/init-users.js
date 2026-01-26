@@ -75,7 +75,7 @@ async function initializeDefaultUsers() {
         colorLog('green', `✓ Created user: ${defaultUser.username}`);
         colorLog('blue', `  Role: ${defaultUser.role}`);
         colorLog('blue', `  Email: ${defaultUser.email}`);
-        colorLog('blue', `  Password: ${defaultUser.password.substring(0, 3)}***`);
+        colorLog('blue', `  Default password configured (see documentation)`);
         
         if (defaultUser.role === 'super_admin') {
           colorLog('red', `  ⚠  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!`);
