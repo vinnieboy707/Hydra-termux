@@ -11,22 +11,25 @@ const attackService = new AttackService();
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { status, protocol, limit = 50, offset = 0 } = req.query;
+    const parsedLimit = parseInt(limit);
+    const parsedOffset = parseInt(offset);
     
-    let sql = 'SELECT * FROM attacks WHERE user_id = ?';
-    const params = [req.user.id];
+    // Build query based on filters to avoid dynamic SQL concatenation
+    let sql, params;
     
-    if (status) {
-      sql += ' AND status = ?';
-      params.push(status);
+    if (status && protocol) {
+      sql = 'SELECT * FROM attacks WHERE user_id = ? AND status = ? AND protocol = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+      params = [req.user.id, status, protocol, parsedLimit, parsedOffset];
+    } else if (status) {
+      sql = 'SELECT * FROM attacks WHERE user_id = ? AND status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+      params = [req.user.id, status, parsedLimit, parsedOffset];
+    } else if (protocol) {
+      sql = 'SELECT * FROM attacks WHERE user_id = ? AND protocol = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+      params = [req.user.id, protocol, parsedLimit, parsedOffset];
+    } else {
+      sql = 'SELECT * FROM attacks WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+      params = [req.user.id, parsedLimit, parsedOffset];
     }
-    
-    if (protocol) {
-      sql += ' AND protocol = ?';
-      params.push(protocol);
-    }
-    
-    sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
     
     const attacks = await all(sql, params);
     res.json({ attacks });

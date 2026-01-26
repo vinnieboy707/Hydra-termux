@@ -289,21 +289,25 @@ router.get('/audit-log', authMiddleware, async (req, res) => {
   try {
     const { limit = 50, offset = 0, eventType } = req.query;
     const userId = req.user.id;
+    const parsedLimit = parseInt(limit);
+    const parsedOffset = parseInt(offset);
     
-    let sql = `
-      SELECT event_type, details, ip_address, user_agent, created_at
-      FROM security_events
-      WHERE user_id = ?
-    `;
-    const params = [userId];
+    // Build query based on filters to avoid dynamic SQL concatenation
+    let sql, params;
     
     if (eventType) {
-      sql += ' AND event_type = ?';
-      params.push(eventType);
+      sql = `SELECT event_type, details, ip_address, user_agent, created_at
+             FROM security_events
+             WHERE user_id = ? AND event_type = ?
+             ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+      params = [userId, eventType, parsedLimit, parsedOffset];
+    } else {
+      sql = `SELECT event_type, details, ip_address, user_agent, created_at
+             FROM security_events
+             WHERE user_id = ?
+             ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+      params = [userId, parsedLimit, parsedOffset];
     }
-    
-    sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
     
     const events = await all(sql, params);
     
