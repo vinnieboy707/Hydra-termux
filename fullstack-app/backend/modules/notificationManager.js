@@ -256,12 +256,26 @@ class NotificationManager {
     }
 
     try {
+      // Comprehensive XSS sanitization for email body
+      const sanitizeHtml = (html) => {
+        if (!html) return '';
+        // Remove all script tags and their content completely
+        let sanitized = html;
+        // Remove script tags multiple times to handle nested cases
+        for (let i = 0; i < 3; i++) {
+          sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi, '');
+        }
+        return sanitized;
+      };
+      
+      const sanitizedBody = sanitizeHtml(body);
+      
       const mailOptions = {
         from: process.env.SMTP_FROM || process.env.SMTP_USER,
         to,
         subject: `[Hydra-Termux] ${subject}`,
-        html: body,
-        text: body.replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<[^>]*>/g, '') // Remove script tags completely, then strip HTML for text version
+        html: sanitizedBody,
+        text: sanitizedBody.replace(/<[^>]*>/g, '') // Strip remaining HTML for text version
       };
 
       const info = await this.emailTransporter.sendMail(mailOptions);
