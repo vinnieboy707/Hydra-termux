@@ -487,7 +487,8 @@ const Onboarding = ({ onComplete }) => {
                 onClick={() => setCurrentStep(index)}
                 aria-label={`Go to step ${index + 1}`}
                 aria-current={index === currentStep ? 'step' : undefined}
-              />
+              >
+              </button>
             ))}
           </div>
           
