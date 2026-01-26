@@ -75,3 +75,28 @@ None. All critical and high-severity issues have been addressed. The remaining 3
 ---
 Generated: 2026-01-26
 CodeQL Analysis: actions (0 alerts), javascript (3 low-risk alerts - acceptable)
+
+## Additional Security Fix - xlsx Vulnerability Removed
+
+### Issue Fixed
+**xlsx Dependency Vulnerabilities (2 critical issues removed)**
+- ❌ SheetJS Regular Expression Denial of Service (ReDoS) - CVE affecting versions < 0.20.2
+- ❌ Prototype Pollution in sheetJS - CVE affecting versions < 0.19.3
+
+### Resolution
+✅ **Removed unused xlsx dependency from frontend package.json**
+- The xlsx@0.18.5 package was not being used anywhere in the frontend codebase
+- Patched versions (0.19.3+, 0.20.2+) are not available on npm (commercial only)
+- Removal is the safest solution when the dependency is unused
+- Frontend build verified successful after removal
+- No impact on functionality
+
+### Remaining Frontend Vulnerabilities
+⚠️ **3 moderate severity issues** (prismjs via react-syntax-highlighter)
+- These are in development/documentation dependencies
+- Not used in production attack surface
+- Can be addressed separately if needed
+
+---
+Updated: 2026-01-26 (xlsx removal)
+Status: All critical vulnerabilities resolved
