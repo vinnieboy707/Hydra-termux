@@ -50,14 +50,19 @@ combine_wordlists() {
             continue
         fi
         
-        local lines=$(wc -l < "$file")
+        local lines
+
+        
+        lines=$(wc -l < "$file")
         log_info "Adding $file ($lines lines)"
         cat "$file" >> "$output_file"
         total_lines=$((total_lines + lines))
     done
     
     if [ -f "$output_file" ]; then
-        local final_lines=$(wc -l < "$output_file")
+        local final_lines
+
+        final_lines=$(wc -l < "$output_file")
         log_success "Combined $total_lines lines into $output_file"
     else
         log_error "Failed to combine wordlists"
@@ -77,13 +82,21 @@ remove_duplicates() {
         return 1
     fi
     
-    local before=$(wc -l < "$input_file")
+    local before
+
+    
+    before=$(wc -l < "$input_file")
     log_info "Original: $before lines"
     
     sort -u "$input_file" > "$output_file"
     
-    local after=$(wc -l < "$output_file")
-    local removed=$((before - after))
+    local after
+
+    
+    after=$(wc -l < "$output_file")
+    local removed
+
+    removed=$((before - after))
     
     log_success "Removed $removed duplicate(s)"
     log_success "Result: $after unique lines"
@@ -106,13 +119,21 @@ filter_by_length() {
     log_info "Min length: ${min_length:-0}"
     log_info "Max length: ${max_length:-unlimited}"
     
-    local before=$(wc -l < "$input_file")
+    local before
+
+    
+    before=$(wc -l < "$input_file")
     
     awk -v min="${min_length:-0}" -v max="${max_length:-999}" \
         'length($0) >= min && length($0) <= max' "$input_file" > "$output_file"
     
-    local after=$(wc -l < "$output_file")
-    local filtered=$((before - after))
+    local after
+
+    
+    after=$(wc -l < "$output_file")
+    local filtered
+
+    filtered=$((before - after))
     
     log_success "Filtered $filtered line(s)"
     log_success "Result: $after lines"
@@ -153,8 +174,12 @@ generate_patterns() {
     log_info "Base word: $base_word"
     
     # Common patterns
-    local current_year=$(date +%Y)
-    local next_year=$((current_year + 1))
+    local current_year
+
+    current_year=$(date +%Y)
+    local next_year
+
+    next_year=$((current_year + 1))
     
     echo "$base_word" >> "$output_file"
     echo "${base_word}123" >> "$output_file"

@@ -158,9 +158,13 @@ parse_results() {
     
     # Extract open ports
     if [ "$OUTPUT_FORMAT" = "xml" ]; then
-        local open_ports=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | wc -l)
+        local open_ports
+
+        open_ports=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | wc -l)
     else
-        local open_ports=$(grep -c "^[0-9]*/.*open" "$scan_file" 2>/dev/null || echo 0)
+        local open_ports
+
+        open_ports=$(grep -c "^[0-9]*/.*open" "$scan_file" 2>/dev/null || echo 0)
     fi
     
     log_info "Open ports found: $open_ports"
@@ -170,7 +174,9 @@ parse_results() {
         echo ""
         log_info "Services detected:"
         grep -oP 'portid="\K[0-9]+' "$scan_file" 2>/dev/null | while read -r port; do
-            local service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
+            local service
+
+            service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
             [ -n "$service" ] && printf "  ${GREEN}Port $port${NC}: $service\n"
         done
     else
@@ -263,7 +269,9 @@ recommend_scripts() {
     if [ "$OUTPUT_FORMAT" = "xml" ]; then
         # Parse XML format
         while read -r port; do
-            local service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
+            local service
+
+            service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
             if [ -n "$service" ]; then
                 services_found+=("$service:$port")
             fi
@@ -271,8 +279,12 @@ recommend_scripts() {
     else
         # Parse normal text format
         while read -r line; do
-            local port=$(echo "$line" | awk '{print $1}' | cut -d'/' -f1)
-            local service=$(echo "$line" | awk '{print $3}')
+            local port
+
+            port=$(echo "$line" | awk '{print $1}' | cut -d'/' -f1)
+            local service
+
+            service=$(echo "$line" | awk '{print $3}')
             if [ -n "$service" ]; then
                 services_found+=("$service:$port")
             fi
@@ -296,13 +308,21 @@ recommend_scripts() {
     )
     
     for service_port in "${services_found[@]}"; do
-        local service=$(echo "$service_port" | cut -d':' -f1)
-        local port=$(echo "$service_port" | cut -d':' -f2)
+        local service
+
+        service=$(echo "$service_port" | cut -d':' -f1)
+        local port
+
+        port=$(echo "$service_port" | cut -d':' -f2)
         
         # Check if we have a script for this service
         if [ -n "${service_map[$service]}" ]; then
-            local script=$(echo "${service_map[$service]}" | cut -d'|' -f1)
-            local desc=$(echo "${service_map[$service]}" | cut -d'|' -f2)
+            local script
+
+            script=$(echo "${service_map[$service]}" | cut -d'|' -f1)
+            local desc
+
+            desc=$(echo "${service_map[$service]}" | cut -d'|' -f2)
             
             # Avoid duplicate recommendations
             if [ -z "${recommended_scripts[$script]}" ]; then

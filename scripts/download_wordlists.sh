@@ -49,8 +49,12 @@ list_wordlists() {
     for name in "${!WORDLISTS[@]}"; do
         local file="$WORDLIST_DIR/${name}.txt"
         if [ -f "$file" ]; then
-            local size=$(du -h "$file" | cut -f1)
-            local lines=$(wc -l < "$file")
+            local size
+
+            size=$(du -h "$file" | cut -f1)
+            local lines
+
+            lines=$(wc -l < "$file")
             log_success "$name ($size, $lines lines) - Downloaded"
         else
             log_info "$name - Not downloaded"
@@ -81,8 +85,12 @@ download_wordlist() {
     fi
     
     if [ $? -eq 0 ] && [ -f "$output" ]; then
-        local size=$(du -h "$output" | cut -f1)
-        local lines=$(wc -l < "$output")
+        local size
+
+        size=$(du -h "$output" | cut -f1)
+        local lines
+
+        lines=$(wc -l < "$output")
         log_success "Downloaded $name ($size, $lines lines)"
         return 0
     else
