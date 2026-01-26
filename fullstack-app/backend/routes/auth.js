@@ -73,7 +73,7 @@ router.post('/login', async (req, res) => {
 
     // Only log in development mode to prevent security issues
     // Note: Sensitive data like usernames and passwords should never be logged
-    if (process.env.NODE_ENV === 'development') {
+      console.log('[LOGIN] Attempt:', { username, hasPassword: !!password });
       console.log('[LOGIN] Login attempt received');
     }
 
