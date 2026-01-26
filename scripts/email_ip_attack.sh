@@ -779,14 +779,23 @@ test_protocol_availability() {
     fi
     
     # Quick TCP connection test using nc if available, fallback to /dev/tcp
+    # Validate target and port to prevent injection
+    if [[ ! "$target" =~ ^[a-zA-Z0-9.-]+$ ]] || [[ ! "$port" =~ ^[0-9]+$ ]]; then
+        log_warning "Invalid target or port format"
+        return 1
+    fi
+    
     if command -v nc &> /dev/null; then
         if timeout 5 nc -zv "$target" "$port" 2>/dev/null; then
             log_success "✓ $protocol ($port) - OPEN"
             return 0
         fi
-    elif timeout 5 bash -c "exec 3<>/dev/tcp/$target/$port 2>/dev/null" 2>/dev/null; then
-        log_success "✓ $protocol ($port) - OPEN"
-        return 0
+    elif [[ "$port" -ge 1 ]] && [[ "$port" -le 65535 ]]; then
+        # Safe to use /dev/tcp with validated inputs
+        if timeout 5 bash -c "exec 3<>/dev/tcp/$target/$port 2>/dev/null" 2>/dev/null; then
+            log_success "✓ $protocol ($port) - OPEN"
+            return 0
+        fi
     fi
     
     [ "$VERBOSE" = "true" ] && log_warning "✗ $protocol ($port) - CLOSED/FILTERED"
