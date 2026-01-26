@@ -259,12 +259,18 @@ class NotificationManager {
       // Comprehensive XSS sanitization for email body
       const sanitizeHtml = (html) => {
         if (!html) return '';
-        // Remove all script tags and their content completely
+        // Remove all script tags - handle with multiple passes for nested/malformed tags
         let sanitized = html;
-        // Remove script tags multiple times to handle nested cases
-        for (let i = 0; i < 3; i++) {
-          sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi, '');
-        }
+        let prevLength;
+        // Keep removing script tags until no more are found
+        do {
+          prevLength = sanitized.length;
+          // Remove script tags with any attributes/whitespace in closing tag
+          sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script[^>]*>/gi, '');
+          // Also catch incomplete/malformed script tags
+          sanitized = sanitized.replace(/<script\b[^>]*>/gi, '');
+        } while (sanitized.length < prevLength);
+        
         return sanitized;
       };
       
