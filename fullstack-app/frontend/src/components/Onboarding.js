@@ -419,13 +419,6 @@ const Onboarding = ({ onComplete }) => {
     }
   };
 
-  const resetOnboarding = () => {
-    localStorage.removeItem('onboarding_complete');
-    localStorage.removeItem('onboarding_completed_at');
-    setCurrentStep(0);
-    setShowOnboarding(true);
-  };
-
   if (!showOnboarding) {
     return null;
   }
