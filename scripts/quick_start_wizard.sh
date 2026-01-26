@@ -134,7 +134,8 @@ EOF
                 fi
 
                 echo "Running: $INSTALL_CMD"
-                if ! eval "$INSTALL_CMD"; then
+                # Execute command safely without eval
+                if ! $INSTALL_CMD; then
                     ui_alert_error "Package installation command failed. Please check the output above and install Hydra manually."
                     exit 1
                 fi

@@ -26,6 +26,12 @@ const webhookRoutes = require('./routes/webhooks');
 const securityRoutes = require('./routes/security');
 const scanRoutes = require('./routes/scan');
 const vpnRoutes = require('./routes/vpn');
+// Supreme feature routes
+const emailIPAttacksRoutes = require('./routes/email-ip-attacks');
+const supremeCombosRoutes = require('./routes/supreme-combos');
+const dnsIntelligenceRoutes = require('./routes/dns-intelligence');
+const attackAnalyticsRoutes = require('./routes/attack-analytics');
+const credentialVaultRoutes = require('./routes/credential-vault');
 
 // Middleware
 app.use(helmet());
@@ -55,6 +61,12 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/security', securityRoutes);
 app.use('/api/scan', scanRoutes);
 app.use('/api/vpn', vpnRoutes);
+// Supreme feature routes
+app.use('/api/email-ip-attacks', emailIPAttacksRoutes);
+app.use('/api/supreme-combos', supremeCombosRoutes);
+app.use('/api/dns-intelligence', dnsIntelligenceRoutes);
+app.use('/api/attack-analytics', attackAnalyticsRoutes);
+app.use('/api/credential-vault', credentialVaultRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

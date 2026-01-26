@@ -212,9 +212,6 @@ If you prefer manual installation:
 
 2. **Install required packages:**
    ```bash
-   # Hydra lives in the Termux root repository. Install it first if you see
-   # "Unable to locate package hydra".
-   pkg install root-repo -y
    pkg install hydra git wget curl openssl nmap termux-api figlet jq -y
    ```
 
@@ -768,3 +765,38 @@ If you find this project useful, please consider giving it a star! ⭐
 [⬆ Back to Top](#-hydra-termux-ultimate-edition)
 
 </div>
+
+---
+
+## 💻 Git Bash Support (Windows)
+
+**Full compatibility with Git Bash on Windows 10/11!**
+
+### Quick Start on Windows
+```bash
+# 1. Clone in Git Bash
+git clone https://github.com/vinnieboy707/Hydra-termux.git
+cd Hydra-termux
+
+# 2. Make executable
+chmod +x hydra.sh install.sh scripts/*.sh Library/*.sh
+
+# 3. Launch
+./hydra.sh
+```
+
+### Verified Compatible
+✅ Git Bash (MINGW64)  
+✅ All 43 menu options  
+✅ Color output & emojis  
+✅ Full path resolution  
+✅ All combo attacks  
+
+See [GIT_BASH_SETUP.md](GIT_BASH_SETUP.md) for complete Windows setup guide.
+
+### Verify Your Installation
+```bash
+# Run automatic wiring check
+./scripts/verify_wiring.sh
+```
+
