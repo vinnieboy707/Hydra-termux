@@ -1,0 +1,41 @@
+{
+  "name": "hydra-termux-fullstack",
+  "version": "2.0.0",
+  "description": "Hydra-Termux Full-Stack Penetration Testing Platform",
+  "private": true,
+  "scripts": {
+    "install:backend": "cd fullstack-app/backend && npm install --legacy-peer-deps",
+    "install:frontend": "cd fullstack-app/frontend && npm install --legacy-peer-deps",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "start:backend": "cd fullstack-app/backend && npm start",
+    "start:frontend": "cd fullstack-app/frontend && npm start",
+    "dev": "echo 'Start backend: npm run start:backend' && echo 'Start frontend: npm run start:frontend'",
+    "fix-termux": "bash scripts/fix-termux-setup.sh",
+    "clean": "rm -rf fullstack-app/backend/node_modules fullstack-app/frontend/node_modules fullstack-app/backend/package-lock.json fullstack-app/frontend/package-lock.json",
+    "clean:backend": "rm -rf fullstack-app/backend/node_modules fullstack-app/backend/package-lock.json",
+    "clean:frontend": "rm -rf fullstack-app/frontend/node_modules fullstack-app/frontend/package-lock.json",
+    "health-check": "bash scripts/health-check.sh",
+    "test:backend": "cd fullstack-app/backend && npm test",
+    "test:frontend": "cd fullstack-app/frontend && npm test",
+    "logs:backend": "tail -f fullstack-app/backend/logs/*.log 2>/dev/null || echo 'No backend logs found'",
+    "logs:frontend": "tail -f fullstack-app/frontend/logs/*.log 2>/dev/null || echo 'No frontend logs found'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vinnieboy707/Hydra-termux.git"
+  },
+  "keywords": [
+    "hydra",
+    "termux",
+    "android",
+    "penetration-testing",
+    "security",
+    "fullstack"
+  ],
+  "author": "vinnieboy707",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}

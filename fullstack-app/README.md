@@ -21,6 +21,83 @@ cd fullstack-app
 
 ---
 
+## 🤖 Termux/Android Setup
+
+**Running on Android via Termux?** Use the automated fix script for a smooth setup:
+
+### Quick Fix (Recommended)
+
+```bash
+# From the repository root, run:
+npm run fix-termux
+
+# Or directly:
+bash scripts/fix-termux-setup.sh
+```
+
+The fix script automatically:
+- ✅ Detects Termux environment
+- ✅ Replaces native `bcrypt` with pure JS `bcryptjs`
+- ✅ Installs all dependencies with mobile optimizations
+- ✅ Creates necessary environment files
+- ✅ Runs health checks and validates setup
+- ✅ Provides detailed next steps
+
+### Why This Is Needed
+
+The default `bcrypt` package requires native compilation (C++ bindings) which fails on Android because:
+- ❌ No pre-built binaries for `android-arm64-unknown` platform
+- ❌ node-gyp requires Android NDK which isn't available in Termux
+- ❌ Compilation errors: `gyp ERR! Undefined variable android_ndk_path`
+
+**Solution:** `bcryptjs` is a pure JavaScript implementation that:
+- ✅ Works identically to bcrypt (same API)
+- ✅ No native dependencies or compilation needed
+- ✅ Perfect for Termux and mobile environments
+- ✅ Slightly slower but fully functional
+
+### Manual Setup (If Needed)
+
+If you prefer manual setup or the script doesn't work:
+
+```bash
+# 1. Replace bcrypt in backend
+cd fullstack-app/backend
+sed -i 's/"bcrypt"/"bcryptjs"/g' package.json
+npm install --legacy-peer-deps
+
+# 2. Install frontend dependencies
+cd ../frontend
+npm install --legacy-peer-deps
+
+# 3. Start the application
+cd ../backend && npm start
+# In new terminal:
+cd fullstack-app/frontend && npm start
+```
+
+### Troubleshooting
+
+**Port already in use:**
+```bash
+# Find and kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+# Or use a different port in backend/.env
+```
+
+**Low memory issues:**
+```bash
+# Close other apps, or install with fewer concurrent jobs
+npm install --legacy-peer-deps --maxsockets=1
+```
+
+**Check system health:**
+```bash
+npm run health-check
+```
+
+---
+
 ## ✨ What's Included
 
 ### Complete Feature Set

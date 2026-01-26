@@ -71,18 +71,36 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Only log in development mode to prevent security issues
+    // Note: Sensitive data like usernames and passwords should never be logged
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[LOGIN] Login attempt received');
+    }
+
     if (!username || !password) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[LOGIN] Missing credentials');
+      }
       return res.status(400).json({ error: 'Username and password required' });
     }
 
     // Get user
     const user = await get('SELECT * FROM users WHERE username = ?', [username]);
     if (!user) {
+      // Don't log any user information to prevent account enumeration
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[LOGIN] Authentication failed - invalid credentials');
+      }
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[LOGIN] User record found, verifying password');
     }
 
     // Verify password
     const validPassword = await bcrypt.compare(password, user.password);
+    
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

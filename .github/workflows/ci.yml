@@ -81,7 +81,7 @@ jobs:
       uses: ludeeus/action-shellcheck@master
       with:
         scandir: './scripts'
-        severity: warning
+        severity: error
         
     - name: Check Main Scripts
       run: |
