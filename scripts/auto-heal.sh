@@ -14,7 +14,7 @@ NC='\033[0m'
 
 LOG_FILE="/var/log/hydra-auto-heal.log"
 ALERT_THRESHOLD=3
-RESTART_COOLDOWN=300  # 5 minutes
+export RESTART_COOLDOWN=300  # 5 minutes - exported for potential use
 
 log_event() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
@@ -121,7 +121,8 @@ check_redis() {
 check_disk_space() {
     print_status "Checking disk space..."
     
-    local usage=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
+    local usage
+    usage=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
     
     if [ "$usage" -gt 90 ]; then
         print_error "Disk usage critical: ${usage}%"
@@ -149,7 +150,8 @@ check_disk_space() {
 check_memory() {
     print_status "Checking memory usage..."
     
-    local mem_usage=$(free | awk 'NR==2 {printf "%.0f", $3/$2*100}')
+    local mem_usage
+    mem_usage=$(free | awk 'NR==2 {printf "%.0f", $3/$2*100}')
     
     if [ "$mem_usage" -gt 90 ]; then
         print_error "Memory usage critical: ${mem_usage}%"
@@ -200,7 +202,8 @@ check_application() {
 check_zombie_processes() {
     print_status "Checking for zombie processes..."
     
-    local zombies=$(ps aux | awk '{if ($8 == "Z") print $0}' | wc -l)
+    local zombies
+    zombies=$(ps aux | awk '{if ($8 == "Z") print $0}' | wc -l)
     
     if [ "$zombies" -gt 0 ]; then
         print_warning "Found $zombies zombie processes"
@@ -237,7 +240,8 @@ check_network() {
 auto_scale() {
     print_status "Checking if auto-scaling is needed..."
     
-    local cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
+    local cpu_usage
+    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
     
     # If CPU usage is high, suggest scaling
     if (( $(echo "$cpu_usage > 80" | bc -l) )); then
@@ -254,7 +258,8 @@ auto_scale() {
 
 # Generate health report
 generate_health_report() {
-    local report_file="/tmp/health-report-$(date +%Y%m%d-%H%M%S).txt"
+    local report_file
+    report_file="/tmp/health-report-$(date +%Y%m%d-%H%M%S).txt"
     
     cat > "$report_file" << EOF
 ═══════════════════════════════════════════════════════

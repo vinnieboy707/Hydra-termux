@@ -40,8 +40,10 @@ analyze_attack_success() {
         return
     fi
     
-    local total_attacks=$(find "$results_dir" -name "*.txt" 2>/dev/null | wc -l)
-    local successful_attacks=$(grep -r "Valid credentials" "$results_dir" 2>/dev/null | wc -l)
+    local total_attacks
+    local successful_attacks
+    total_attacks=$(find "$results_dir" -name "*.txt" 2>/dev/null | wc -l)
+    successful_attacks=$(grep -r "Valid credentials" "$results_dir" 2>/dev/null | wc -l)
     
     if [ "$total_attacks" -gt 0 ]; then
         local success_rate=$((successful_attacks * 100 / total_attacks))
@@ -77,7 +79,8 @@ analyze_protocols() {
     
     # Count successes by protocol
     for protocol in ssh ftp mysql web rdp smb; do
-        local count=$(grep -r "$protocol" "$results_dir" 2>/dev/null | wc -l)
+        local count
+        count=$(grep -r "$protocol" "$results_dir" 2>/dev/null | wc -l)
         if [ "$count" -gt 0 ]; then
             protocol_counts[$protocol]=$count
         fi
@@ -102,7 +105,8 @@ analyze_performance() {
     
     # Average attack duration
     if [ -f "$PROJECT_ROOT/logs/attack_timing.log" ]; then
-        local avg_duration=$(awk '{sum+=$1; count++} END {print sum/count}' "$PROJECT_ROOT/logs/attack_timing.log" 2>/dev/null || echo "0")
+        local avg_duration
+        avg_duration=$(awk '{sum+=$1; count++} END {print sum/count}' "$PROJECT_ROOT/logs/attack_timing.log" 2>/dev/null || echo "0")
         print_metric "Average Attack Duration: ${avg_duration} seconds"
     fi
     
@@ -112,7 +116,8 @@ analyze_performance() {
     
     # Docker container performance
     if command -v docker &> /dev/null; then
-        local containers=$(docker ps -q | wc -l)
+        local containers
+        containers=$(docker ps -q | wc -l)
         print_metric "Active Containers: $containers"
         
         # Container resource usage
@@ -134,8 +139,10 @@ analyze_wordlists() {
     echo "Available wordlists:"
     for wordlist in "$wordlist_dir"/*.txt; do
         if [ -f "$wordlist" ]; then
-            local name=$(basename "$wordlist")
-            local size=$(wc -l < "$wordlist")
+            local name
+            local size
+            name=$(basename "$wordlist")
+            size=$(wc -l < "$wordlist")
             printf "  %-30s: %'d entries\n" "$name" "$size"
         fi
     done
@@ -195,8 +202,10 @@ analyze_trends() {
     # Attacks over time
     echo "Attack frequency (last 7 days):"
     for i in {6..0}; do
-        local date=$(date -d "$i days ago" +%Y-%m-%d)
-        local count=$(grep "$date" "$logs_dir"/*.log 2>/dev/null | wc -l)
+        local date
+        local count
+        date=$(date -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -v-${i}d +%Y-%m-%d 2>/dev/null || date +%Y-%m-%d)
+        count=$(grep "$date" "$logs_dir"/*.log 2>/dev/null | wc -l)
         printf "  %s: " "$date"
         printf '█%.0s' $(seq 1 $((count / 10)))
         echo " ($count)"
@@ -207,7 +216,8 @@ analyze_trends() {
 
 # Generate comprehensive report
 generate_comprehensive_report() {
-    local report_file="$PROJECT_ROOT/reports/analytics-report-$(date +%Y%m%d-%H%M%S).md"
+    local report_file
+    report_file="$PROJECT_ROOT/reports/analytics-report-$(date +%Y%m%d-%H%M%S).md"
     mkdir -p "$PROJECT_ROOT/reports"
     
     cat > "$report_file" << 'EOF'
