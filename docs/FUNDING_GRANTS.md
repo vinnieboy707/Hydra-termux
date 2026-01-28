@@ -909,7 +909,7 @@ Objectives:
 
 Objectives:
 - 100 full scholarships
-- Community partner ips with 10+ organizations
+- Community partnerships with 10+ organizations
 - Free tier access for all
 - Mentorship program
 
