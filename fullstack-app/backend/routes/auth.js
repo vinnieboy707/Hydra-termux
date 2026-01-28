@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { run, get } = require('../database');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
@@ -151,6 +152,26 @@ router.get('/verify', async (req, res) => {
     res.json({ valid: true, user });
   } catch (error) {
     res.status(401).json({ error: 'Invalid token', valid: false });
+  }
+});
+
+// Get current user profile (requires authentication)
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    // req.user is populated by authMiddleware
+    const user = await get(
+      'SELECT id, username, email, role, created_at, last_login FROM users WHERE id = ?',
+      [req.user.id]
+    );
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Get current user error:', error);
+    res.status(500).json({ error: 'Failed to fetch user profile' });
   }
 });
 
