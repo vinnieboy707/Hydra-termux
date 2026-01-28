@@ -93,15 +93,16 @@ serve(async (req) => {
         throw new Error(\`Unknown action: \${action}\`)
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('Error:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Internal server error',
-        details: error.toString()
+        error: err.message || 'Internal server error',
+        details: err.toString()
       }),
       { 
-        status: error.message?.includes('Unauthorized') ? 401 : 400,
+        status: err.message?.includes('Unauthorized') ? 401 : 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
@@ -465,7 +466,7 @@ async function triggerWebhook(supabase: any, params: {
     try {
       const events = JSON.parse(webhook.events || '[]')
       return events.includes(event_type)
-    } catch {
+    } catch (e: unknown) {
       return false
     }
   })
