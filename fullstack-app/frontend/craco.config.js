@@ -1,11 +1,5 @@
 module.exports = {
-  webpack: {
-    configure: (webpackConfig, { env, paths }) => {
-      // Return the modified webpack config
-      return webpackConfig;
-    },
-  },
-  devServer: (devServerConfig, { env, paths, proxy, allowedHost }) => {
+  devServer: (devServerConfig) => {
     // Override the deprecated middleware setup methods
     // Remove deprecated onBeforeSetupMiddleware and onAfterSetupMiddleware
     delete devServerConfig.onBeforeSetupMiddleware;
