@@ -175,9 +175,10 @@ async function sendEmail(
     const result = await response.json();
     return { success: true, messageId: result.id };
     
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('Email exception:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: err.message };
   }
 }
 
@@ -225,9 +226,10 @@ async function sendSMS(
     const result = await response.json();
     return { success: true, messageId: result.sid };
     
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('SMS exception:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: err.message };
   }
 }
 
@@ -335,13 +337,14 @@ serve(async (req) => {
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('Notification error:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to send notification',
-        message: error.message,
-        type: error.name
+        message: err.message,
+        type: err.name
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

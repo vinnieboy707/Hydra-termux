@@ -1,0 +1,183 @@
+version: '3.8'
+
+services:
+  hydra-dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.dev
+    container_name: hydra-termux-dev
+    restart: unless-stopped
+    
+    # Run as root for development flexibility, but switch to vscode user
+    user: vscode
+    
+    # Keep container running for development
+    command: sleep infinity
+    
+    # Port mappings
+    ports:
+      - "3000:3000"   # Backend API
+      - "3001:3001"   # Frontend Dev Server
+      - "9229:9229"   # Node.js Debugger
+      - "5173:5173"   # Vite Dev Server (if using Vite)
+    
+    # Environment variables for development
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=postgresql://hydra_dev:hydra_dev_pass@postgres-dev:5432/hydra_dev_db
+      - REDIS_URL=redis://redis-dev:6379
+      - JWT_SECRET=dev_jwt_secret_change_in_production
+      - SESSION_SECRET=dev_session_secret_change_in_production
+      - LOG_LEVEL=debug
+      - DEVELOPMENT_MODE=true
+      - HOT_RELOAD=true
+    
+    # Volume mounts
+    volumes:
+      # Mount source code for hot reload
+      - ..:/workspace:cached
+      
+      # Preserve bash history
+      - dev-bash-history:/commandhistory
+      
+      # Node modules (prevent overwriting)
+      - /workspace/fullstack-app/backend/node_modules
+      - /workspace/fullstack-app/frontend/node_modules
+      - /workspace/node_modules
+      
+      # Development data
+      - dev-data:/data
+      - dev-logs:/logs
+      - ../results:/workspace/results
+      - ../wordlists:/workspace/wordlists
+    
+    # Dependencies
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      redis-dev:
+        condition: service_healthy
+    
+    # Networking
+    networks:
+      - hydra-dev-network
+    
+    # Capabilities for network tools
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+      - SYS_PTRACE  # For debugging
+    
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    
+    # Working directory
+    working_dir: /workspace
+
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: hydra-postgres-dev
+    restart: unless-stopped
+    
+    environment:
+      - POSTGRES_USER=hydra_dev
+      - POSTGRES_PASSWORD=hydra_dev_pass
+      - POSTGRES_DB=hydra_dev_db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ../fullstack-app/backend/schema:/docker-entrypoint-initdb.d:ro
+    
+    ports:
+      - "5432:5432"
+    
+    networks:
+      - hydra-dev-network
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hydra_dev -d hydra_dev_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-dev:
+    image: redis:7-alpine
+    container_name: hydra-redis-dev
+    restart: unless-stopped
+    
+    command: redis-server --appendonly yes
+    
+    volumes:
+      - redis-dev-data:/data
+    
+    ports:
+      - "6379:6379"
+    
+    networks:
+      - hydra-dev-network
+    
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: Adminer for database management
+  adminer:
+    image: adminer:latest
+    container_name: hydra-adminer
+    restart: unless-stopped
+    
+    ports:
+      - "8080:8080"
+    
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres-dev
+    
+    networks:
+      - hydra-dev-network
+    
+    depends_on:
+      - postgres-dev
+
+  # Optional: RedisInsight for Redis management
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: hydra-redis-insight
+    restart: unless-stopped
+    
+    ports:
+      - "8001:8001"
+    
+    volumes:
+      - redis-insight-data:/db
+    
+    networks:
+      - hydra-dev-network
+    
+    depends_on:
+      - redis-dev
+
+volumes:
+  postgres-dev-data:
+    driver: local
+  redis-dev-data:
+    driver: local
+  redis-insight-data:
+    driver: local
+  dev-data:
+    driver: local
+  dev-logs:
+    driver: local
+  dev-bash-history:
+    driver: local
+
+networks:
+  hydra-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.0.0/16

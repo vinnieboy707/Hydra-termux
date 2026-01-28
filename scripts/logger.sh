@@ -332,7 +332,8 @@ track_ip_rotation() {
         line_count=$(wc -l < "$log_file" 2>/dev/null || echo "0")
         if [ "$line_count" -gt 10000 ]; then
             # Archive old log and start fresh
-            local archive_file="$LOG_DIR/ip_rotation_${user_id}_$(date +%Y%m%d_%H%M%S).log.gz"
+            local archive_file
+            archive_file="$LOG_DIR/ip_rotation_${user_id}_$(date +%Y%m%d_%H%M%S).log.gz"
             gzip -c "$log_file" > "$archive_file" 2>/dev/null || true
             # Keep only last 1000 entries in active log
             tail -n 1000 "$log_file" > "$log_file.tmp"

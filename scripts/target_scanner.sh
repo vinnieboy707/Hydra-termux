@@ -105,7 +105,8 @@ run_scan() {
     echo ""
     
     # Determine output format
-    local output_file="$OUTPUT_DIR/scan_${TARGET//[.\/:]/_}_$(date +%Y%m%d_%H%M%S)"
+    local output_file
+    output_file="$OUTPUT_DIR/scan_${TARGET//[.\/:]/_}_$(date +%Y%m%d_%H%M%S)"
     local format_opt=""
     
     case "$OUTPUT_FORMAT" in
@@ -441,8 +442,8 @@ recommend_scripts() {
 }
 
 # Parse command line arguments
-# shellcheck disable=SC2034
 VERBOSE=false
+export VERBOSE  # Export for potential use in child processes
 CUSTOM_PORTS=""
 
 while [[ $# -gt 0 ]]; do

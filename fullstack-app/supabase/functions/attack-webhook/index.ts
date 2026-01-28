@@ -126,8 +126,9 @@ async function sendWebhookWithRetry(
         attempts: retries 
       }
       
-    } catch (error) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      const err = error as Error
+      if (err.name === 'AbortError') {
         if (attempt < retries - 1) {
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS[attempt]))
           continue
@@ -146,7 +147,7 @@ async function sendWebhookWithRetry(
       
       return { 
         success: false, 
-        error: error.message,
+        error: err.message,
         attempts: retries 
       }
     }
@@ -323,13 +324,14 @@ serve(async (req) => {
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('Webhook processing error:', error)
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
-        message: error.message,
-        type: error.name 
+        message: err.message,
+        type: err.name 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

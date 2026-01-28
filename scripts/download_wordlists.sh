@@ -208,8 +208,8 @@ verify_wordlists() {
 # Parse command line arguments
 DOWNLOAD_ALL=false
 LIST_ONLY=false
-# shellcheck disable=SC2034
 VERBOSE=false
+export VERBOSE  # Export for potential use in child processes
 
 while [[ $# -gt 0 ]]; do
     case $1 in

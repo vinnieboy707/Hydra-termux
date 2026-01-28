@@ -35,8 +35,192 @@ EOF
     sleep 2
 }
 
+# Detect environment (development container, production, or local)
+detect_environment() {
+    if [ -f "/.dockerenv" ] || [ -n "$DEVELOPMENT_MODE" ]; then
+        if [ "$DEVELOPMENT_MODE" = "true" ] || [ -f "/workspace/.devcontainer/devcontainer.json" ]; then
+            echo "devcontainer"
+        else
+            echo "docker"
+        fi
+    else
+        echo "local"
+    fi
+}
+
+# Development Container Onboarding
+dev_container_onboarding() {
+    clear
+    print_banner "🔧 Development Container Detected"
+    echo ""
+    
+    print_message "🎉 Welcome to the Hydra-Termux Dev Container!" "$GREEN"
+    echo ""
+    echo "Your development environment is fully configured with:"
+    echo "  ✅ All penetration testing tools pre-installed"
+    echo "  ✅ PostgreSQL database (postgres-dev:5432)"
+    echo "  ✅ Redis cache (redis-dev:6379)"
+    echo "  ✅ Adminer database UI (localhost:8080)"
+    echo "  ✅ Redis Insight (localhost:8001)"
+    echo "  ✅ ShellCheck and linting tools"
+    echo "  ✅ Hot reload enabled"
+    echo ""
+    
+    print_message "🚀 Quick Start Commands:" "$CYAN"
+    echo ""
+    echo "  Development:"
+    echo "    npm run dev           - Start all development servers"
+    echo "    npm run dev:backend   - Backend only"
+    echo "    npm run dev:frontend  - Frontend only"
+    echo "    npm test              - Run tests"
+    echo ""
+    echo "  Hydra Tools:"
+    echo "    ./hydra.sh            - Main Hydra interface"
+    echo "    hydra-status          - Check service status"
+    echo ""
+    echo "  Database Management:"
+    echo "    http://localhost:8080 - Adminer (PostgreSQL UI)"
+    echo "    http://localhost:8001 - Redis Insight"
+    echo ""
+    
+    read -p "Press Enter to continue with environment setup..." _
+    
+    # Run environment-specific setup
+    dev_container_setup
+}
+
+# Development container setup
+dev_container_setup() {
+    clear
+    print_banner "🔧 Setting Up Development Environment"
+    echo ""
+    
+    # Check database connectivity
+    print_message "Checking database connection..." "$CYAN"
+    if PGPASSWORD=hydra_dev_pass psql -h postgres-dev -U hydra_dev -d hydra_dev_db -c '\q' 2>/dev/null; then
+        log_success "✅ PostgreSQL is connected"
+    else
+        log_warning "⚠️  PostgreSQL connection failed - may need to wait for services to start"
+    fi
+    
+    # Check Redis connectivity
+    print_message "Checking Redis connection..." "$CYAN"
+    if redis-cli -h redis-dev ping &>/dev/null; then
+        log_success "✅ Redis is connected"
+    else
+        log_warning "⚠️  Redis connection failed - may need to wait for services to start"
+    fi
+    
+    echo ""
+    print_message "Development environment is ready!" "$GREEN"
+    echo ""
+    echo "💡 Tips for development:"
+    echo "  • Use 'npm run dev' to start with hot reload"
+    echo "  • Check 'hydra-status' for service status"
+    echo "  • All changes are automatically synced to the container"
+    echo "  • Database data persists between container restarts"
+    echo ""
+    
+    read -p "Press Enter to continue..." _
+}
+
 # Choose onboarding path
 choose_onboarding_path() {
+    # Detect environment first
+    local env_type
+    env_type=$(detect_environment)
+    
+    # Declare validated_choice at function scope
+    local validated_choice
+    
+    # If in dev container, show dev-specific onboarding option
+    if [ "$env_type" = "devcontainer" ]; then
+        clear
+        print_banner "🎯 Choose Your Path (Development Mode)"
+        echo ""
+        
+        print_message "Development Container Detected!" "$CYAN"
+        echo ""
+        echo "  1) 🔧 Dev Container Quick Start (Recommended)"
+        echo "     Tailored for VS Code development container users"
+        echo ""
+        echo "  2) 🚀 Standard Quick Start (5 minutes)"
+        echo "     Perfect for experienced users who want to start immediately"
+        echo ""
+        echo "  3) 📚 Complete Tutorial (15-20 minutes)"
+        echo "     Comprehensive walkthrough of all features"
+        echo ""
+        echo "  4) 🎮 Interactive Practice Mode"
+        echo "     Learn by doing with guided exercises"
+        echo ""
+        echo "  5) ⏭️  Skip Onboarding"
+        echo "     Go directly to main menu"
+        echo ""
+        
+        read -p "Enter your choice [1-5]: " path_choice
+        
+        case "$path_choice" in
+            1)
+                validated_choice="dev"
+                ;;
+            2)
+                validated_choice="1"
+                ;;
+            3)
+                validated_choice="2"
+                ;;
+            4)
+                validated_choice="3"
+                ;;
+            5)
+                validated_choice="4"
+                ;;
+            *)
+                log_warning "Invalid choice, using Dev Container Quick Start"
+                validated_choice="dev"
+                ;;
+        esac
+    else
+        clear
+        print_banner "🎯 Choose Your Path"
+        echo ""
+        
+        print_message "How would you like to proceed?" "$CYAN"
+        echo ""
+        echo "  1) 🚀 Quick Start (5 minutes)"
+        echo "     Perfect for experienced users who want to start immediately"
+        echo ""
+        echo "  2) 📚 Complete Tutorial (15-20 minutes)"
+        echo "     Comprehensive walkthrough of all features"
+        echo ""
+        echo "  3) 🎮 Interactive Practice Mode"
+        echo "     Learn by doing with guided exercises"
+        echo ""
+        echo "  4) ⏭️  Skip Onboarding"
+        echo "     Go directly to main menu (not recommended for first-time users)"
+        echo ""
+        
+        read -p "Enter your choice [1-4]: " path_choice
+        
+        # Validate input to prevent file corruption
+        case "$path_choice" in
+            1|2|3|4)
+                validated_choice="$path_choice"
+                ;;
+            *)
+                log_warning "Invalid choice, defaulting to Quick Start"
+                validated_choice="1"
+                ;;
+        esac
+    fi
+    
+    echo "path=$validated_choice" >> "$USER_PROFILE"
+    echo "environment=$env_type" >> "$USER_PROFILE"
+    echo "$validated_choice"
+}
+
+# Choose onboarding path (original)
+choose_onboarding_path_original() {
     clear
     print_banner "🎯 Choose Your Path"
     echo ""
@@ -365,7 +549,8 @@ step_quick_setup() {
         1)
             log_info "Downloading wordlists..."
             # Log full (unfiltered) output to file while only showing filtered output to user
-            local log_file="$PROJECT_ROOT/logs/wordlist_download_$(date +%Y%m%d_%H%M%S).log"
+            local log_file
+            log_file="$PROJECT_ROOT/logs/wordlist_download_$(date +%Y%m%d_%H%M%S).log"
             mkdir -p "$PROJECT_ROOT/logs"
             bash "$PROJECT_ROOT/scripts/download_wordlists.sh" --quick 2>&1 | tee "$log_file" | grep -E "(Downloading|Success|Complete|Error)" | head -10
             log_success "✓ Basic wordlists downloaded"
@@ -881,6 +1066,11 @@ main() {
     path=$(choose_onboarding_path)
     
     case "$path" in
+        dev)
+            # Development Container Path
+            dev_container_onboarding
+            quick_start_path
+            ;;
         1)
             # Quick Start
             quick_start_path

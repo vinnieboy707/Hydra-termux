@@ -1311,7 +1311,8 @@ generate_report() {
     local wordlist_count="${10:-0}"
     
     # Generate unique report filename
-    local report_file="$REPORT_DIR/attack_report_${protocol}_$(date +%Y%m%d_%H%M%S).md"
+    local report_file
+    report_file="$REPORT_DIR/attack_report_${protocol}_$(date +%Y%m%d_%H%M%S).md"
     
     # Calculate duration
     local start_epoch

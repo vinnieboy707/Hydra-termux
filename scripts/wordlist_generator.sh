@@ -61,10 +61,6 @@ combine_wordlists() {
     done
     
     if [ -f "$output_file" ]; then
-        # shellcheck disable=SC2034
-        local final_lines
-
-        final_lines=$(wc -l < "$output_file")
         log_success "Combined $total_lines lines into $output_file"
     else
         log_error "Failed to combine wordlists"

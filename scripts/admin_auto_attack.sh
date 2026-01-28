@@ -192,7 +192,8 @@ attack_service() {
 # Function to generate report
 generate_report() {
     local scan_file="$1"
-    local report_file="$OUTPUT_DIR/report_$(date +%Y%m%d_%H%M%S).html"
+    local report_file
+    report_file="$OUTPUT_DIR/report_$(date +%Y%m%d_%H%M%S).html"
     
     print_header "Generating Report"
     
@@ -238,7 +239,8 @@ EOF
 EOF
     
     # Add results from JSON file with HTML escaping
-    local results_file="$PROJECT_ROOT/logs/results_$(date +%Y%m%d).json"
+    local results_file
+    results_file="$PROJECT_ROOT/logs/results_$(date +%Y%m%d).json"
     if [ -f "$results_file" ]; then
         echo "<table><tr><th>Protocol</th><th>Username</th><th>Password</th><th>Port</th></tr>" >> "$report_file"
         

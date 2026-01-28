@@ -1,0 +1,163 @@
+# Hydra-Termux Production Dockerfile
+# Multi-stage build for optimized and secure production deployment
+
+# ============================================================================
+# Stage 1: Builder - Build frontend and prepare backend dependencies
+# ============================================================================
+FROM node:20-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    git
+
+# Set working directory
+WORKDIR /build
+
+# Copy package files
+COPY fullstack-app/backend/package*.json ./backend/
+COPY fullstack-app/frontend/package*.json ./frontend/
+
+# Install and build backend dependencies
+WORKDIR /build/backend
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Install and build frontend
+WORKDIR /build/frontend
+RUN npm ci && \
+    npm run build && \
+    npm cache clean --force
+
+# ============================================================================
+# Stage 2: Production - Minimal production image
+# ============================================================================
+FROM ubuntu:22.04
+
+# Metadata
+LABEL maintainer="Hydra-Termux Team" \
+      version="1.0" \
+      description="Hydra-Termux Production Container" \
+      org.opencontainers.image.source="https://github.com/vinnieboy707/Hydra-termux"
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive \
+    NODE_ENV=production \
+    PORT=3000 \
+    TZ=UTC \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Core utilities
+    curl \
+    wget \
+    git \
+    ca-certificates \
+    gnupg \
+    # Node.js 20 LTS
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    # Penetration testing tools
+    hydra \
+    nmap \
+    sqlmap \
+    nikto \
+    john \
+    hashcat \
+    aircrack-ng \
+    metasploit-framework \
+    # Network utilities
+    netcat-openbsd \
+    dnsutils \
+    whois \
+    traceroute \
+    iproute2 \
+    iputils-ping \
+    # Python and tools
+    python3 \
+    python3-pip \
+    python3-requests \
+    python3-bs4 \
+    # Security tools
+    openssl \
+    nmap-common \
+    masscan \
+    # Database clients
+    sqlite3 \
+    postgresql-client \
+    # Monitoring
+    htop \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Install Python security tools
+RUN pip3 install --no-cache-dir \
+    requests==2.31.0 \
+    beautifulsoup4==4.12.2 \
+    dnspython==2.4.2 \
+    impacket==0.11.0 \
+    pwntools==4.11.0 \
+    paramiko==3.4.0
+
+# Create application user with minimal privileges
+RUN groupadd --gid 1000 hydra && \
+    useradd --uid 1000 --gid 1000 -m -s /bin/bash hydra && \
+    mkdir -p /app /data /logs && \
+    chown -R hydra:hydra /app /data /logs
+
+# Set working directory
+WORKDIR /app
+
+# Copy application files
+COPY --chown=hydra:hydra . .
+
+# Copy built artifacts from builder
+COPY --from=builder --chown=hydra:hydra /build/backend/node_modules ./fullstack-app/backend/node_modules
+COPY --from=builder --chown=hydra:hydra /build/frontend/build ./fullstack-app/frontend/build
+
+# Make scripts executable
+RUN find /app -name "*.sh" -type f -exec chmod +x {} \; && \
+    chmod +x /app/hydra.sh /app/install.sh
+
+# Create necessary directories with proper permissions
+RUN mkdir -p \
+    /app/results \
+    /app/wordlists \
+    /app/logs \
+    /app/config \
+    /data/database \
+    /data/backups \
+    /data/uploads \
+    /logs/app \
+    /logs/access \
+    /logs/error \
+    && chown -R hydra:hydra /app /data /logs
+
+# Create health check script
+RUN echo '#!/bin/bash\ncurl -f http://localhost:3000/api/health || exit 1' > /usr/local/bin/healthcheck.sh && \
+    chmod +x /usr/local/bin/healthcheck.sh
+
+# Switch to application user
+USER hydra
+
+# Expose ports
+EXPOSE 3000 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh
+
+# Set entrypoint
+COPY --chown=hydra:hydra docker-entrypoint.sh /usr/local/bin/
+USER root
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+USER hydra
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+
+# Default command
+CMD ["npm", "start", "--prefix", "fullstack-app/backend"]

@@ -251,7 +251,8 @@ run_attack() {
         
         # Check exit status and error output
         local exit_code=$?
-        local error_output=$(cat "$error_file" 2>/dev/null)
+        local error_output
+        error_output=$(cat "$error_file" 2>/dev/null)
         
         if [ $exit_code -eq 0 ] && [ -s "$output_file" ]; then
             realtime_status "success" "Attack completed successfully"
