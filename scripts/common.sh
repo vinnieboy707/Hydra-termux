@@ -347,7 +347,8 @@ validate_ip() {
     
     # Check each octet
     local IFS='.'
-    local -a octets=($ip)
+    local -a octets
+    read -ra octets <<< "$ip"
     local octet
     
     for octet in "${octets[@]}"; do

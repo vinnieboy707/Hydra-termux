@@ -134,7 +134,9 @@ run_attack() {
     local username_file
     username_file=$(get_usernames)
     local wordlists
-    wordlists=($(get_wordlists))
+    local wordlists_output
+    wordlists_output=$(get_wordlists)
+    mapfile -t wordlists <<< "$wordlists_output"
     
     if [ ${#wordlists[@]} -eq 0 ]; then
         log_error "No password wordlists found"

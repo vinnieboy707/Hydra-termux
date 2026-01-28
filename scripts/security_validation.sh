@@ -29,7 +29,8 @@ security_validate_ipv4() {
     
     # Check octets
     local IFS='.'
-    local -a octets=($ip)
+    local -a octets
+    read -ra octets <<< "$ip"
     for octet in "${octets[@]}"; do
         if [ "$octet" -gt 255 ]; then
             echo "ERROR: Invalid IPv4 octet (>255): $ip" >&2
