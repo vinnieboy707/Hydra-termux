@@ -22,7 +22,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing dorks-eye... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit
     git clone https://github.com/BullsEye0/dorks-eye.git
     
     if [ $? -ne 0 ]; then
@@ -30,11 +30,11 @@ if [ ! -d "$TOOL_DIR" ]; then
         exit 1
     fi
     
-    cd "$TOOL_DIR"
+    cd "$TOOL_DIR" || exit
     log_info "Installing Python dependencies..."
     pip install -r requirements.txt 2>/dev/null || pip3 install -r requirements.txt 2>/dev/null || true
 fi
 
 log_info "Launching dorks-eye..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit
 python3 dorks-eye.py

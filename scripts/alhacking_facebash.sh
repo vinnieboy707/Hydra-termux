@@ -24,7 +24,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing Facebash... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit
     git clone https://github.com/fu8uk1/facebash
     
     if [ $? -ne 0 ]; then
@@ -32,12 +32,12 @@ if [ ! -d "$TOOL_DIR" ]; then
         exit 1
     fi
     
-    cd "$TOOL_DIR"
+    cd "$TOOL_DIR" || exit
     log_info "Running installer..."
     bash install.sh 2>/dev/null || true
     chmod +x facebash.sh 2>/dev/null || true
 fi
 
 log_info "Launching Facebash..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit
 ./facebash.sh

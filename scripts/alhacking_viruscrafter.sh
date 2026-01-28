@@ -24,7 +24,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing TigerVirus... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit
     git clone https://github.com/Devil-Tigers/TigerVirus
     
     if [ $? -ne 0 ]; then
@@ -34,5 +34,5 @@ if [ ! -d "$TOOL_DIR" ]; then
 fi
 
 log_info "Launching TigerVirus..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit
 bash app.sh

@@ -28,7 +28,7 @@ fi
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing info-site... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit
     git clone https://github.com/king-hacking/info-site.git
     
     if [ $? -ne 0 ]; then
@@ -38,5 +38,5 @@ if [ ! -d "$TOOL_DIR" ]; then
 fi
 
 log_info "Launching info-site..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit
 bash info.sh
