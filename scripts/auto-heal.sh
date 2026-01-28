@@ -14,7 +14,7 @@ NC='\033[0m'
 
 LOG_FILE="/var/log/hydra-auto-heal.log"
 ALERT_THRESHOLD=3
-export RESTART_COOLDOWN=300  # 5 minutes - exported for potential use
+# RESTART_COOLDOWN can be added here if restart throttling is implemented
 
 log_event() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
@@ -243,8 +243,12 @@ auto_scale() {
     local cpu_usage
     cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
     
+    # Normalize to integer for comparison (strip any decimal part)
+    local cpu_usage_int
+    cpu_usage_int=${cpu_usage%.*}
+    
     # If CPU usage is high, suggest scaling
-    if (( $(echo "$cpu_usage > 80" | bc -l) )); then
+    if [ "$cpu_usage_int" -gt 80 ]; then
         print_warning "High CPU usage detected: ${cpu_usage}%"
         print_status "Consider scaling up the application"
         

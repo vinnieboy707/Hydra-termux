@@ -7,7 +7,6 @@ set -e
 
 # Colors
 GREEN='\033[0;32m'
-export YELLOW='\033[1;33m'  # Export for potential use
 BLUE='\033[0;34m'
 NC='\033[0m'
 

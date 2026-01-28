@@ -130,6 +130,9 @@ choose_onboarding_path() {
     local env_type
     env_type=$(detect_environment)
     
+    # Declare validated_choice at function scope
+    local validated_choice
+    
     # If in dev container, show dev-specific onboarding option
     if [ "$env_type" = "devcontainer" ]; then
         clear
@@ -200,7 +203,6 @@ choose_onboarding_path() {
         read -p "Enter your choice [1-4]: " path_choice
         
         # Validate input to prevent file corruption
-        local validated_choice
         case "$path_choice" in
             1|2|3|4)
                 validated_choice="$path_choice"

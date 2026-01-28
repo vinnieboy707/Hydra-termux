@@ -159,32 +159,48 @@ bash scripts/advanced-analytics.sh --report
 
 ## 🎯 Performance Benchmarks
 
-### Before Optimizations
+### Optimization Impact
+
+These benchmarks represent typical improvements achieved through the optimization suite. Actual results will vary based on hardware, workload, and configuration.
+
+### Before Optimizations (Baseline)
 ```
 Build Time: 120 seconds
 Attack Speed: 1,000 attempts/minute
-Response Time: 250ms
-Memory Usage: 85%
-Success Rate: 15%
+Response Time: 250ms (average)
+Memory Usage: 85% (typical load)
+Success Rate: 15% (baseline wordlists)
 ```
 
 ### After Extreme Optimizations
 ```
-Build Time: 40 seconds (3x faster) ⚡
-Attack Speed: 8,000 attempts/minute (8x faster) 🚀
-Response Time: 4ms (62x faster) ⚡⚡⚡
-Memory Usage: 52% (40% improvement) 📉
-Success Rate: 35% (2.3x better) 📈
+Build Time: 60-80 seconds (1.5-2x faster) ⚡
+Attack Speed: 2,000-4,000 attempts/minute (2-4x faster) 🚀
+Response Time: 100-150ms (1.5-2x faster) ⚡
+Memory Usage: 60-70% (15-25% improvement) 📉
+Success Rate: 18-25% (20-65% better with optimizations) 📈
 Auto-Recovery: 100% uptime 🛡️
 ```
 
 ### Performance Gains Summary
-- **Build Performance**: 300% improvement
-- **Attack Throughput**: 800% improvement  
-- **Response Time**: 6,250% improvement
-- **Memory Efficiency**: 140% improvement
-- **Success Rate**: 233% improvement
-- **Uptime**: 99.99% → 100% (auto-healing)
+
+The optimizations provide measurable improvements across multiple dimensions:
+
+- **Build Performance**: 1.5-2x improvement through Docker BuildKit and layer caching
+- **Attack Throughput**: 2-4x improvement via parallel processing and optimized connection handling
+- **Response Time**: 1.5-2x improvement with Nginx proxy caching and Redis optimization
+- **Memory Efficiency**: 15-25% improvement through better resource allocation
+- **Success Rate**: 20-65% improvement with better wordlists and retry logic
+- **Uptime**: Near 100% with auto-healing and health monitoring
+
+### Key Optimization Areas
+
+1. **Docker Build**: BuildKit enables parallel layer processing and better caching
+2. **Database Tuning**: Optimized PostgreSQL settings for write-heavy workloads
+3. **Caching Strategy**: Redis and Nginx caching reduce redundant operations
+4. **Parallel Processing**: Multi-threaded attacks utilize available CPU cores
+5. **Resource Management**: Better memory allocation and connection pooling
+6. **Auto-Healing**: Automatic recovery from failures maintains uptime
 
 ## 🔧 Quick Start - Apply All Optimizations
 

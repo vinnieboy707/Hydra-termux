@@ -107,7 +107,7 @@ check_security() {
     fi
     
     # Check for exposed secrets in code
-    if grep -rq "password.*=.*['\"]" "$PROJECT_ROOT/scripts/" 2>/dev/null | grep -v "^#" | grep -v "example" | grep -v "template"; then
+    if grep -r "password.*=.*['\"]" "$PROJECT_ROOT/scripts/" 2>/dev/null | grep -v "^#" | grep -v "example" | grep -v "template" | grep -q .; then
         print_warning "Possible hardcoded credentials found in scripts"
     fi
     

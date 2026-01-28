@@ -153,7 +153,7 @@ services:
       - hydra-network
     
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "sh", "-c", "redis-cli -a $REDIS_PASSWORD ping || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -295,17 +295,9 @@ services:
 volumes:
   postgres-data:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./data/postgres
   
   postgres-backups:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./data/backups/postgres
   
   redis-data:
     driver: local

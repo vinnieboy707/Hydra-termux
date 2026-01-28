@@ -220,7 +220,7 @@ generate_comprehensive_report() {
     report_file="$PROJECT_ROOT/reports/analytics-report-$(date +%Y%m%d-%H%M%S).md"
     mkdir -p "$PROJECT_ROOT/reports"
     
-    cat > "$report_file" << 'EOF'
+    cat > "$report_file" << EOF
 # Hydra-Termux Analytics Report
 
 **Generated:** $(date)
