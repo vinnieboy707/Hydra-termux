@@ -151,7 +151,8 @@ ui_print() {
 ui_print_center() {
     local text="$1"
     local color="${2:-NC}"
-    local cols=$(ui_get_cols)
+    local cols
+    cols=$(ui_get_cols)
     local padding=$(( (cols - ${#text}) / 2 ))
     printf "%${padding}s" ""
     echo -e "${COLORS[$color]}${text}${COLORS[NC]}"
@@ -524,7 +525,8 @@ ui_badge() {
 
 # Divider
 ui_divider() {
-    local width=$(ui_get_cols)
+    local width
+    width=$(ui_get_cols)
     local char="${1:-─}"
     local color="${2:-DIM}"
     

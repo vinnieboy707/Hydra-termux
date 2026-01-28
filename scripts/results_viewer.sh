@@ -44,7 +44,8 @@ show_all_results() {
     print_header "All Attack Results (Past 30 Days)"
     
     # Find all results files from the past 30 days
-    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null | sort -r)
+    local results_files
+    results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null | sort -r)
     
     if [ -z "$results_files" ]; then
         log_warning "No results found in the past 30 days"
@@ -54,7 +55,8 @@ show_all_results() {
     # Count total results
     local total_count=0
     for file in $results_files; do
-        local count=$(jq '. | length' "$file" 2>/dev/null || echo 0)
+        local count
+        count=$(jq '. | length' "$file" 2>/dev/null || echo 0)
         total_count=$((total_count + count))
     done
     
@@ -69,9 +71,12 @@ show_all_results() {
     # Display results grouped by date
     local file_count=0
     for results_file in $results_files; do
-        local file_date=$(basename "$results_file" | sed 's/results_\(.*\)\.json/\1/')
-        local formatted_date=$(echo "$file_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3/')
-        local file_count_single=$(jq '. | length' "$results_file" 2>/dev/null || echo 0)
+        local file_date
+        file_date=$(basename "$results_file" | sed 's/results_\(.*\)\.json/\1/')
+        local formatted_date
+        formatted_date=$(echo "$file_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3/')
+        local file_count_single
+        file_count_single=$(jq '. | length' "$results_file" 2>/dev/null || echo 0)
         
         if [ "$file_count_single" -gt 0 ]; then
             file_count=$((file_count + 1))
@@ -107,7 +112,8 @@ filter_by_protocol() {
     
     print_header "Results for Protocol: $protocol (Past 30 Days)"
     
-    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
+    local results_files
+    results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
     
     if [ -z "$results_files" ]; then
         log_warning "No results found in the past 30 days"
@@ -115,7 +121,8 @@ filter_by_protocol() {
     fi
     
     local count=0
-    local temp_output=$(mktemp /tmp/results_filter.XXXXXX)
+    local temp_output
+    temp_output=$(mktemp /tmp/results_filter.XXXXXX)
     
     for file in $results_files; do
         jq -r --arg proto "$protocol" '.[] | select(.protocol == $proto) | "\(.timestamp)|\(.target)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null >> "$temp_output"
@@ -147,7 +154,8 @@ filter_by_target() {
     
     print_header "Results for Target: $target (Past 30 Days)"
     
-    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
+    local results_files
+    results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
     
     if [ -z "$results_files" ]; then
         log_warning "No results found in the past 30 days"
@@ -155,7 +163,8 @@ filter_by_target() {
     fi
     
     local count=0
-    local temp_output=$(mktemp /tmp/results_filter.XXXXXX)
+    local temp_output
+    temp_output=$(mktemp /tmp/results_filter.XXXXXX)
     
     for file in $results_files; do
         jq -r --arg tgt "$target" '.[] | select(.target == $tgt) | "\(.timestamp)|\(.protocol)|\(.port)|\(.username):\(.password)"' "$file" 2>/dev/null >> "$temp_output"
@@ -188,7 +197,8 @@ export_results() {
     
     print_header "Exporting Results (Past 30 Days)"
     
-    local results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
+    local results_files
+    results_files=$(find "$RESULTS_DIR" -name "results_*.json" -type f -mtime -30 2>/dev/null)
     
     if [ -z "$results_files" ]; then
         log_error "No results found in the past 30 days"
@@ -228,7 +238,8 @@ export_results() {
 clear_old_results() {
     print_header "Clearing Old Results"
     
-    local count=$(find "$RESULTS_DIR" -name "results_*.json" -mtime +30 -type f 2>/dev/null | wc -l)
+    local count
+    count=$(find "$RESULTS_DIR" -name "results_*.json" -mtime +30 -type f 2>/dev/null | wc -l)
     
     if [ $count -eq 0 ]; then
         log_info "No old results to clear"

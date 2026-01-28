@@ -127,7 +127,8 @@ parse_scan_results() {
     print_header "Analyzing Scan Results"
     
     # Extract open ports and services
-    local services=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | sort -n)
+    local services
+    services=$(grep -oP 'portid="\K[0-9]+(?=")' "$scan_file" 2>/dev/null | sort -n)
     
     if [ -z "$services" ]; then
         log_warning "No open ports found"
@@ -140,7 +141,8 @@ parse_scan_results() {
     declare -gA DISCOVERED_SERVICES
     
     while IFS= read -r port; do
-        local service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
+        local service
+        service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
         
         if [ -n "$service" ]; then
             DISCOVERED_SERVICES["$port"]="$service"
@@ -188,7 +190,8 @@ attack_service() {
 # Function to generate report
 generate_report() {
     local scan_file="$1"
-    local report_file="$OUTPUT_DIR/report_$(date +%Y%m%d_%H%M%S).html"
+    local report_file
+    report_file="$OUTPUT_DIR/report_$(date +%Y%m%d_%H%M%S).html"
     
     print_header "Generating Report"
     
@@ -234,7 +237,8 @@ EOF
 EOF
     
     # Add results from JSON file with HTML escaping
-    local results_file="$PROJECT_ROOT/logs/results_$(date +%Y%m%d).json"
+    local results_file
+    results_file="$PROJECT_ROOT/logs/results_$(date +%Y%m%d).json"
     if [ -f "$results_file" ]; then
         echo "<table><tr><th>Protocol</th><th>Username</th><th>Password</th><th>Port</th></tr>" >> "$report_file"
         
@@ -262,7 +266,8 @@ run_auto_attack() {
     echo ""
     
     # Step 1: Scan target
-    local scan_file=$(scan_target)
+    local scan_file
+    scan_file=$(scan_target)
     if [ -z "$scan_file" ]; then
         log_error "Scanning failed"
         return 1

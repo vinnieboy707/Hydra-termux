@@ -45,7 +45,8 @@ ATTACK_WORDLIST_COUNT=0
 log_message() {
     local level="$1"
     local message="$2"
-    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    local timestamp
+    timestamp=$(date "+%Y-%m-%d %H:%M:%S")
     
     echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
 }
@@ -108,7 +109,8 @@ save_result() {
     local username="$3"
     local password="$4"
     local port="$5"
-    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    local timestamp
+    timestamp=$(date "+%Y-%m-%d %H:%M:%S")
     
     # Create JSON entry with proper escaping using jq
     local json_entry
@@ -123,7 +125,8 @@ save_result() {
     
     # Add to results file
     if [ -f "$RESULTS_FILE" ]; then
-        local temp_file=$(mktemp)
+        local temp_file
+        temp_file=$(mktemp)
         jq --argjson entry "$json_entry" '. += [$entry]' "$RESULTS_FILE" > "$temp_file" 2>/dev/null || {
             # If jq fails, fall back to simple append
             echo "$json_entry" >> "$LOG_DIR/results_fallback.txt"
@@ -176,7 +179,8 @@ finish_attack_tracking() {
     # Generate detailed report if functions are available
     if declare -f generate_report >/dev/null 2>&1; then
         # Generate detailed report
-        local report_file=$(generate_report "$protocol" "$target" "$port" \
+        local report_file
+        report_file=$(generate_report "$protocol" "$target" "$port" \
             "$ATTACK_START_TIME" "$ATTACK_END_TIME" "$status" \
             "$username" "$password" "$ATTACK_ATTEMPTS" "$ATTACK_WORDLIST_COUNT")
         
@@ -215,7 +219,8 @@ save_attack_metadata() {
         '{protocol: $protocol, target: $target, port: $port, status: $status, start_time: $start_time, end_time: $end_time, attempts: $attempts, wordlist_count: $wordlist_count, report_file: $report_file}')
     
     if [ -f "$ATTACK_METADATA_FILE" ]; then
-        local temp_file=$(mktemp)
+        local temp_file
+        temp_file=$(mktemp)
         jq --argjson entry "$metadata_entry" '. += [$entry]' "$ATTACK_METADATA_FILE" > "$temp_file" 2>/dev/null && \
             mv "$temp_file" "$ATTACK_METADATA_FILE"
     fi
@@ -317,10 +322,12 @@ track_ip_rotation() {
     
     # Rotate log file if it exceeds 10000 lines
     if [ -f "$log_file" ]; then
-        local line_count=$(wc -l < "$log_file" 2>/dev/null || echo "0")
+        local line_count
+        line_count=$(wc -l < "$log_file" 2>/dev/null || echo "0")
         if [ "$line_count" -gt 10000 ]; then
             # Archive old log and start fresh
-            local archive_file="$LOG_DIR/ip_rotation_${user_id}_$(date +%Y%m%d_%H%M%S).log.gz"
+            local archive_file
+            archive_file="$LOG_DIR/ip_rotation_${user_id}_$(date +%Y%m%d_%H%M%S).log.gz"
             gzip -c "$log_file" > "$archive_file" 2>/dev/null || true
             # Keep only last 1000 entries in active log
             tail -n 1000 "$log_file" > "$log_file.tmp"
@@ -364,7 +371,8 @@ track_ip_rotation() {
         log_debug "IP Rotation: Current=$current_ip, Unique IPs (last hour)=$unique_ips"
         
         # Check if approaching the 1000 IP threshold
-        local total_ips=$(wc -l < "$log_file" 2>/dev/null || echo "0")
+        local total_ips
+        total_ips=$(wc -l < "$log_file" 2>/dev/null || echo "0")
         if [ "$total_ips" -ge 900 ] && [ "$total_ips" -lt 1000 ]; then
             log_info "IP Rotation: $total_ips/1000 IPs tracked ($(($total_ips * 100 / 1000))%)"
         elif [ "$total_ips" -ge 1000 ]; then
@@ -379,10 +387,14 @@ get_ip_rotation_stats() {
     local log_file="$LOG_DIR/ip_rotation_${user_id}.log"
     
     if [ -f "$log_file" ]; then
-        local total_ips=$(wc -l < "$log_file")
-        local unique_ips=$(cut -d'|' -f2 "$log_file" | sort -u | wc -l)
-        local first_seen=$(head -n1 "$log_file" | cut -d'|' -f1)
-        local last_seen=$(tail -n1 "$log_file" | cut -d'|' -f1)
+        local total_ips
+        total_ips=$(wc -l < "$log_file")
+        local unique_ips
+        unique_ips=$(cut -d'|' -f2 "$log_file" | sort -u | wc -l)
+        local first_seen
+        first_seen=$(head -n1 "$log_file" | cut -d'|' -f1)
+        local last_seen
+        last_seen=$(tail -n1 "$log_file" | cut -d'|' -f1)
         
         echo "Total IPs tracked: $total_ips"
         echo "Unique IPs: $unique_ips"
@@ -419,7 +431,8 @@ show_progress() {
 realtime_status() {
     local status="$1"
     local message="$2"
-    local timestamp=$(date "+%H:%M:%S")
+    local timestamp
+    timestamp=$(date "+%H:%M:%S")
     
     case "$status" in
         "starting")

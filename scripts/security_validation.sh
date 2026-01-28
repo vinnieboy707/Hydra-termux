@@ -359,7 +359,8 @@ security_validate_wordlist() {
     fi
     
     # Check file size (warn if >100MB)
-    local size=$(stat -f%z "$wordlist" 2>/dev/null || stat -c%s "$wordlist" 2>/dev/null)
+    local size
+    size=$(stat -f%z "$wordlist" 2>/dev/null || stat -c%s "$wordlist" 2>/dev/null)
     if [ "$size" -gt 104857600 ]; then
         echo "WARNING: Large wordlist file (>100MB): $wordlist" >&2
         echo "  This may take a very long time to process." >&2

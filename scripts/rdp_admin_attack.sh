@@ -82,7 +82,8 @@ run_attack() {
     # Start tracking attack for reporting
     start_attack_tracking
     
-    local username_file=$(mktemp)
+    local username_file
+    username_file=$(mktemp)
     
     # Get usernames
     if [ -n "$CUSTOM_USERLIST" ] && [ -f "$CUSTOM_USERLIST" ]; then
@@ -121,8 +122,10 @@ run_attack() {
     "${hydra_cmd[@]}" "rdp://$TARGET:$PORT" 2>&1 | while IFS= read -r line; do
         if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
             # Parse successful login (support credentials with spaces)
-            local login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
-            local password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
+            local login
+            login=$(echo "$line" | sed -n 's/.*login: \(.*\) password:.*/\1/p')
+            local password
+            password=$(echo "$line" | sed -n 's/.*password: \(.*\)/\1/p')
             
             save_result "rdp" "$TARGET" "$login" "$password" "$PORT"
             log_success "Valid credentials found: $login:$password"

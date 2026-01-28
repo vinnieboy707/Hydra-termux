@@ -405,7 +405,8 @@ show_results() {
         
         # Try to parse results
         if command_exists jq; then
-            local found_count=$(jq '. | length' "$results_file" 2>/dev/null || echo "0")
+            local found_count
+            found_count=$(jq '. | length' "$results_file" 2>/dev/null || echo "0")
             echo ""
             ui_kv "Credentials Found" "$found_count" 35
         fi
