@@ -22,7 +22,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing CamPhish... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit
     git clone https://github.com/techchipnet/CamPhish
     
     if [ $? -ne 0 ]; then
@@ -32,5 +32,5 @@ if [ ! -d "$TOOL_DIR" ]; then
 fi
 
 log_info "Launching CamPhish..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit
 bash camphish.sh

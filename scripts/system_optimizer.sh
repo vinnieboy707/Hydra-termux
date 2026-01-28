@@ -28,7 +28,8 @@ detect_system_resources() {
     echo ""
     
     # CPU cores
-    local cpu_cores=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo "1")
+    local cpu_cores
+    cpu_cores=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo "1")
     log_info "CPU Cores: $cpu_cores"
     echo "CPU_CORES=$cpu_cores" >> "$OPTIMIZATION_LOG"
     
@@ -43,7 +44,8 @@ detect_system_resources() {
     echo "RAM_MB=$ram_mb" >> "$OPTIMIZATION_LOG"
     
     # Disk space
-    local disk_space=$(df -BG "$PROJECT_ROOT" 2>/dev/null | awk 'NR==2{print $4}' | tr -d 'G' || echo "unknown")
+    local disk_space
+    disk_space=$(df -BG "$PROJECT_ROOT" 2>/dev/null | awk 'NR==2{print $4}' | tr -d 'G' || echo "unknown")
     log_info "Free Disk Space: ${disk_space}GB"
     echo "DISK_SPACE_GB=$disk_space" >> "$OPTIMIZATION_LOG"
     

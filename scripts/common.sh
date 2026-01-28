@@ -177,7 +177,8 @@ resolve_script_path() {
             # Handle relative paths
             if [ "${resolved_path#/}" = "$resolved_path" ]; then
                 # Relative path: resolve it relative to the script's directory
-                local link_dir="$(cd "$(dirname "$script_path")" 2>/dev/null && pwd)"
+                local link_dir
+                link_dir="$(cd "$(dirname "$script_path")" 2>/dev/null && pwd)"
                 resolved_path="$link_dir/$resolved_path"
             fi
             echo "$resolved_path"
@@ -346,7 +347,8 @@ validate_ip() {
     
     # Check each octet
     local IFS='.'
-    local -a octets=($ip)
+    local -a octets
+    read -ra octets <<< "$ip"
     local octet
     
     for octet in "${octets[@]}"; do

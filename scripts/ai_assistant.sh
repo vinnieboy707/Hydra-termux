@@ -27,7 +27,8 @@ get_user_level() {
         return
     fi
     
-    local total_actions=$(wc -l < "$USER_HISTORY" 2>/dev/null || echo "0")
+    local total_actions
+    total_actions=$(wc -l < "$USER_HISTORY" 2>/dev/null || echo "0")
     
     if [ "$total_actions" -lt 5 ]; then
         echo "beginner"
@@ -47,7 +48,8 @@ log_action() {
 # Get contextual hint based on current action
 get_contextual_hint() {
     local context="$1"
-    local user_level=$(get_user_level)
+    local user_level
+    user_level=$(get_user_level)
     
     case "$context" in
         "main_menu")
@@ -718,8 +720,10 @@ EOF
 
 # Progress tracker
 show_progress() {
-    local total_actions=$(wc -l < "$USER_HISTORY" 2>/dev/null || echo "0")
-    local level=$(get_user_level)
+    local total_actions
+    total_actions=$(wc -l < "$USER_HISTORY" 2>/dev/null || echo "0")
+    local level
+    level=$(get_user_level)
     
     clear
     print_banner "📈 Your Progress"

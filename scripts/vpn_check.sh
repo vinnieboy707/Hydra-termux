@@ -59,7 +59,8 @@ check_vpn_connection() {
         
         # Get public IP
         if command -v curl &>/dev/null; then
-            local public_ip=$(curl -s --connect-timeout 5 https://api.ipify.org 2>/dev/null)
+            local public_ip
+            public_ip=$(curl -s --connect-timeout 5 https://api.ipify.org 2>/dev/null)
             if [ -n "$public_ip" ]; then
                 echo -e "${BLUE}[*] Current public IP: $public_ip${NC}"
             fi
@@ -124,7 +125,8 @@ test_vpn_leak() {
     fi
     
     # Get DNS servers
-    local dns_servers=$(cat /etc/resolv.conf 2>/dev/null | grep nameserver | awk '{print $2}')
+    local dns_servers
+    dns_servers=$(cat /etc/resolv.conf 2>/dev/null | grep nameserver | awk '{print $2}')
     
     if [ -n "$dns_servers" ]; then
         echo -e "${BLUE}[*] Current DNS servers:${NC}"
