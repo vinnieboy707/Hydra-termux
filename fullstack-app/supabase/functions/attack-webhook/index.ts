@@ -22,20 +22,22 @@ const WEBHOOK_TIMEOUT = 30000 // 30 seconds
 
 // Request validation middleware
 interface RequestBody {
-  attack_id: unknown;
-  event_type: unknown;
+  attack_id: number;
+  event_type: string;
 }
 
-function validateRequest(body: RequestBody): { valid: boolean; error?: string } {
-  if (!body.attack_id || typeof body.attack_id !== 'number') {
+function validateRequest(body: unknown): { valid: boolean; error?: string } {
+  const requestBody = body as RequestBody;
+  
+  if (!requestBody.attack_id || typeof requestBody.attack_id !== 'number') {
     return { valid: false, error: 'Invalid attack_id: must be a number' }
   }
-  if (!body.event_type || typeof body.event_type !== 'string') {
+  if (!requestBody.event_type || typeof requestBody.event_type !== 'string') {
     return { valid: false, error: 'Invalid event_type: must be a string' }
   }
   const validEvents = ['attack.queued', 'attack.started', 'attack.completed', 'attack.failed', 
                        'credentials.found', 'target.added', 'wordlist.uploaded']
-  if (!validEvents.includes(body.event_type)) {
+  if (!validEvents.includes(requestBody.event_type)) {
     return { valid: false, error: `Invalid event_type: must be one of ${validEvents.join(', ')}` }
   }
   return { valid: true }
@@ -80,7 +82,7 @@ interface WebhookPayload {
   event: string;
   timestamp: string;
   webhook_id: number;
-  data: Record<string, unknown>;
+  data: Attack;
 }
 
 async function sendWebhookWithRetry(
