@@ -3,11 +3,8 @@
   "dockerComposeFile": "docker-compose.dev.yml",
   "service": "hydra-dev",
   "workspaceFolder": "/workspace",
-  
-  // Configure tool-specific properties
   "customizations": {
     "vscode": {
-      // Extensions to install in the dev container
       "extensions": [
         "ms-vscode.vscode-typescript-next",
         "dbaeumer.vscode-eslint",
@@ -23,8 +20,6 @@
         "redhat.vscode-yaml",
         "streetsidesoftware.code-spell-checker"
       ],
-      
-      // VS Code settings
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
         "terminal.integrated.profiles.linux": {
@@ -55,8 +50,6 @@
       }
     }
   },
-  
-  // Features to add to the dev container
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": true,
@@ -81,11 +74,7 @@
       "moby": true
     }
   },
-  
-  // Use 'forwardPorts' to make a list of ports inside the container available locally
   "forwardPorts": [3000, 3001, 5432, 6379],
-  
-  // Port attributes
   "portsAttributes": {
     "3000": {
       "label": "Backend API",
@@ -104,24 +93,14 @@
       "onAutoForward": "silent"
     }
   },
-  
-  // Use 'postCreateCommand' to run commands after the container is created
   "postCreateCommand": "bash .devcontainer/post-create.sh",
-  
-  // Use 'postStartCommand' to run commands after the container starts
   "postStartCommand": "bash .devcontainer/post-start.sh",
-  
-  // Comment out to connect as root instead
   "remoteUser": "vscode",
-  
-  // Environment variables
   "remoteEnv": {
     "NODE_ENV": "development",
     "LOG_LEVEL": "debug",
     "DEVELOPMENT_MODE": "true"
   },
-  
-  // Mount the host's SSH and GPG keys
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,readonly,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,readonly,type=bind,consistency=cached"
