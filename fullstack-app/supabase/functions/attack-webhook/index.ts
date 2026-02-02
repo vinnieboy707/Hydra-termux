@@ -50,8 +50,8 @@ function validateRequest(body: unknown): { valid: true; data: RequestBody } | { 
   return { 
     valid: true, 
     data: {
-      attack_id: requestBody.attack_id,
-      event_type: requestBody.event_type
+      attack_id: requestBody.attack_id as number,
+      event_type: requestBody.event_type as string
     }
   }
 }
