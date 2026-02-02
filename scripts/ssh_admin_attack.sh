@@ -111,7 +111,8 @@ get_wordlists() {
         wordlists+=("$HOME/wordlists/rockyou.txt")
     fi
     
-    echo "${wordlists[@]}"
+    # Output one path per line for mapfile compatibility
+    printf "%s\n" "${wordlists[@]}"
 }
 
 # Function to get usernames
