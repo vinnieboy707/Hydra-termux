@@ -1,11 +1,9 @@
 const logger = require('../utils/logger');
-const { v4: uuidv4 } = require('uuid');
-
 /**
  * Generate unique error ID for tracking
  */
 const generateErrorId = () => {
-  return `ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 };
 
 /**

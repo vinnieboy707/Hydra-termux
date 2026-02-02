@@ -105,7 +105,7 @@ router.post('/login', asyncHandler(async (req, res) => {
   // Generate token
   const token = jwt.sign(
     { id: user.id, username: user.username, role: user.role },
-    JWT_SECRET || 'your-secret-key-change-this',
+    JWT_SECRET,
     { expiresIn: '24h' }
   );
 
@@ -132,7 +132,7 @@ router.get('/verify', asyncHandler(async (req, res) => {
 
   const token = authHeader.split(' ')[1];
 
-  const decoded = jwt.verify(token, JWT_SECRET || 'your-secret-key-change-this');
+  const decoded = jwt.verify(token, JWT_SECRET);
   const user = await get('SELECT id, username, email, role FROM users WHERE id = ?', [decoded.id]);
   
   if (!user) {
