@@ -125,11 +125,11 @@ run_scan() {
     echo ""
     
     # Run nmap
-    nmap $nmap_opts -sV $format_opt "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
+    nmap "$nmap_opts" -sV "$format_opt" "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
     
     local result=$?
     
-    if [ $result -eq 0 ]; then
+    if [ "$result" -eq 0 ]; then
         log_success "Scan completed successfully"
         
         # Parse and display summary
@@ -192,7 +192,7 @@ parse_results() {
     log_success "Results saved to: $scan_file"
     
     # Suggest next steps
-    if [ $open_ports -gt 0 ]; then
+    if [ "$open_ports" -gt 0 ]; then
         print_header "Suggested Next Steps"
         log_info "Run auto attack: bash scripts/admin_auto_attack.sh -t $TARGET"
         log_info "View results: bash scripts/results_viewer.sh --all"

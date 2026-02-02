@@ -348,7 +348,7 @@ track_ip_rotation() {
     if command -v curl &>/dev/null; then
         local ip_output
         ip_output=$(curl -s --connect-timeout 3 https://api.ipify.org 2>/dev/null)
-        if [ $? -eq 0 ] && [ -n "$ip_output" ]; then
+        if [ -n "$ip_output" ]; then
             current_ip="$ip_output"
         else
             log_warn "IP Rotation: Failed to fetch public IP from https://api.ipify.org (network/firewall issue?). Skipping IP rotation tracking for this run."
@@ -439,7 +439,7 @@ show_progress() {
     printf "%${remaining}s" | tr ' ' '-'
     printf "${CYAN}] ${percent}%%${NC}"
     
-    [ $current -eq $total ] && echo ""
+    [ "$current" -eq "$total" ] && echo ""
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════

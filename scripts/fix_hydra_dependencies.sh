@@ -188,9 +188,7 @@ compile_hydra() {
     
     # Compile
     echo -e "${YELLOW}🔨 Compiling (this may take 2-5 minutes)...${NC}"
-    make -j$(nproc 2>/dev/null || echo 2) > /dev/null 2>&1
-    
-    if [ $? -ne 0 ]; then
+    if ! make -j$(nproc 2>/dev/null || echo 2) > /dev/null 2>&1; then
         echo -e "${RED}❌ Compilation failed${NC}"
         echo -e "${YELLOW}ℹ️  Showing last 20 lines of errors:${NC}"
         make 2>&1 | tail -20
@@ -199,13 +197,18 @@ compile_hydra() {
     
     # Install
     echo -e "${YELLOW}📦 Installing Hydra...${NC}"
+    local install_success=false
     if [ "$PLATFORM" = "termux" ]; then
-        make install > /dev/null 2>&1
+        if make install > /dev/null 2>&1; then
+            install_success=true
+        fi
     else
-        sudo make install > /dev/null 2>&1
+        if sudo make install > /dev/null 2>&1; then
+            install_success=true
+        fi
     fi
     
-    if [ $? -eq 0 ]; then
+    if [ "$install_success" = true ]; then
         echo -e "${GREEN}✅ Hydra successfully compiled and installed${NC}"
         
         # Verify installation

@@ -277,7 +277,7 @@ perform_dns_analysis() {
     local mx_records
     mx_records=$(dig +short MX "$domain" 2>/dev/null | sort -n)
     if [ -n "$mx_records" ]; then
-        echo "$mx_records" | while read priority server; do
+        echo "$mx_records" | while read -r priority server; do
             # Remove trailing dot
             server="${server%.}"
             log_success "  MX Record: Priority $priority -> $server"
@@ -297,7 +297,7 @@ perform_dns_analysis() {
         echo "    $spf_record" | sed 's/"//g'
         
         # Parse SPF for mail servers
-        echo "$spf_record" | grep -oP 'mx:|a:|ip4:[0-9.]+|include:[^ ]+' | while read entry; do
+        echo "$spf_record" | grep -oP 'mx:|a:|ip4:[0-9.]+|include:[^ ]+' | while read -r entry; do
             [ "$VERBOSE" = "true" ] && log_info "    Authorized: $entry"
         done
     else
@@ -353,7 +353,7 @@ perform_dns_analysis() {
     # PTR Records for reverse DNS
     log_info "🔄 Checking reverse DNS (PTR) records..."
     if [ -f "$analysis_file" ]; then
-        while read server; do
+        while read -r server; do
             [ -z "$server" ] && continue
             local ip
             ip=$(dig +short A "$server" 2>/dev/null | head -1)
@@ -373,13 +373,13 @@ perform_dns_analysis() {
     # A Records for mail servers
     log_info "🌐 Resolving A records for mail servers..."
     if [ -f "$analysis_file" ]; then
-        while read server; do
+        while read -r server; do
             [ -z "$server" ] && continue
             local ips
             ips=$(dig +short A "$server" 2>/dev/null)
             if [ -n "$ips" ]; then
                 log_success "  $server:"
-                echo "$ips" | while read ip; do
+                echo "$ips" | while read -r ip; do
                     echo "    → $ip"
                 done
             fi
@@ -482,7 +482,7 @@ smtp_capability_check() {
         fi
         if echo "$response" | grep -qi "AUTH"; then
             log_success "  ✓ Authentication supported"
-            echo "$response" | grep -i "AUTH" | while read line; do
+            echo "$response" | grep -i "AUTH" | while read -r line; do
                 [ "$VERBOSE" = "true" ] && log_info "    $line"
             done
         fi
@@ -530,7 +530,7 @@ smtp_enumerate_users() {
     fi
     
     log_info "Testing VRFY command..."
-    while read username; do
+    while read -r username; do
         [ -z "$username" ] && continue
         [[ "$username" == "#"* ]] && continue  # Skip comments
         
@@ -611,7 +611,9 @@ support
 contact
 EOF
 
-    log_success "Generated $(grep -v '^#' "$output_file" | grep -v '^$' | wc -l) username variations"
+    local count
+    count=$(grep -v '^#' "$output_file" | grep -c -v '^$')
+    log_success "Generated $count username variations"
 }
 
 get_default_usernames() {
@@ -733,7 +735,9 @@ Test123
 Demo123
 EOF
 
-    log_success "Generated $(grep -v '^#' "$output_file" | grep -v '^$' | wc -l) password candidates"
+    local count
+    count=$(grep -v '^#' "$output_file" | grep -c -v '^$')
+    log_success "Generated $count password candidates"
 }
 
 get_wordlists() {

@@ -23,9 +23,7 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing zphisher... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/htr-tech/zphisher
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/htr-tech/zphisher; then
         log_error "Failed to clone zphisher"
         exit 1
     fi

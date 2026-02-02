@@ -29,9 +29,7 @@ fi
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing track-ip... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/htr-tech/track-ip.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/htr-tech/track-ip.git; then
         log_error "Failed to clone track-ip"
         exit 1
     fi

@@ -107,7 +107,7 @@ scan_target() {
     local scan_file="$OUTPUT_DIR/nmap_${TARGET//[.\/]/_}.xml"
     
     log_progress "Running nmap scan..."
-    nmap $scan_opts -sV -oX "$scan_file" "$TARGET" 2>&1 | while IFS= read -r line; do
+    nmap "$scan_opts" -sV -oX "$scan_file" "$TARGET" 2>&1 | while IFS= read -r line; do
         [ "$VERBOSE" = "true" ] && echo "$line"
     done
     
@@ -292,8 +292,7 @@ run_auto_attack() {
     for port in "${!DISCOVERED_SERVICES[@]}"; do
         local service="${DISCOVERED_SERVICES[$port]}"
         
-        attack_service "$port" "$service"
-        if [ $? -eq 0 ]; then
+        if attack_service "$port" "$service"; then
             success_count=$((success_count + 1))
         fi
         

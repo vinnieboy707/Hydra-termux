@@ -294,7 +294,7 @@ ui_menu() {
         echo ""
         
         for i in "${!options[@]}"; do
-            if [ $i -eq $selected ]; then
+            if [ "$i" -eq "$selected" ]; then
                 echo -e "  ${COLORS[BG_CYAN]}${COLORS[BLACK]} ${SYMBOLS[ARROW]} ${options[$i]} ${COLORS[NC]}"
             else
                 echo -e "  ${COLORS[CYAN]}${SYMBOLS[BULLET]}${COLORS[NC]} ${options[$i]}"
@@ -484,7 +484,7 @@ ui_tabs() {
     
     echo ""
     for i in "${!tabs[@]}"; do
-        if [ $i -eq $active ]; then
+        if [ "$i" -eq "$active" ]; then
             echo -ne "${COLORS[BG_CYAN]}${COLORS[BLACK]} ${tabs[$i]} ${COLORS[NC]} "
         else
             echo -ne "${COLORS[CYAN]} ${tabs[$i]} ${COLORS[NC]} "
@@ -521,7 +521,7 @@ ui_breadcrumb() {
     echo -ne "${COLORS[DIM]}"
     for i in "${!crumbs[@]}"; do
         echo -ne "${crumbs[$i]}"
-        if [ $i -lt $((${#crumbs[@]} - 1)) ]; then
+        if [ "$i" -lt $((${#crumbs[@]} - 1)) ]; then
             echo -ne " ${SYMBOLS[ARROW]} "
         fi
     done
@@ -545,7 +545,7 @@ ui_divider() {
     local char="${1:-─}"
     local color="${2:-DIM}"
     
-    echo -e "${COLORS[$color]}$(printf "${char}%.0s" $(seq 1 $width))${COLORS[NC]}"
+    echo -e "${COLORS[$color]}$(printf "${char}%.0s" $(seq 1 "$width"))${COLORS[NC]}"
 }
 
 # Key-value display

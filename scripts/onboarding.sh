@@ -83,7 +83,7 @@ dev_container_onboarding() {
     echo "    http://localhost:8001 - Redis Insight"
     echo ""
     
-    read -p "Press Enter to continue with environment setup..." _
+    read -r -p "Press Enter to continue with environment setup..." _
     
     # Run environment-specific setup
     dev_container_setup
@@ -121,7 +121,7 @@ dev_container_setup() {
     echo "  • Database data persists between container restarts"
     echo ""
     
-    read -p "Press Enter to continue..." _
+    read -r -p "Press Enter to continue..." _
 }
 
 # Choose onboarding path
@@ -157,7 +157,7 @@ choose_onboarding_path() {
         echo "     Go directly to main menu"
         echo ""
         
-        read -p "Enter your choice [1-5]: " path_choice
+        read -r -p "Enter your choice [1-5]: " path_choice
         
         case "$path_choice" in
             1)
@@ -200,7 +200,7 @@ choose_onboarding_path() {
         echo "     Go directly to main menu (not recommended for first-time users)"
         echo ""
         
-        read -p "Enter your choice [1-4]: " path_choice
+        read -r -p "Enter your choice [1-4]: " path_choice
         
         # Validate input to prevent file corruption
         case "$path_choice" in
@@ -240,7 +240,7 @@ choose_onboarding_path_original() {
     echo "     Go directly to main menu (not recommended for first-time users)"
     echo ""
     
-    read -p "Enter your choice [1-4]: " path_choice
+    read -r -p "Enter your choice [1-4]: " path_choice
     
     # Validate input to prevent file corruption
     local validated_choice
@@ -276,7 +276,7 @@ quick_start_path() {
     echo "4️⃣  First Task - Try your first safe scan"
     echo ""
     
-    read -p "Ready to continue? (press Enter)" _
+    read -r -p "Ready to continue? (press Enter)" _
     
     # Run essential steps
     step_introduction_quick
@@ -332,7 +332,7 @@ step_introduction_quick() {
     echo "  • ⚖️  You are 100% RESPONSIBLE for your actions"
     echo ""
     
-    read -p "I understand and agree to use this tool legally (yes/no): " agree
+    read -r -p "I understand and agree to use this tool legally (yes/no): " agree
     
     if [[ ! "$agree" =~ ^[Yy][Ee][Ss]$ ]]; then
         log_error "You must agree to the terms to continue."
@@ -372,7 +372,7 @@ step_introduction() {
     echo "     → Wordlist generation, reporting, logging"
     echo ""
     
-    read -p "Press Enter to review legal requirements..." _
+    read -r -p "Press Enter to review legal requirements..." _
     
     clear
     print_banner "⚠️  LEGAL REQUIREMENTS ⚠️"
@@ -410,7 +410,7 @@ step_introduction() {
     echo "  • Use VPN for anonymity"
     echo ""
     
-    read -p "Do you understand and agree to these terms? (yes/no): " agree
+    read -r -p "Do you understand and agree to these terms? (yes/no): " agree
     
     if [[ ! "$agree" =~ ^[Yy][Ee][Ss]$ ]]; then
         log_error "You must agree to the terms to continue."
@@ -459,7 +459,7 @@ step_system_check() {
     else
         log_warning "⚠ Missing dependencies: ${missing_deps[*]}"
         echo ""
-        read -p "Would you like to install missing dependencies now? (y/n): " install_deps
+        read -r -p "Would you like to install missing dependencies now? (y/n): " install_deps
         
         if [[ "$install_deps" =~ ^[Yy]$ ]]; then
             log_info "Installing dependencies..."
@@ -470,7 +470,7 @@ step_system_check() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Step 3: Tool Categories
@@ -510,7 +510,7 @@ step_tool_categories() {
     echo "   • IP tracking and manipulation"
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Quick setup helper
@@ -543,7 +543,7 @@ step_quick_setup() {
     echo "  3) Skip wordlists"
     echo ""
     
-    read -p "Your choice [1-3]: " wl_choice
+    read -r -p "Your choice [1-3]: " wl_choice
     
     case "$wl_choice" in
         1)
@@ -565,7 +565,7 @@ step_quick_setup() {
     esac
     
     echo ""
-    read -p "Press Enter to continue..." _
+    read -r -p "Press Enter to continue..." _
 }
 
 # First action guide
@@ -594,7 +594,7 @@ step_first_action_guide() {
     echo "     Set up a safe test environment"
     echo ""
     
-    read -p "What would you like to try? [1-4]: " first_action
+    read -r -p "What would you like to try? [1-4]: " first_action
     
     # Validate input before writing to file
     case "$first_action" in
@@ -621,7 +621,7 @@ step_first_action_guide() {
     
     echo ""
     echo "first_action=$first_action" >> "$USER_PROFILE"
-    read -p "Press Enter to continue to main menu..." _
+    read -r -p "Press Enter to continue to main menu..." _
 }
 
 # Practice mode introduction
@@ -641,7 +641,7 @@ practice_mode_intro() {
     echo "  ✓ How to launch your first safe attack"
     echo ""
     
-    read -p "Start practice mode now? (y/n): " start_practice
+    read -r -p "Start practice mode now? (y/n): " start_practice
     
     if [[ "$start_practice" =~ ^[Yy]$ ]]; then
         practice_exercise_1_setup
@@ -674,7 +674,7 @@ practice_exercise_1_setup() {
     echo "Always check logs/ and reports/ folders after an attack!"
     echo ""
     
-    read -p "Ready for next exercise? (press Enter)" _
+    read -r -p "Ready for next exercise? (press Enter)" _
     practice_exercise_2_scanning
 }
 
@@ -708,7 +708,7 @@ practice_exercise_2_scanning() {
     echo "to practice scanning safely!"
     echo ""
     
-    read -p "Ready for next exercise? (press Enter)" _
+    read -r -p "Ready for next exercise? (press Enter)" _
     practice_exercise_3_wordlists
 }
 
@@ -743,7 +743,7 @@ practice_exercise_3_wordlists() {
     echo "  • Combine multiple wordlists for best results"
     echo ""
     
-    read -p "Ready for next exercise? (press Enter)" _
+    read -r -p "Ready for next exercise? (press Enter)" _
     practice_exercise_4_safe_attack
 }
 
@@ -795,7 +795,7 @@ practice_exercise_4_safe_attack() {
     echo ""
     echo "You're ready to start using Hydra-Termux safely!"
     echo ""
-    read -p "Press Enter to continue to main menu..." _
+    read -r -p "Press Enter to continue to main menu..." _
 }
 
 # Step 4: First Time Setup
@@ -824,7 +824,7 @@ step_first_setup() {
     echo "Wordlists are essential for brute-force attacks."
     echo "They contain common usernames and passwords."
     echo ""
-    read -p "Would you like to download popular wordlists now? (y/n): " download_wl
+    read -r -p "Would you like to download popular wordlists now? (y/n): " download_wl
     
     if [[ "$download_wl" =~ ^[Yy]$ ]]; then
         log_info "This may take a few minutes..."
@@ -834,7 +834,7 @@ step_first_setup() {
     fi
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Step 5: How to Use
@@ -875,7 +875,7 @@ step_how_to_use() {
     echo "  • Use custom wordlists for better results (option 10)"
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Step 6: ALHacking Tools Guide
@@ -925,7 +925,7 @@ step_alhacking_guide() {
     echo "  3. Tools are saved in Tools/ directory"
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Step 7: Best Practices
@@ -967,7 +967,7 @@ step_best_practices() {
     echo "   • Don't exploit for harm"
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Step 8: Quick Start
@@ -1004,7 +1004,7 @@ step_quick_start() {
     echo "  4. Review the results and logs"
     echo ""
     
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Final step

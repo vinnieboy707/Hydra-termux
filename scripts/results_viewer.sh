@@ -256,13 +256,13 @@ clear_old_results() {
     
     count=$(find "$RESULTS_DIR" -name "results_*.json" -mtime +30 -type f 2>/dev/null | wc -l)
     
-    if [ $count -eq 0 ]; then
+    if [ "$count" -eq 0 ]; then
         log_info "No old results to clear"
         return 0
     fi
     
     log_warning "Found $count old result file(s)"
-    read -p "Delete files older than 30 days? (y/n): " confirm
+    read -r -p "Delete files older than 30 days? (y/n): " confirm
     
     if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
         find "$RESULTS_DIR" -name "results_*.json" -mtime +30 -type f -delete 2>/dev/null
