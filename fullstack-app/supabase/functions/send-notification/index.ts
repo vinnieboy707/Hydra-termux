@@ -177,7 +177,7 @@ async function sendEmail(
     
   } catch (error) {
     console.error('Email exception:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
@@ -227,7 +227,7 @@ async function sendSMS(
     
   } catch (error) {
     console.error('SMS exception:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
@@ -340,8 +340,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: 'Failed to send notification',
-        message: error.message,
-        type: error.name
+        message: error instanceof Error ? error.message : 'Unknown error',
+        type: error instanceof Error ? error.name : 'UnknownError'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

@@ -157,10 +157,10 @@ serve(async (req) => {
       duration,
       error: {
         type: CleanupErrorType.UNKNOWN_ERROR,
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
         details: {
-          name: error.name,
-          stack: error.stack
+          name: error instanceof Error ? error.name : 'UnknownError',
+          stack: error instanceof Error ? error.stack : undefined
         }
       }
     }
