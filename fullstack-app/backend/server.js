@@ -8,6 +8,9 @@ const http = require('http');
 const WebSocket = require('ws');
 require('dotenv').config();
 
+const logger = require('./utils/logger');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -36,7 +39,7 @@ const credentialVaultRoutes = require('./routes/credential-vault');
 // Middleware
 app.use(helmet());
 app.use(cors());
-app.use(morgan('combined'));
+app.use(morgan('combined', { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -79,14 +82,18 @@ app.get('/api/health', (req, res) => {
 
 // WebSocket connection handling
 wss.on('connection', (ws) => {
-  console.log('WebSocket client connected');
+  logger.info('WebSocket client connected');
   
   ws.on('message', (message) => {
-    console.log('Received:', message);
+    logger.debug('WebSocket message received', { message: message.toString().substring(0, 100) });
   });
   
   ws.on('close', () => {
-    console.log('WebSocket client disconnected');
+    logger.info('WebSocket client disconnected');
+  });
+  
+  ws.on('error', (error) => {
+    logger.error('WebSocket error', { error: error.message });
   });
 });
 
@@ -99,19 +106,11 @@ global.broadcast = (data) => {
   });
 };
 
-// Error handling
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: err.message 
-  });
-});
+// 404 handler (must be after all routes)
+app.use(notFoundHandler);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
-});
+// Error handling (must be last)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
@@ -119,16 +118,11 @@ const PORT = process.env.PORT || 3000;
 const { initializeDefaultUsers } = require('./init-users');
 
 server.listen(PORT, async () => {
-  console.log(`
-╔═══════════════════════════════════════════════════════════════╗
-║                                                               ║
-║   🐍 HYDRA PENETRATION TESTING PLATFORM API 🐍               ║
-║                                                               ║
-║   Server running on port ${PORT}                              ║
-║   Environment: ${process.env.NODE_ENV || 'development'}                                    ║
-║                                                               ║
-╚═══════════════════════════════════════════════════════════════╝
-  `);
+  logger.info('═══════════════════════════════════════════════════════════════');
+  logger.info('🐍 HYDRA PENETRATION TESTING PLATFORM API 🐍');
+  logger.info(`Server running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info('═══════════════════════════════════════════════════════════════');
   
   // Initialize default users if they don't exist
   // Use retry logic with proper database readiness check
@@ -147,7 +141,7 @@ server.listen(PORT, async () => {
     
     try {
       await initializeDefaultUsers();
-      console.log('Default users initialized successfully.');
+      logger.info('Default users initialized successfully');
       initSuccess = true;
       if (intervalId) {
         clearInterval(intervalId);
@@ -157,7 +151,10 @@ server.listen(PORT, async () => {
       isInitializing = false; // Allow retry on failure
       const elapsed = Date.now() - startTime;
       if (elapsed >= DB_INIT_TIMEOUT) {
-        console.error(`Error initializing users (timeout after ${elapsed}ms): ${err.message}`);
+        logger.error('Error initializing users (timeout)', { 
+          elapsed: `${elapsed}ms`, 
+          error: err.message 
+        });
         if (intervalId) {
           clearInterval(intervalId);
           intervalId = null;
