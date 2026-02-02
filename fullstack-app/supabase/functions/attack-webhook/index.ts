@@ -26,7 +26,7 @@ interface RequestBody {
   event_type: string;
 }
 
-function validateRequest(body: unknown): { valid: boolean; error?: string } {
+function validateRequest(body: unknown): { valid: true; data: RequestBody } | { valid: false; error: string } {
   const requestBody = body as RequestBody;
   
   if (!requestBody.attack_id || typeof requestBody.attack_id !== 'number') {
@@ -40,7 +40,7 @@ function validateRequest(body: unknown): { valid: boolean; error?: string } {
   if (!validEvents.includes(requestBody.event_type)) {
     return { valid: false, error: `Invalid event_type: must be one of ${validEvents.join(', ')}` }
   }
-  return { valid: true }
+  return { valid: true, data: requestBody }
 }
 
 // Rate limiting check
@@ -78,11 +78,21 @@ async function generateHmacSignature(payload: string, secret: string): Promise<s
 }
 
 // Send webhook with retry logic and timeout
+interface WebhookData {
+  attack_id: number;
+  protocol: string;
+  host: string;
+  port: number;
+  status: string;
+  credentials_found: number;
+  duration_seconds: number;
+}
+
 interface WebhookPayload {
   event: string;
   timestamp: string;
   webhook_id: number;
-  data: Attack;
+  data: WebhookData;
 }
 
 async function sendWebhookWithRetry(
@@ -279,7 +289,7 @@ serve(async (req) => {
       )
     }
     
-    const { attack_id, event_type } = body
+    const { attack_id, event_type } = validation.data
     
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
