@@ -3,7 +3,7 @@
 /// <reference lib="deno.ns" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,7 +21,12 @@ const RETRY_DELAYS = [1000, 2000, 4000] // Exponential backoff in ms
 const WEBHOOK_TIMEOUT = 30000 // 30 seconds
 
 // Request validation middleware
-function validateRequest(body: any): { valid: boolean; error?: string } {
+interface RequestBody {
+  attack_id: unknown;
+  event_type: unknown;
+}
+
+function validateRequest(body: RequestBody): { valid: boolean; error?: string } {
   if (!body.attack_id || typeof body.attack_id !== 'number') {
     return { valid: false, error: 'Invalid attack_id: must be a number' }
   }
@@ -71,9 +76,16 @@ async function generateHmacSignature(payload: string, secret: string): Promise<s
 }
 
 // Send webhook with retry logic and timeout
+interface WebhookPayload {
+  event: string;
+  timestamp: string;
+  webhook_id: number;
+  data: Record<string, unknown>;
+}
+
 async function sendWebhookWithRetry(
   url: string,
-  payload: any,
+  payload: WebhookPayload,
   secret: string,
   retries = MAX_RETRIES
 ): Promise<{ success: boolean; status?: number; error?: string; attempts: number }> {
@@ -156,12 +168,30 @@ async function sendWebhookWithRetry(
 }
 
 // Batch process webhooks with concurrency limit
+interface Webhook {
+  id: number;
+  url: string;
+  secret: string;
+  success_count: number;
+  failure_count: number;
+}
+
+interface Attack {
+  id: number;
+  protocol: string;
+  host: string;
+  port: number;
+  status: string;
+  credentials_found: number;
+  duration_seconds: number;
+}
+
 async function batchProcessWebhooks(
-  webhooks: any[],
-  attack: any,
+  webhooks: Webhook[],
+  attack: Attack,
   event_type: string,
-  supabaseClient: any
-): Promise<any[]> {
+  supabaseClient: SupabaseClient
+): Promise<Array<{ webhook_id: number; success: boolean; status?: number; error?: string; attempts: number }>> {
   const BATCH_SIZE = 5 // Process 5 webhooks concurrently
   const results = []
   

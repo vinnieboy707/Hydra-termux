@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -185,7 +185,13 @@ serve(async (req) => {
   }
 })
 
-async function sendNotification(userId: string, event: string, data: any) {
+interface EmailIPNotificationData {
+  attack_name: string;
+  status: string;
+  credentials_found: number;
+}
+
+async function sendNotification(userId: string, event: string, data: EmailIPNotificationData) {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

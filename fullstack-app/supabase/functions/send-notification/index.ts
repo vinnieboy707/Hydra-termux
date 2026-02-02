@@ -3,7 +3,7 @@
 /// <reference lib="deno.ns" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -121,7 +121,7 @@ Hydra-Termux Team
 }
 
 // Template variable replacement
-function renderTemplate(template: string, variables: Record<string, any>): string {
+function renderTemplate(template: string, variables: Record<string, string | number | boolean>): string {
   let rendered = template
   for (const [key, value] of Object.entries(variables)) {
     rendered = rendered.replace(new RegExp(`{{${key}}}`, 'g'), String(value))

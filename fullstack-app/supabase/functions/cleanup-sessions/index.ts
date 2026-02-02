@@ -3,7 +3,7 @@
 /// <reference lib="deno.ns" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // Error types for granular error handling
 enum CleanupErrorType {
@@ -25,7 +25,7 @@ interface CleanupResult {
   }
 }
 
-async function cleanupExpiredSessions(supabaseClient: any): Promise<{ count: number; error?: any }> {
+async function cleanupExpiredSessions(supabaseClient: SupabaseClient): Promise<{ count: number; error?: unknown }> {
   try {
     const { data, error } = await supabaseClient.rpc('cleanup_expired_sessions')
     
@@ -41,7 +41,7 @@ async function cleanupExpiredSessions(supabaseClient: any): Promise<{ count: num
   }
 }
 
-async function cleanupExpiredRefreshTokens(supabaseClient: any): Promise<{ count: number; error?: any }> {
+async function cleanupExpiredRefreshTokens(supabaseClient: SupabaseClient): Promise<{ count: number; error?: unknown }> {
   try {
     const { data, error } = await supabaseClient.rpc('cleanup_expired_refresh_tokens')
     
@@ -58,7 +58,7 @@ async function cleanupExpiredRefreshTokens(supabaseClient: any): Promise<{ count
 }
 
 async function logCleanupOperation(
-  supabaseClient: any,
+  supabaseClient: SupabaseClient,
   result: CleanupResult
 ): Promise<void> {
   try {

@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -237,7 +237,16 @@ function getCategoryFromAttackType(attackType: string): string {
   return mapping[attackType] || 'other'
 }
 
-async function sendNotification(userId: string, event: string, data: any) {
+interface NotificationData {
+  attack_name: string;
+  attack_type: string;
+  status: string;
+  credentials_found: number;
+  total_tested: number;
+  success_rate: string;
+}
+
+async function sendNotification(userId: string, event: string, data: NotificationData) {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
