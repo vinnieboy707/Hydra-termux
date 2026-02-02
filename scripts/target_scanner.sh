@@ -125,7 +125,7 @@ run_scan() {
     echo ""
     
     # Run nmap
-    nmap "$nmap_opts" -sV "$format_opt" "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
+    nmap $nmap_opts -sV $format_opt "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
     
     local result=$?
     
