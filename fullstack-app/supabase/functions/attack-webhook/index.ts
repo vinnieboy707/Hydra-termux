@@ -27,7 +27,12 @@ interface RequestBody {
 }
 
 function validateRequest(body: unknown): { valid: true; data: RequestBody } | { valid: false; error: string } {
-  const requestBody = body as RequestBody;
+  // Type guard checks
+  if (!body || typeof body !== 'object') {
+    return { valid: false, error: 'Request body must be an object' }
+  }
+  
+  const requestBody = body as Record<string, unknown>;
   
   if (!requestBody.attack_id || typeof requestBody.attack_id !== 'number') {
     return { valid: false, error: 'Invalid attack_id: must be a number' }
@@ -40,7 +45,15 @@ function validateRequest(body: unknown): { valid: true; data: RequestBody } | { 
   if (!validEvents.includes(requestBody.event_type)) {
     return { valid: false, error: `Invalid event_type: must be one of ${validEvents.join(', ')}` }
   }
-  return { valid: true, data: requestBody }
+  
+  // After validation, we know the structure is correct
+  return { 
+    valid: true, 
+    data: {
+      attack_id: requestBody.attack_id,
+      event_type: requestBody.event_type
+    }
+  }
 }
 
 // Rate limiting check
