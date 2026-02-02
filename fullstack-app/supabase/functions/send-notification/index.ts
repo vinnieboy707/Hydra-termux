@@ -286,7 +286,14 @@ serve(async (req) => {
     const subject = renderTemplate(template.subject, variables)
     const body = renderTemplate(template.body, variables)
 
-    const results: any[] = []
+    interface NotificationResult {
+      type: string;
+      success: boolean;
+      error?: string;
+      messageId?: string;
+    }
+
+    const results: NotificationResult[] = []
     const types = notification_types || [NotificationType.EMAIL]
 
     // Send notifications based on user preferences and requested types

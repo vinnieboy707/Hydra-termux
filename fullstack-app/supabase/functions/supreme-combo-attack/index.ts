@@ -12,12 +12,20 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     )
@@ -92,7 +100,17 @@ serve(async (req) => {
       case 'update_progress': {
         const { progress } = config
         
-        const updateData: any = {
+        interface UpdateData {
+          total_combos_tested: number;
+          successful_logins: number;
+          failed_attempts: number;
+          rate_limited: number;
+          captcha_hit: number;
+          combos_per_second?: number;
+          success_rate?: string;
+        }
+        
+        const updateData: UpdateData = {
           total_combos_tested: progress.total_combos_tested,
           successful_logins: progress.successful_logins,
           failed_attempts: progress.failed_attempts,
