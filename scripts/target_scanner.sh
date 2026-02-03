@@ -125,7 +125,7 @@ run_scan() {
     echo ""
     
     # Run nmap
-    nmap $nmap_opts -sV $format_opt "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
+    nmap "$nmap_opts" -sV "$format_opt" "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
     
     local result=$?
     
@@ -178,13 +178,13 @@ parse_results() {
             local service
 
             service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
-            [ -n "$service" ] && printf "  ${GREEN}Port $port${NC}: $service\n"
+            [ -n "$service" ] && printf "  %sPort %s%s: %s\n" "${GREEN}" "$port" "${NC}" "$service"
         done
     else
         echo ""
         log_info "Services detected:"
         grep "^[0-9]*/.*open" "$scan_file" 2>/dev/null | while read -r line; do
-            printf "  ${GREEN}$line${NC}\n"
+            printf "  %s%s%s\n" "${GREEN}" "$line" "${NC}"
         done
     fi
     

@@ -78,7 +78,7 @@ show_all_results() {
         file_date=$(basename "$results_file" | sed 's/results_\(.*\)\.json/\1/')
         local formatted_date
 
-        formatted_date=$(echo "$file_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3/')
+        formatted_date=${file_date:0:4}-${file_date:4:2}-${file_date:6:2}
         local file_count_single
 
         file_count_single=$(jq '. | length' "$results_file" 2>/dev/null || echo 0)

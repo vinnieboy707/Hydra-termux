@@ -205,7 +205,7 @@ analyze_trends() {
         local date
         local count
         date=$(date -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -v-"${i}"d +%Y-%m-%d 2>/dev/null || date +%Y-%m-%d)
-        count=$(grep -h "$date" "$logs_dir"/*.log 2>/dev/null | wc -l)
+        count=$(grep -hc "$date" "$logs_dir"/*.log 2>/dev/null || echo 0)
         printf "  %s: " "$date"
         printf '█%.0s' $(seq 1 $((count / 10)))
         echo " ($count)"
@@ -277,8 +277,8 @@ show_dashboard() {
         
         echo ""
         echo -e "${CYAN}Quick Stats:${NC}"
-        echo "  Attacks today: $(grep -h "$(date +%Y-%m-%d)" "$PROJECT_ROOT/logs"/*.log 2>/dev/null | wc -l)"
-        echo "  Success rate: $(grep -r "Valid credentials" "$PROJECT_ROOT/results" 2>/dev/null | wc -l) successful"
+        echo "  Attacks today: $(grep -hc "$(date +%Y-%m-%d)" "$PROJECT_ROOT/logs"/*.log 2>/dev/null || echo 0)"
+        echo "  Success rate: $(grep -rc "Valid credentials" "$PROJECT_ROOT/results" 2>/dev/null || echo 0) successful"
         
         echo ""
         echo "Press Ctrl+C to exit | Refreshes every 5 seconds"

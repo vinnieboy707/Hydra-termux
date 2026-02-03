@@ -179,13 +179,15 @@ generate_patterns() {
 
     next_year=$((current_year + 1))
     
-    echo "$base_word" >> "$output_file"
-    echo "${base_word}123" >> "$output_file"
-    echo "${base_word}@123" >> "$output_file"
-    echo "${base_word}!" >> "$output_file"
-    echo "${base_word}${current_year}" >> "$output_file"
-    echo "${base_word}${next_year}" >> "$output_file"
-    echo "123${base_word}" >> "$output_file"
+    {
+        echo "$base_word"
+        echo "${base_word}123"
+        echo "${base_word}@123"
+        echo "${base_word}!"
+        echo "${base_word}${current_year}"
+        echo "${base_word}${next_year}"
+        echo "123${base_word}"
+    } >> "$output_file"
     
     # Capitalization variants
     echo "${base_word^}" >> "$output_file"  # First letter uppercase

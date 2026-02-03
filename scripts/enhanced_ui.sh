@@ -175,7 +175,7 @@ ui_box() {
         local padding
 
         padding=$(( (width - ${#title} - 4) / 2 ))
-        printf "${COLORS[$color]}║${COLORS[NC]}"
+        printf "%s║%s" "${COLORS[$color]}" "${COLORS[NC]}"
         printf "%${padding}s" ""
         echo -e "${COLORS[BOLD]}${COLORS[BRIGHT_WHITE]}${title}${COLORS[NC]}"
         printf "%${padding}s" ""
@@ -195,7 +195,7 @@ ui_box_line() {
     local width="${2:-60}"
     local color="${3:-NC}"
     
-    printf "${COLORS[CYAN]}║${COLORS[NC]} "
+    printf "%s║%s " "${COLORS[CYAN]}" "${COLORS[NC]}"
     printf "${COLORS[$color]}%-$((width-4))s${COLORS[NC]}" "$text"
     echo -e " ${COLORS[CYAN]}║${COLORS[NC]}"
 }
@@ -255,11 +255,11 @@ ui_loading() {
     local width=40
     
     ui_cursor_hide
-    for ((i=0; i<=$width; i++)); do
+    for ((i=0; i<=width; i++)); do
         local percent
 
         percent=$((i * 100 / width))
-        printf "\r${COLORS[CYAN]}${message}${COLORS[NC]} ["
+        printf "\r%s%s%s [" "${COLORS[CYAN]}" "${message}" "${COLORS[NC]}"
         printf "${COLORS[BRIGHT_CYAN]}%${i}s${COLORS[NC]}" | tr ' ' '▓'
         printf "%$((width-i))s" | tr ' ' '░'
         printf "] %3d%%" "$percent"
