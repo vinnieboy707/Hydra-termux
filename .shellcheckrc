@@ -23,6 +23,9 @@ disable=SC2030
 # SC2031: Variable modified in subshell - Complex refactoring, documented limitation
 disable=SC2031
 
+# SC2129: Multiple redirects - Acceptable when comments are needed between operations
+disable=SC2129
+
 # SC2206: Word splitting/globbing - Acceptable for array construction
 disable=SC2206
 
