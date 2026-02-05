@@ -29,9 +29,7 @@ fi
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing info-site... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/king-hacking/info-site.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/king-hacking/info-site.git; then
         log_error "Failed to clone info-site"
         exit 1
     fi

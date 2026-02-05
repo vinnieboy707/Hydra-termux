@@ -25,9 +25,7 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing Facebash... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/fu8uk1/facebash
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/fu8uk1/facebash; then
         log_error "Failed to clone Facebash"
         exit 1
     fi

@@ -29,9 +29,7 @@ fi
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing HackerPro... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/jaykali/hackerpro.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/jaykali/hackerpro.git; then
         log_error "Failed to clone HackerPro"
         exit 1
     fi

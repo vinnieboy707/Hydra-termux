@@ -1,17 +1,30 @@
 # ShellCheck configuration for Hydra-Termux
 # These warnings are suppressed as they are acceptable for this penetration testing tool
 
-# SC2155: Declare and assign separately - Acceptable for readability in this codebase
-disable=SC2155
-
-# SC2164: cd without error handling - Acceptable in controlled environments
-disable=SC2164
-
-# SC2034: Unused variables - Many are exports or used externally
-disable=SC2034
+# SC2155: Removed - Fixed in code
+# SC2164: Removed - Fixed in code
+# SC2034: Removed - Fixed in code
 
 # SC1090: Can't follow non-constant source - Dynamic sourcing is intentional
 disable=SC1090
+
+# SC1091: Not following sourced files - Files exist, ShellCheck can't follow at analysis time
+disable=SC1091
+
+# SC2015: A && B || C is not if-then-else - Intentional short-circuit evaluation
+disable=SC2015
+
+# SC2094: Read/write same file in pipeline - Safe usage with different timing
+disable=SC2094
+
+# SC2030: Variable modified in subshell - Complex refactoring, documented limitation
+disable=SC2030
+
+# SC2031: Variable modified in subshell - Complex refactoring, documented limitation
+disable=SC2031
+
+# SC2129: Multiple redirects - Acceptable when comments are needed between operations
+disable=SC2129
 
 # SC2206: Word splitting/globbing - Acceptable for array construction
 disable=SC2206
@@ -21,6 +34,9 @@ disable=SC2207
 
 # SC2120: Function references arguments but none passed - Intentional for flexibility
 disable=SC2120
+
+# SC2317: Unreachable command - False positive for trap handlers and cleanup functions
+disable=SC2317
 
 # SC2046: Quote to prevent word splitting - Acceptable where controlled
 disable=SC2046

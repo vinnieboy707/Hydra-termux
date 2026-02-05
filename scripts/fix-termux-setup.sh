@@ -267,10 +267,10 @@ spin='-\|/'
 i=0
 while kill -0 $NPM_PID 2>/dev/null; do
     i=$(( (i+1) %4 ))
-    printf "\r${CYAN}Installing... ${spin:$i:1}${NC}"
+    printf "\r%sInstalling... %s%s" "${CYAN}" "${spin:$i:1}" "${NC}"
     sleep 0.5
 done
-printf "\r${GREEN}${CHECK_MARK} Installation complete!${NC}\n"
+printf "\r%s%s Installation complete!%s\n" "${GREEN}" "${CHECK_MARK}" "${NC}"
 
 log_success "Backend dependencies installed successfully"
 
@@ -300,7 +300,7 @@ if [ ! -f ".env" ]; then
         if command -v openssl &> /dev/null; then
             JWT_SECRET=$(openssl rand -hex 32)
         else
-            JWT_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+            JWT_SECRET=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
         fi
         
         cat > .env << EOF
@@ -364,10 +364,10 @@ if [ "$SKIP_FRONTEND_INSTALL" = false ]; then
     i=0
     while kill -0 $NPM_PID 2>/dev/null; do
         i=$(( (i+1) %4 ))
-        printf "\r${CYAN}Installing... ${spin:$i:1}${NC}"
+        printf "\r%sInstalling... %s%s" "${CYAN}" "${spin:$i:1}" "${NC}"
         sleep 0.5
     done
-    printf "\r${GREEN}${CHECK_MARK} Installation complete!${NC}\n"
+    printf "\r%s%s Installation complete!%s\n" "${GREEN}" "${CHECK_MARK}" "${NC}"
     
     log_success "Frontend dependencies installed successfully"
 else

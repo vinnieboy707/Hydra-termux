@@ -135,7 +135,7 @@ create_batches() {
         echo "$target"
         
         count=$((count + 1))
-        if [ $count -ge $batch_size ]; then
+        if [ "$count" -ge "$batch_size" ]; then
             count=0
             batch_num=$((batch_num + 1))
         fi

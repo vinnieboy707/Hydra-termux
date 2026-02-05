@@ -23,9 +23,7 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing CamPhish... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/techchipnet/CamPhish
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/techchipnet/CamPhish; then
         log_error "Failed to clone CamPhish"
         exit 1
     fi

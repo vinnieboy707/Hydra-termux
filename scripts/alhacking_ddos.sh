@@ -25,9 +25,7 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing DDoS-Ripper... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/palahsu/DDoS-Ripper.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/palahsu/DDoS-Ripper.git; then
         log_error "Failed to clone DDoS-Ripper"
         exit 1
     fi

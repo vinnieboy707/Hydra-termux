@@ -31,9 +31,7 @@ fi
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing BadMod... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/MrSqar-Ye/BadMod.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/MrSqar-Ye/BadMod.git; then
         log_error "Failed to clone BadMod"
         exit 1
     fi
