@@ -128,7 +128,7 @@ test_vpn_leak() {
     # Get DNS servers
     local dns_servers
 
-    dns_servers=$(cat /etc/resolv.conf 2>/dev/null | grep nameserver | awk '{print $2}')
+    dns_servers=$(grep nameserver /etc/resolv.conf 2>/dev/null | awk '{print $2}')
     
     if [ -n "$dns_servers" ]; then
         echo -e "${BLUE}[*] Current DNS servers:${NC}"

@@ -185,21 +185,16 @@ serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: err.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
 
-interface EmailIPNotificationData {
-  attack_name: string;
-  status: string;
-  credentials_found: number;
-}
-
-async function sendNotification(userId: string, event: string, data: EmailIPNotificationData) {
+async function sendNotification(userId: string, event: string, data: any): Promise<void> {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -238,7 +233,7 @@ async function sendNotification(userId: string, event: string, data: EmailIPNoti
         })
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Notification error:', error)
   }
 }

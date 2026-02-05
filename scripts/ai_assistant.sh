@@ -386,7 +386,7 @@ EOF
     esac
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Suggest next action based on history
@@ -466,7 +466,7 @@ What do you need help with? Enter a number:
 0) Back to main menu
 
 EOF
-        read -p "Enter choice: " choice
+        read -r -p "Enter choice: " choice
         
         case "$choice" in
             1) show_workflow_guide "first_attack" ;;
@@ -500,7 +500,7 @@ Select your goal:
 0) Back
 
 EOF
-    read -p "Enter choice: " choice
+    read -r -p "Enter choice: " choice
     
     case "$choice" in
         1) show_workflow_guide "first_attack" ;;
@@ -542,7 +542,7 @@ ALHacking Tools (20-37):
   Utils: 20,35-37 (Setup, IP changer, Help)
 
 EOF
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Show ALHacking help
@@ -576,7 +576,7 @@ First Time Recommended Flow:
   5. Then try other tools
 
 EOF
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Show troubleshooting guide
@@ -625,7 +625,7 @@ Common Issues & Solutions:
 Need more help? Check docs/TROUBLESHOOTING.md
 
 EOF
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Explain results
@@ -673,7 +673,7 @@ Reading Scan Results:
   • OS detection = Operating system
 
 EOF
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Show best practices
@@ -718,7 +718,7 @@ Essential Rules:
 Remember: With great power comes great responsibility!
 
 EOF
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Progress tracker
@@ -735,21 +735,21 @@ show_progress() {
     echo ""
     
     cat << EOF
-Experience Level: $(echo $level | tr '[:lower:]' '[:upper:]')
+Experience Level: $(echo "$level" | tr '[:lower:]' '[:upper:]')
 Total Actions: $total_actions
 
 Milestones:
-$([ $total_actions -ge 1 ] && echo "  ✓ First action" || echo "  ☐ First action")
-$([ $total_actions -ge 5 ] && echo "  ✓ Beginner (5 actions)" || echo "  ☐ Beginner (5 actions)")
-$([ $total_actions -ge 10 ] && echo "  ✓ Learning (10 actions)" || echo "  ☐ Learning (10 actions)")
-$([ $total_actions -ge 20 ] && echo "  ✓ Intermediate (20 actions)" || echo "  ☐ Intermediate (20 actions)")
-$([ $total_actions -ge 50 ] && echo "  ✓ Advanced (50 actions)" || echo "  ☐ Advanced (50 actions)")
-$([ $total_actions -ge 100 ] && echo "  ✓ Expert (100 actions)" || echo "  ☐ Expert (100 actions)")
+$([ "$total_actions" -ge 1 ] && echo "  ✓ First action" || echo "  ☐ First action")
+$([ "$total_actions" -ge 5 ] && echo "  ✓ Beginner (5 actions)" || echo "  ☐ Beginner (5 actions)")
+$([ "$total_actions" -ge 10 ] && echo "  ✓ Learning (10 actions)" || echo "  ☐ Learning (10 actions)")
+$([ "$total_actions" -ge 20 ] && echo "  ✓ Intermediate (20 actions)" || echo "  ☐ Intermediate (20 actions)")
+$([ "$total_actions" -ge 50 ] && echo "  ✓ Advanced (50 actions)" || echo "  ☐ Advanced (50 actions)")
+$([ "$total_actions" -ge 100 ] && echo "  ✓ Expert (100 actions)" || echo "  ☐ Expert (100 actions)")
 
 Keep going! Each action makes you better! 🚀
 
 EOF
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
 }
 
 # Export functions for use in other scripts

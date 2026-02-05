@@ -235,9 +235,10 @@ serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: err.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
@@ -255,16 +256,7 @@ function getCategoryFromAttackType(attackType: string): string {
   return mapping[attackType] || 'other'
 }
 
-interface NotificationData {
-  attack_name: string;
-  attack_type: string;
-  status: string;
-  credentials_found: number;
-  total_tested: number;
-  success_rate: string;
-}
-
-async function sendNotification(userId: string, event: string, data: NotificationData) {
+async function sendNotification(userId: string, event: string, data: any): Promise<void> {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -312,7 +304,7 @@ async function sendNotification(userId: string, event: string, data: Notificatio
         body: JSON.stringify({ text: message })
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Notification error:', error)
   }
 }

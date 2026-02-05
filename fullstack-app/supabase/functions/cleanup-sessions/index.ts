@@ -35,7 +35,7 @@ async function cleanupExpiredSessions(supabaseClient: SupabaseClient): Promise<{
     }
     
     return { count: data || 0 }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Session cleanup exception:', error)
     return { count: 0, error }
   }
@@ -51,7 +51,7 @@ async function cleanupExpiredRefreshTokens(supabaseClient: SupabaseClient): Prom
     }
     
     return { count: data || 0 }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Token cleanup exception:', error)
     return { count: 0, error }
   }
@@ -75,7 +75,7 @@ async function logCleanupOperation(
       },
       created_at: new Date().toISOString(),
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to log cleanup operation:', error)
   }
 }
@@ -150,17 +150,18 @@ serve(async (req) => {
       JSON.stringify(result),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     const duration = Date.now() - startTime
     const result: CleanupResult = {
       success: false,
       duration,
       error: {
         type: CleanupErrorType.UNKNOWN_ERROR,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: err.message,
         details: {
-          name: error instanceof Error ? error.name : 'UnknownError',
-          stack: error instanceof Error ? error.stack : undefined
+          name: err.name,
+          stack: err.stack
         }
       }
     }

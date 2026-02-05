@@ -105,7 +105,8 @@ run_scan() {
     echo ""
     
     # Determine output format
-    local output_file="$OUTPUT_DIR/scan_${TARGET//[.\/:]/_}_$(date +%Y%m%d_%H%M%S)"
+    local output_file
+    output_file="$OUTPUT_DIR/scan_${TARGET//[.\/:]/_}_$(date +%Y%m%d_%H%M%S)"
     local format_opt=""
     
     case "$OUTPUT_FORMAT" in
@@ -124,11 +125,11 @@ run_scan() {
     echo ""
     
     # Run nmap
-    nmap $nmap_opts -sV $format_opt "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
+    nmap "$nmap_opts" -sV "$format_opt" "$TARGET" 2>&1 | tee "${output_file}_verbose.txt"
     
     local result=$?
     
-    if [ $result -eq 0 ]; then
+    if [ "$result" -eq 0 ]; then
         log_success "Scan completed successfully"
         
         # Parse and display summary
@@ -177,13 +178,13 @@ parse_results() {
             local service
 
             service=$(grep "portid=\"$port\"" "$scan_file" | grep -oP 'name="\K[^"]+' | head -1)
-            [ -n "$service" ] && printf "  ${GREEN}Port $port${NC}: $service\n"
+            [ -n "$service" ] && printf "  %sPort %s%s: %s\n" "${GREEN}" "$port" "${NC}" "$service"
         done
     else
         echo ""
         log_info "Services detected:"
         grep "^[0-9]*/.*open" "$scan_file" 2>/dev/null | while read -r line; do
-            printf "  ${GREEN}$line${NC}\n"
+            printf "  %s%s%s\n" "${GREEN}" "$line" "${NC}"
         done
     fi
     
@@ -191,7 +192,7 @@ parse_results() {
     log_success "Results saved to: $scan_file"
     
     # Suggest next steps
-    if [ $open_ports -gt 0 ]; then
+    if [ "$open_ports" -gt 0 ]; then
         print_header "Suggested Next Steps"
         log_info "Run auto attack: bash scripts/admin_auto_attack.sh -t $TARGET"
         log_info "View results: bash scripts/results_viewer.sh --all"
@@ -441,8 +442,8 @@ recommend_scripts() {
 }
 
 # Parse command line arguments
-# shellcheck disable=SC2034
 VERBOSE=false
+export VERBOSE  # Export for potential use in child processes
 CUSTOM_PORTS=""
 
 while [[ $# -gt 0 ]]; do

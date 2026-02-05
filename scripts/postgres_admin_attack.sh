@@ -113,10 +113,10 @@ run_attack() {
     
     # Run hydra
     hydra -L "$username_file" -P "$wordlist" \
-          -t $THREADS \
-          -w $TIMEOUT \
+          -t "$THREADS" \
+          -w "$TIMEOUT" \
           -f \
-          postgres://$TARGET:$PORT/$DATABASE 2>&1 | while IFS= read -r line; do
+          postgres://"$TARGET":"$PORT"/"$DATABASE" 2>&1 | while IFS= read -r line; do
         
         if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
             # Parse successful login (support credentials with spaces)

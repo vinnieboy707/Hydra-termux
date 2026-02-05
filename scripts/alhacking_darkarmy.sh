@@ -29,9 +29,7 @@ fi
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing DARKARMY... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/D4RK-4RMY/DARKARMY
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/D4RK-4RMY/DARKARMY; then
         log_error "Failed to clone DARKARMY"
         exit 1
     fi

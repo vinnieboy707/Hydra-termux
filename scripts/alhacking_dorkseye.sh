@@ -23,9 +23,7 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing dorks-eye... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/BullsEye0/dorks-eye.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/BullsEye0/dorks-eye.git; then
         log_error "Failed to clone dorks-eye"
         exit 1
     fi

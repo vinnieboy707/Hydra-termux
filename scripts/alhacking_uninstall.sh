@@ -22,7 +22,7 @@ fi
 
 log_warning "This will remove all downloaded ALHacking tools!"
 echo ""
-read -p "Are you sure you want to continue? (y/N): " confirm
+read -r -p "Are you sure you want to continue? (y/N): " confirm
 
 if [[ "$confirm" =~ ^[Yy]$ ]]; then
     log_info "Removing tools directory..."

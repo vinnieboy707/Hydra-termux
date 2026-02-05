@@ -40,9 +40,7 @@ if [ ! -d "$TOOL_DIR" ]; then
     # Install Python dependencies
     pip3 install requests 2>/dev/null || true
     
-    git clone https://github.com/FDX100/Auto_Tor_IP_changer.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/FDX100/Auto_Tor_IP_changer.git; then
         log_error "Failed to clone Auto_Tor_IP_changer"
         exit 1
     fi

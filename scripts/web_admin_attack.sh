@@ -159,10 +159,10 @@ run_attack() {
         [ "$USE_SSL" = "true" ] && service="https-post-form"
         
         hydra -L "$username_file" -P "$wordlist" \
-              -t $THREADS \
+              -t "$THREADS" \
               -f \
-              $TARGET \
-              $service "$LOGIN_PATH:$form_params:$FAILURE_STRING" 2>&1 | while IFS= read -r line; do
+              "$TARGET" \
+              "$service" "$LOGIN_PATH:$form_params:$FAILURE_STRING" 2>&1 | while IFS= read -r line; do
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
                 # Parse successful login (support credentials with spaces)
@@ -189,10 +189,10 @@ run_attack() {
         [ "$USE_SSL" = "true" ] && service="https-get"
         
         hydra -L "$username_file" -P "$wordlist" \
-              -t $THREADS \
+              -t "$THREADS" \
               -f \
-              $TARGET \
-              $service "$LOGIN_PATH" 2>&1 | while IFS= read -r line; do
+              "$TARGET" \
+              "$service" "$LOGIN_PATH" 2>&1 | while IFS= read -r line; do
             
             if [[ $line == *"host:"* ]] && [[ $line == *"login:"* ]] && [[ $line == *"password:"* ]]; then
                 # Parse successful login (support credentials with spaces)
