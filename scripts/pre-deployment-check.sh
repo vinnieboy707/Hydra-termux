@@ -3,7 +3,8 @@
 # Pre-Deployment Checklist Script
 # Ensures all guardrails and best practices are followed before deployment
 
-set -e
+# Don't use set -e as we handle errors explicitly with return codes
+set +e
 
 # Colors for output
 RED='\033[0;31m'
@@ -221,25 +222,25 @@ check_docker() {
     if command -v docker-compose &> /dev/null; then
         print_success "Docker Compose is installed"
         docker-compose --version
+        
+        # Validate docker-compose files
+        if [ -f "$PROJECT_ROOT/docker-compose.yml" ]; then
+            if docker-compose -f "$PROJECT_ROOT/docker-compose.yml" config &>/dev/null; then
+                print_success "docker-compose.yml is valid"
+            else
+                print_failure "docker-compose.yml has errors"
+            fi
+        fi
+        
+        if [ -f "$PROJECT_ROOT/docker-compose.production.yml" ]; then
+            if docker-compose -f "$PROJECT_ROOT/docker-compose.production.yml" config &>/dev/null; then
+                print_success "docker-compose.production.yml is valid"
+            else
+                print_failure "docker-compose.production.yml has errors"
+            fi
+        fi
     else
-        print_warning "Docker Compose is not installed"
-    fi
-    
-    # Validate docker-compose files
-    if [ -f "$PROJECT_ROOT/docker-compose.yml" ]; then
-        if docker-compose -f "$PROJECT_ROOT/docker-compose.yml" config &>/dev/null; then
-            print_success "docker-compose.yml is valid"
-        else
-            print_failure "docker-compose.yml has errors"
-        fi
-    fi
-    
-    if [ -f "$PROJECT_ROOT/docker-compose.production.yml" ]; then
-        if docker-compose -f "$PROJECT_ROOT/docker-compose.production.yml" config &>/dev/null; then
-            print_success "docker-compose.production.yml is valid"
-        else
-            print_failure "docker-compose.production.yml has errors"
-        fi
+        print_warning "Docker Compose is not installed - skipping compose file validation"
     fi
 }
 
@@ -313,11 +314,14 @@ check_dependencies() {
         # Check for vulnerabilities if npm is installed
         if command -v npm &> /dev/null; then
             print_info "Checking for npm vulnerabilities..."
-            cd "$PROJECT_ROOT"
-            if npm audit --audit-level=high &>/dev/null; then
-                print_success "No high-severity npm vulnerabilities"
+            if cd "$PROJECT_ROOT"; then
+                if npm audit --audit-level=high &>/dev/null; then
+                    print_success "No high-severity npm vulnerabilities"
+                else
+                    print_warning "npm vulnerabilities found - run 'npm audit' for details"
+                fi
             else
-                print_warning "npm vulnerabilities found - run 'npm audit' for details"
+                print_warning "Could not change to project directory"
             fi
         fi
     fi
