@@ -150,7 +150,7 @@ elif [ "$DB_TYPE" = "postgres" ]; then
     # Prompt for password if not provided
     if [ -z "$DB_PASSWORD" ]; then
         echo ""
-        read -s -p "Enter PostgreSQL password for user $DB_USER: " DB_PASSWORD
+        read -r -s -p "Enter PostgreSQL password for user $DB_USER: " DB_PASSWORD
         echo ""
     fi
     

@@ -11,7 +11,6 @@ cd "$SCRIPT_DIR"
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
@@ -147,7 +146,7 @@ done
 # Frontend files
 for file in $(find frontend/src -name "*.js" -type f 2>/dev/null || echo ""); do
     if [ -f "$file" ]; then
-        filename=$(echo "$file" | sed 's|frontend/src/||')
+        filename="${file#frontend/src/}"
         check "Syntax: frontend/$filename" "node --check $file"
     fi
 done

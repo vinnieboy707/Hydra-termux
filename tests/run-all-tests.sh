@@ -4,12 +4,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Color codes
 readonly GREEN='\033[0;32m'
 readonly RED='\033[0;31m'
-readonly YELLOW='\033[1;33m'
 readonly NC='\033[0m'
 
 # Test suite counters

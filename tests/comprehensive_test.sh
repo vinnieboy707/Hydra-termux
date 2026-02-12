@@ -223,8 +223,10 @@ test_no_script_dir_collision() {
         echo \"AFTER=\$SCRIPT_DIR\"
     ")
     
-    local before=$(echo "$result" | grep "BEFORE=" | cut -d= -f2)
-    local after=$(echo "$result" | grep "AFTER=" | cut -d= -f2)
+    local before
+    before=$(echo "$result" | grep "BEFORE=" | cut -d= -f2)
+    local after
+    after=$(echo "$result" | grep "AFTER=" | cut -d= -f2)
     
     if [ "$before" != "$after" ]; then
         echo "  SCRIPT_DIR changed from '$before' to '$after'"

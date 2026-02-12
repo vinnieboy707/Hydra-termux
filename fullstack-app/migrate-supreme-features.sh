@@ -52,9 +52,9 @@ execute_sql_file() {
         return 1
     fi
     
-    PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -f "$file"
+    PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -f "$file"
     
-    if [ $? -eq 0 ]; then
+    if psql_exit_status=$?; [ $psql_exit_status -eq 0 ]; then
         echo "✅ Success: $description"
         return 0
     else
@@ -66,9 +66,7 @@ execute_sql_file() {
 # Backup existing database
 echo "📦 Creating database backup..."
 BACKUP_FILE="backup_$(date +%Y%m%d_%H%M%S).sql"
-PGPASSWORD=$DB_PASSWORD pg_dump -h $DB_HOST -p $DB_PORT -U $DB_USER $DB_NAME > "$BACKUP_FILE"
-
-if [ $? -eq 0 ]; then
+if PGPASSWORD=$DB_PASSWORD pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME" > "$BACKUP_FILE"; then
     echo "✅ Backup created: $BACKUP_FILE"
 else
     echo "❌ Backup failed!"
@@ -86,7 +84,7 @@ echo ""
 # Execute base schema if needed
 if [ -f "backend/schema/complete-database-schema.sql" ]; then
     echo "Checking if base schema exists..."
-    TABLE_EXISTS=$(PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users');")
+    TABLE_EXISTS=$(PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users');")
     
     if [ "$TABLE_EXISTS" != "t" ]; then
         execute_sql_file "backend/schema/complete-database-schema.sql" "Base database schema"
@@ -121,7 +119,7 @@ TABLES=(
 ALL_TABLES_EXIST=true
 
 for table in "${TABLES[@]}"; do
-    EXISTS=$(PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '$table');")
+    EXISTS=$(PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '$table');")
     
     if [ "$EXISTS" = "t" ]; then
         echo "  ✅ $table"
@@ -165,7 +163,7 @@ fi
 
 # Create initial notification settings for existing users
 echo "📧 Setting up notification settings for existing users..."
-PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c "
+PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "
 INSERT INTO notification_settings (user_id, email_enabled, discord_enabled)
 SELECT id, TRUE, FALSE FROM users
 ON CONFLICT (user_id) DO NOTHING;
@@ -176,10 +174,10 @@ echo ""
 
 # Display statistics
 echo "📊 Database Statistics:"
-USER_COUNT=$(PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -tAc "SELECT COUNT(*) FROM users;")
+USER_COUNT=$(PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM users;")
 echo "  Users: $USER_COUNT"
 
-ATTACK_COUNT=$(PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -tAc "SELECT COUNT(*) FROM attacks;" 2>/dev/null || echo "0")
+ATTACK_COUNT=$(PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM attacks;" 2>/dev/null || echo "0")
 echo "  Legacy Attacks: $ATTACK_COUNT"
 
 echo ""

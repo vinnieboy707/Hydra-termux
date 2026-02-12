@@ -42,7 +42,12 @@ perform_health_check() {
     fi
     
     # Build response
-    local response="{\"status\":\"$status\",\"checks\":{\"$(IFS=,; echo "${checks[*]}" | sed 's/,/","/g')\"}}"
+    local response
+    local checks_str
+    IFS=,
+    checks_str="${checks[*]}"
+    checks_str="${checks_str//,/\",\"}"
+    response="{\"status\":\"$status\",\"checks\":{\"$checks_str\"}}"
     echo "$response"
 }
 
