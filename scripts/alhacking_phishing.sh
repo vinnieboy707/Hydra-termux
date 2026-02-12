@@ -3,6 +3,19 @@
 # ALHacking Phishing Tool (zphisher)
 # Advanced phishing tool
 
+# ⚠️  SECURITY WARNING ⚠️
+# This script downloads and executes third-party code from an external GitHub repository
+# without version pinning or integrity verification. This poses security risks:
+# - The repository owner could push malicious updates
+# - The repository could be compromised
+# - Network traffic could be intercepted (man-in-the-middle attacks)
+#
+# RECOMMENDATIONS:
+# 1. Review the third-party code before running this script
+# 2. Consider pinning to a specific commit or tag
+# 3. Use this tool only in isolated/sandboxed environments
+# 4. Never run with elevated privileges unless absolutely necessary
+
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -22,7 +35,7 @@ mkdir -p "$TOOLS_DIR"
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing zphisher... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit
     git clone https://github.com/htr-tech/zphisher
     
     if [ $? -ne 0 ]; then
@@ -32,5 +45,5 @@ if [ ! -d "$TOOL_DIR" ]; then
 fi
 
 log_info "Launching zphisher..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit
 bash zphisher.sh

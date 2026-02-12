@@ -29,7 +29,8 @@ security_validate_ipv4() {
     
     # Check octets
     local IFS='.'
-    local -a octets=($ip)
+    local -a octets
+    read -ra octets <<< "$ip"
     for octet in "${octets[@]}"; do
         if [ "$octet" -gt 255 ]; then
             echo "ERROR: Invalid IPv4 octet (>255): $ip" >&2
@@ -359,7 +360,8 @@ security_validate_wordlist() {
     fi
     
     # Check file size (warn if >100MB)
-    local size=$(stat -f%z "$wordlist" 2>/dev/null || stat -c%s "$wordlist" 2>/dev/null)
+    local size
+    size=$(stat -f%z "$wordlist" 2>/dev/null || stat -c%s "$wordlist" 2>/dev/null)
     if [ "$size" -gt 104857600 ]; then
         echo "WARNING: Large wordlist file (>100MB): $wordlist" >&2
         echo "  This may take a very long time to process." >&2

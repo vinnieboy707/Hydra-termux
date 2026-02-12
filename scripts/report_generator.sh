@@ -1311,11 +1311,14 @@ generate_report() {
     local wordlist_count="${10:-0}"
     
     # Generate unique report filename
-    local report_file="$REPORT_DIR/attack_report_${protocol}_$(date +%Y%m%d_%H%M%S).md"
+    local report_file
+    report_file="$REPORT_DIR/attack_report_${protocol}_$(date +%Y%m%d_%H%M%S).md"
     
     # Calculate duration
-    local start_epoch=$(date -d "$start_time" +%s 2>/dev/null || echo 0)
-    local end_epoch=$(date -d "$end_time" +%s 2>/dev/null || echo 0)
+    local start_epoch
+    start_epoch=$(date -d "$start_time" +%s 2>/dev/null || echo 0)
+    local end_epoch
+    end_epoch=$(date -d "$end_time" +%s 2>/dev/null || echo 0)
     local duration=$((end_epoch - start_epoch))
     local duration_human
     if [ "$start_epoch" -eq 0 ] || [ "$end_epoch" -eq 0 ]; then

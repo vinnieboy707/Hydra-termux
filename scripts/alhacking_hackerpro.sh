@@ -3,6 +3,19 @@
 # ALHacking HackerPro
 # All-in-one hacking tool
 
+# ⚠️  SECURITY WARNING ⚠️
+# This script downloads and executes third-party code from an external GitHub repository
+# without version pinning or integrity verification. This poses security risks:
+# - The repository owner could push malicious updates
+# - The repository could be compromised
+# - Network traffic could be intercepted (man-in-the-middle attacks)
+#
+# RECOMMENDATIONS:
+# 1. Review the third-party code before running this script
+# 2. Consider pinning to a specific commit or tag
+# 3. Use this tool only in isolated/sandboxed environments
+# 4. Never run with elevated privileges unless absolutely necessary
+
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -28,7 +41,7 @@ fi
 # Check if tool is already installed
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing HackerPro... This may take a moment."
-    cd "$TOOLS_DIR"
+    cd "$TOOLS_DIR" || exit
     git clone https://github.com/jaykali/hackerpro.git
     
     if [ $? -ne 0 ]; then
@@ -36,13 +49,13 @@ if [ ! -d "$TOOL_DIR" ]; then
         exit 1
     fi
     
-    cd "$TOOL_DIR"
+    cd "$TOOL_DIR" || exit
     log_info "Running installer..."
     bash install.sh 2>/dev/null || true
 fi
 
 log_info "Launching HackerPro..."
-cd "$TOOL_DIR"
+cd "$TOOL_DIR" || exit
 log_warning "⚠️  Note: This tool uses Python 2 (deprecated and unmaintained)"
 log_warning "Security updates are no longer available for Python 2"
 echo ""

@@ -40,7 +40,8 @@ validate_ip() {
     if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
         # Check each octet
         local IFS='.'
-        local -a octets=($ip)
+        local -a octets
+        read -ra octets <<< "$ip"
         for octet in "${octets[@]}"; do
             if [ "$octet" -gt 255 ]; then
                 return 1

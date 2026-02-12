@@ -55,9 +55,9 @@ for ts_file in "$PROJECT_ROOT"/fullstack-app/supabase/functions/*/index.ts; do
     if [ -f "$ts_file" ]; then
         # Basic syntax check
         if grep -q "import.*from.*http" "$ts_file" && grep -q "serve(async" "$ts_file"; then
-            print_test_result "$(basename $(dirname $ts_file))/index.ts has valid structure" "PASS"
+            print_test_result "$(basename "$(dirname "$ts_file")")/index.ts has valid structure" "PASS"
         else
-            print_test_result "$(basename $(dirname $ts_file))/index.ts may have issues" "FAIL"
+            print_test_result "$(basename "$(dirname "$ts_file")")/index.ts may have issues" "FAIL"
             TS_ERROR=1
         fi
     fi
