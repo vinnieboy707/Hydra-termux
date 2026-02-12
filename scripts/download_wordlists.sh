@@ -76,16 +76,21 @@ download_wordlist() {
     
     log_progress "Downloading $name..."
     
+    local download_success=false
     if command -v wget &> /dev/null; then
-        wget -q --show-progress -O "$output" "$url" 2>&1
+        if wget -q --show-progress -O "$output" "$url" 2>&1; then
+            download_success=true
+        fi
     elif command -v curl &> /dev/null; then
-        curl -# -L -o "$output" "$url" 2>&1
+        if curl -# -L -o "$output" "$url" 2>&1; then
+            download_success=true
+        fi
     else
         log_error "Neither wget nor curl is installed"
         return 1
     fi
     
-    if [ $? -eq 0 ] && [ -f "$output" ]; then
+    if [ "$download_success" = true ] && [ -f "$output" ]; then
         local size
 
         size=$(du -h "$output" | cut -f1)
@@ -110,10 +115,11 @@ download_all() {
     
     for name in "${!WORDLISTS[@]}"; do
         current=$((current + 1))
-        show_progress $current $total
+        show_progress "$current" "$total"
         
-        download_wordlist "$name"
-        [ $? -eq 0 ] && success=$((success + 1))
+        if download_wordlist "$name"; then
+            success=$((success + 1))
+        fi
         
         sleep 1
     done
@@ -208,8 +214,8 @@ verify_wordlists() {
 # Parse command line arguments
 DOWNLOAD_ALL=false
 LIST_ONLY=false
-# shellcheck disable=SC2034
 VERBOSE=false
+export VERBOSE  # Export for potential use in child processes
 
 while [[ $# -gt 0 ]]; do
     case $1 in

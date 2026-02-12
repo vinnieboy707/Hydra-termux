@@ -23,16 +23,14 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing subscan... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/zidansec/subscan
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/zidansec/subscan; then
         log_error "Failed to clone subscan"
         exit 1
     fi
 fi
 
 echo ""
-read -p "Enter domain (e.g., example.com): " domain
+read -r -p "Enter domain (e.g., example.com): " domain
 
 if [ -z "$domain" ]; then
     log_error "Domain is required"

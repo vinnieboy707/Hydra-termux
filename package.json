@@ -17,6 +17,8 @@
     "health-check": "bash scripts/health-check.sh",
     "test:backend": "cd fullstack-app/backend && npm test",
     "test:frontend": "cd fullstack-app/frontend && npm test",
+    "type-check": "npm run type-check:supabase",
+    "type-check:supabase": "cd fullstack-app/supabase/functions && deno check --config=tsconfig.json **/*.ts || echo 'Deno not available, skipping Supabase type-check'",
     "logs:backend": "tail -f fullstack-app/backend/logs/*.log 2>/dev/null || echo 'No backend logs found'",
     "logs:frontend": "tail -f fullstack-app/frontend/logs/*.log 2>/dev/null || echo 'No frontend logs found'"
   },

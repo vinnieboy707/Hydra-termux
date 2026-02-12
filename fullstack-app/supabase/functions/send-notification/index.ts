@@ -121,7 +121,7 @@ Hydra-Termux Team
 }
 
 // Template variable replacement
-function renderTemplate(template: string, variables: Record<string, any>): string {
+function renderTemplate(template: string, variables: Record<string, string | number | boolean>): string {
   let rendered = template
   for (const [key, value] of Object.entries(variables)) {
     rendered = rendered.replace(new RegExp(`{{${key}}}`, 'g'), String(value))
@@ -175,9 +175,10 @@ async function sendEmail(
     const result = await response.json();
     return { success: true, messageId: result.id };
     
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('Email exception:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: err.message };
   }
 }
 
@@ -225,9 +226,10 @@ async function sendSMS(
     const result = await response.json();
     return { success: true, messageId: result.sid };
     
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('SMS exception:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: err.message };
   }
 }
 
@@ -286,7 +288,14 @@ serve(async (req) => {
     const subject = renderTemplate(template.subject, variables)
     const body = renderTemplate(template.body, variables)
 
-    const results: any[] = []
+    interface NotificationResult {
+      type: string;
+      success: boolean;
+      error?: string;
+      messageId?: string;
+    }
+
+    const results: NotificationResult[] = []
     const types = notification_types || [NotificationType.EMAIL]
 
     // Send notifications based on user preferences and requested types
@@ -335,13 +344,14 @@ serve(async (req) => {
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('Notification error:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to send notification',
-        message: error.message,
-        type: error.name
+        message: err.message,
+        type: err.name
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

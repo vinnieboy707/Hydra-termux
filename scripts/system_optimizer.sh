@@ -652,7 +652,7 @@ main() {
     detect_system_resources
     echo ""
     
-    read -p "Continue with optimization? (y/n): " confirm
+    read -r -p "Continue with optimization? (y/n): " confirm
     if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
         log_info "Optimization cancelled"
         exit 0

@@ -32,9 +32,7 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing fast-mail-bomber... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/juzeon/fast-mail-bomber.git
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/juzeon/fast-mail-bomber.git; then
         log_error "Failed to clone fast-mail-bomber"
         exit 1
     fi
@@ -53,7 +51,7 @@ fi
 
 cd "$TOOL_DIR" || exit 1
 echo ""
-read -p "Enter email address to target: " email
+read -r -p "Enter email address to target: " email
 
 if [ -z "$email" ]; then
     log_error "Email address is required"

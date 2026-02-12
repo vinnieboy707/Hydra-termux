@@ -107,7 +107,7 @@ scan_target() {
     local scan_file="$OUTPUT_DIR/nmap_${TARGET//[.\/]/_}.xml"
     
     log_progress "Running nmap scan..."
-    nmap $scan_opts -sV -oX "$scan_file" "$TARGET" 2>&1 | while IFS= read -r line; do
+    nmap "$scan_opts" -sV -oX "$scan_file" "$TARGET" 2>&1 | while IFS= read -r line; do
         [ "$VERBOSE" = "true" ] && echo "$line"
     done
     
@@ -192,7 +192,8 @@ attack_service() {
 # Function to generate report
 generate_report() {
     local scan_file="$1"
-    local report_file="$OUTPUT_DIR/report_$(date +%Y%m%d_%H%M%S).html"
+    local report_file
+    report_file="$OUTPUT_DIR/report_$(date +%Y%m%d_%H%M%S).html"
     
     print_header "Generating Report"
     
@@ -238,7 +239,8 @@ EOF
 EOF
     
     # Add results from JSON file with HTML escaping
-    local results_file="$PROJECT_ROOT/logs/results_$(date +%Y%m%d).json"
+    local results_file
+    results_file="$PROJECT_ROOT/logs/results_$(date +%Y%m%d).json"
     if [ -f "$results_file" ]; then
         echo "<table><tr><th>Protocol</th><th>Username</th><th>Password</th><th>Port</th></tr>" >> "$report_file"
         
@@ -290,8 +292,7 @@ run_auto_attack() {
     for port in "${!DISCOVERED_SERVICES[@]}"; do
         local service="${DISCOVERED_SERVICES[$port]}"
         
-        attack_service "$port" "$service"
-        if [ $? -eq 0 ]; then
+        if attack_service "$port" "$service"; then
             success_count=$((success_count + 1))
         fi
         

@@ -3,7 +3,7 @@
 /// <reference lib="deno.ns" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // Error types for granular error handling
 enum CleanupErrorType {
@@ -25,7 +25,7 @@ interface CleanupResult {
   }
 }
 
-async function cleanupExpiredSessions(supabaseClient: any): Promise<{ count: number; error?: any }> {
+async function cleanupExpiredSessions(supabaseClient: SupabaseClient): Promise<{ count: number; error?: unknown }> {
   try {
     const { data, error } = await supabaseClient.rpc('cleanup_expired_sessions')
     
@@ -35,13 +35,13 @@ async function cleanupExpiredSessions(supabaseClient: any): Promise<{ count: num
     }
     
     return { count: data || 0 }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Session cleanup exception:', error)
     return { count: 0, error }
   }
 }
 
-async function cleanupExpiredRefreshTokens(supabaseClient: any): Promise<{ count: number; error?: any }> {
+async function cleanupExpiredRefreshTokens(supabaseClient: SupabaseClient): Promise<{ count: number; error?: unknown }> {
   try {
     const { data, error } = await supabaseClient.rpc('cleanup_expired_refresh_tokens')
     
@@ -51,14 +51,14 @@ async function cleanupExpiredRefreshTokens(supabaseClient: any): Promise<{ count
     }
     
     return { count: data || 0 }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Token cleanup exception:', error)
     return { count: 0, error }
   }
 }
 
 async function logCleanupOperation(
-  supabaseClient: any,
+  supabaseClient: SupabaseClient,
   result: CleanupResult
 ): Promise<void> {
   try {
@@ -75,7 +75,7 @@ async function logCleanupOperation(
       },
       created_at: new Date().toISOString(),
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to log cleanup operation:', error)
   }
 }
@@ -150,17 +150,18 @@ serve(async (req) => {
       JSON.stringify(result),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as Error
     const duration = Date.now() - startTime
     const result: CleanupResult = {
       success: false,
       duration,
       error: {
         type: CleanupErrorType.UNKNOWN_ERROR,
-        message: error.message,
+        message: err.message,
         details: {
-          name: error.name,
-          stack: error.stack
+          name: err.name,
+          stack: err.stack
         }
       }
     }

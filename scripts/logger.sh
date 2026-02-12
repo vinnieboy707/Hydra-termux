@@ -332,7 +332,8 @@ track_ip_rotation() {
         line_count=$(wc -l < "$log_file" 2>/dev/null || echo "0")
         if [ "$line_count" -gt 10000 ]; then
             # Archive old log and start fresh
-            local archive_file="$LOG_DIR/ip_rotation_${user_id}_$(date +%Y%m%d_%H%M%S).log.gz"
+            local archive_file
+            archive_file="$LOG_DIR/ip_rotation_${user_id}_$(date +%Y%m%d_%H%M%S).log.gz"
             gzip -c "$log_file" > "$archive_file" 2>/dev/null || true
             # Keep only last 1000 entries in active log
             tail -n 1000 "$log_file" > "$log_file.tmp"
@@ -347,7 +348,7 @@ track_ip_rotation() {
     if command -v curl &>/dev/null; then
         local ip_output
         ip_output=$(curl -s --connect-timeout 3 https://api.ipify.org 2>/dev/null)
-        if [ $? -eq 0 ] && [ -n "$ip_output" ]; then
+        if [ -n "$ip_output" ]; then
             current_ip="$ip_output"
         else
             log_warn "IP Rotation: Failed to fetch public IP from https://api.ipify.org (network/firewall issue?). Skipping IP rotation tracking for this run."
@@ -382,7 +383,7 @@ track_ip_rotation() {
 
         total_ips=$(wc -l < "$log_file" 2>/dev/null || echo "0")
         if [ "$total_ips" -ge 900 ] && [ "$total_ips" -lt 1000 ]; then
-            log_info "IP Rotation: $total_ips/1000 IPs tracked ($(($total_ips * 100 / 1000))%)"
+            log_info "IP Rotation: $total_ips/1000 IPs tracked ($((total_ips * 100 / 1000))%)"
         elif [ "$total_ips" -ge 1000 ]; then
             log_success "IP Rotation: Reached tracking threshold (1000+ IPs)"
         fi
@@ -432,13 +433,13 @@ show_progress() {
 
     remaining=$((50 - completed))
     
-    printf "\r${CYAN}Progress: [${GREEN}"
+    printf "\r%sProgress: [%s" "${CYAN}" "${GREEN}"
     printf "%${completed}s" | tr ' ' '='
-    printf "${NC}"
+    printf "%s" "${NC}"
     printf "%${remaining}s" | tr ' ' '-'
-    printf "${CYAN}] ${percent}%%${NC}"
+    printf "%s] %s%%%s" "${CYAN}" "${percent}" "${NC}"
     
-    [ $current -eq $total ] && echo ""
+    [ "$current" -eq "$total" ] && echo ""
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -887,13 +888,13 @@ show_realtime_progress() {
     remaining=$((50 - completed))
     
     # Clear line and show progress
-    printf "\r${CYAN}[%s]${NC} " "$(date +%H:%M:%S)"
-    printf "${BLUE}%s${NC}://${YELLOW}%s${NC}:${GREEN}%s${NC} " "$protocol" "$target" "$port"
-    printf "${CYAN}[${GREEN}"
+    printf "\r%s[%s]%s " "${CYAN}" "$(date +%H:%M:%S)" "${NC}"
+    printf "%s%s%s://%s%s%s:%s%s%s " "${BLUE}" "$protocol" "${NC}" "${YELLOW}" "$target" "${NC}" "${GREEN}" "$port" "${NC}"
+    printf "%s[%s" "${CYAN}" "${GREEN}"
     printf "%${completed}s" | tr ' ' '='
-    printf "${NC}"
+    printf "%s" "${NC}"
     printf "%${remaining}s" | tr ' ' '-'
-    printf "${CYAN}]${NC} "
+    printf "%s]%s " "${CYAN}" "${NC}"
     printf "${MAGENTA}%3d%%${NC} " "$percent"
     printf "${CYAN}(%d/%d)${NC} " "$current" "$total"
     printf "${GREEN}Found: %d${NC}" "$found"

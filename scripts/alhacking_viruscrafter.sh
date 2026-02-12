@@ -25,9 +25,7 @@ mkdir -p "$TOOLS_DIR"
 if [ ! -d "$TOOL_DIR" ]; then
     log_info "Installing TigerVirus... This may take a moment."
     cd "$TOOLS_DIR" || exit 1
-    git clone https://github.com/Devil-Tigers/TigerVirus
-    
-    if [ $? -ne 0 ]; then
+    if ! git clone https://github.com/Devil-Tigers/TigerVirus; then
         log_error "Failed to clone TigerVirus"
         exit 1
     fi

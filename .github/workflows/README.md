@@ -15,7 +15,7 @@ This directory contains automated workflows for continuous integration, security
 **Jobs:**
 
 #### `lint-and-test`
-- Tests on Node.js versions 16.x, 18.x, and 20.x
+- Tests on Node.js versions 20.x and 22.x (Node >= 20.0.0 required)
 - Installs dependencies for backend and frontend
 - Validates JavaScript syntax
 - Builds frontend
@@ -289,8 +289,10 @@ In `ci.yml`, update the matrix:
 ```yaml
 strategy:
   matrix:
-    node-version: [16.x, 18.x, 20.x]  # Add or remove versions
+    node-version: [20.x, 22.x]  # Add or remove versions (minimum 20.x required)
 ```
+
+**Note:** Node.js >= 20.0.0 is required due to Supabase package dependencies.
 
 ### Change Security Scan Schedule
 
