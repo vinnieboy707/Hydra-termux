@@ -121,7 +121,7 @@ Hydra-Termux Team
 }
 
 // Template variable replacement
-function renderTemplate(template: string, variables: Record<string, any>): string {
+function renderTemplate(template: string, variables: Record<string, string | number | boolean>): string {
   let rendered = template
   for (const [key, value] of Object.entries(variables)) {
     rendered = rendered.replace(new RegExp(`{{${key}}}`, 'g'), String(value))
@@ -288,7 +288,14 @@ serve(async (req) => {
     const subject = renderTemplate(template.subject, variables)
     const body = renderTemplate(template.body, variables)
 
-    const results: any[] = []
+    interface NotificationResult {
+      type: string;
+      success: boolean;
+      error?: string;
+      messageId?: string;
+    }
+
+    const results: NotificationResult[] = []
     const types = notification_types || [NotificationType.EMAIL]
 
     // Send notifications based on user preferences and requested types

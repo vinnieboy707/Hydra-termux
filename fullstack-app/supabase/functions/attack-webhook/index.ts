@@ -3,7 +3,7 @@
 /// <reference lib="deno.ns" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,19 +21,39 @@ const RETRY_DELAYS = [1000, 2000, 4000] // Exponential backoff in ms
 const WEBHOOK_TIMEOUT = 30000 // 30 seconds
 
 // Request validation middleware
-function validateRequest(body: any): { valid: boolean; error?: string } {
-  if (!body.attack_id || typeof body.attack_id !== 'number') {
+interface RequestBody {
+  attack_id: number;
+  event_type: string;
+}
+
+function validateRequest(body: unknown): { valid: true; data: RequestBody } | { valid: false; error: string } {
+  // Type guard checks
+  if (!body || typeof body !== 'object') {
+    return { valid: false, error: 'Request body must be an object' }
+  }
+  
+  const requestBody = body as Record<string, unknown>;
+  
+  if (!requestBody.attack_id || typeof requestBody.attack_id !== 'number') {
     return { valid: false, error: 'Invalid attack_id: must be a number' }
   }
-  if (!body.event_type || typeof body.event_type !== 'string') {
+  if (!requestBody.event_type || typeof requestBody.event_type !== 'string') {
     return { valid: false, error: 'Invalid event_type: must be a string' }
   }
   const validEvents = ['attack.queued', 'attack.started', 'attack.completed', 'attack.failed', 
                        'credentials.found', 'target.added', 'wordlist.uploaded']
-  if (!validEvents.includes(body.event_type)) {
+  if (!validEvents.includes(requestBody.event_type)) {
     return { valid: false, error: `Invalid event_type: must be one of ${validEvents.join(', ')}` }
   }
-  return { valid: true }
+  
+  // After validation, we know the structure is correct
+  return { 
+    valid: true, 
+    data: {
+      attack_id: requestBody.attack_id as number,
+      event_type: requestBody.event_type as string
+    }
+  }
 }
 
 // Rate limiting check
@@ -71,9 +91,26 @@ async function generateHmacSignature(payload: string, secret: string): Promise<s
 }
 
 // Send webhook with retry logic and timeout
+interface WebhookData {
+  attack_id: number;
+  protocol: string;
+  host: string;
+  port: number;
+  status: string;
+  credentials_found: number;
+  duration_seconds: number;
+}
+
+interface WebhookPayload {
+  event: string;
+  timestamp: string;
+  webhook_id: number;
+  data: WebhookData;
+}
+
 async function sendWebhookWithRetry(
   url: string,
-  payload: any,
+  payload: WebhookPayload,
   secret: string,
   retries = MAX_RETRIES
 ): Promise<{ success: boolean; status?: number; error?: string; attempts: number }> {
@@ -157,12 +194,30 @@ async function sendWebhookWithRetry(
 }
 
 // Batch process webhooks with concurrency limit
+interface Webhook {
+  id: number;
+  url: string;
+  secret: string;
+  success_count: number;
+  failure_count: number;
+}
+
+interface Attack {
+  id: number;
+  protocol: string;
+  host: string;
+  port: number;
+  status: string;
+  credentials_found: number;
+  duration_seconds: number;
+}
+
 async function batchProcessWebhooks(
-  webhooks: any[],
-  attack: any,
+  webhooks: Webhook[],
+  attack: Attack,
   event_type: string,
-  supabaseClient: any
-): Promise<any[]> {
+  supabaseClient: SupabaseClient
+): Promise<Array<{ webhook_id: number; success: boolean; status?: number; error?: string; attempts: number }>> {
   const BATCH_SIZE = 5 // Process 5 webhooks concurrently
   const results = []
   
@@ -248,7 +303,7 @@ serve(async (req) => {
       )
     }
     
-    const { attack_id, event_type } = body
+    const { attack_id, event_type } = validation.data
     
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

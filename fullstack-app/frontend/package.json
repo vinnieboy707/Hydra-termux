@@ -68,5 +68,9 @@
     "resolve-url-loader": "5.0.0",
     "svgo": "2.8.0",
     "webpack-dev-server": "4.15.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
   }
 }
