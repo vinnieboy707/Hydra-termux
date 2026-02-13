@@ -151,13 +151,13 @@ if [ "$SETUP_MODE" = "interactive" ]; then
     echo "║   SUPER ADMIN ACCOUNT SETUP                                   ║"
     echo "╚═══════════════════════════════════════════════════════════════╝"
     echo ""
-    read -p "Enter super admin username [admin]: " ADMIN_USER
+    read -r -p "Enter super admin username [admin]: " ADMIN_USER
     ADMIN_USER=${ADMIN_USER:-admin}
     
-    read -p "Enter super admin email [admin@hydra.local]: " ADMIN_EMAIL
+    read -r -p "Enter super admin email [admin@hydra.local]: " ADMIN_EMAIL
     ADMIN_EMAIL=${ADMIN_EMAIL:-admin@hydra.local}
     
-    read -sp "Enter super admin password [auto-generate]: " ADMIN_PASS
+    read -r -sp "Enter super admin password [auto-generate]: " ADMIN_PASS
     echo ""
     
     # Generate secure password if not provided
@@ -243,7 +243,7 @@ echo "2) Start frontend only"
 echo "3) Start both (recommended)"
 echo "4) Exit"
 echo ""
-read -p "Enter choice [1-4]: " choice
+read -r -p "Enter choice [1-4]: " choice
 
 case $choice in
     1)
@@ -286,7 +286,7 @@ case $choice in
         echo "╚═══════════════════════════════════════════════════════════════╝"
         
         # Cleanup on exit
-        trap "echo ''; echo 'Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit 0" INT TERM
+        trap 'echo ""; echo "Stopping servers..."; kill '"$BACKEND_PID"' '"$FRONTEND_PID"' 2>/dev/null; exit 0' INT TERM
         
         # Wait for processes
         wait

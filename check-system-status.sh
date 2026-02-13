@@ -208,7 +208,7 @@ required_docs=(
 
 for doc in "${required_docs[@]}"; do
     if [ -f "$doc" ]; then
-        check_pass "Documentation: $(basename $doc)"
+        check_pass "Documentation: $(basename "$doc")"
     else
         check_warn "Documentation missing: $doc"
     fi
@@ -292,9 +292,9 @@ if command -v node &> /dev/null; then
     for file in fullstack-app/backend/*.js; do
         if [ -f "$file" ]; then
             if node -c "$file" 2>/dev/null; then
-                check_pass "Syntax OK: $(basename $file)"
+                check_pass "Syntax OK: $(basename "$file")"
             else
-                check_fail "Syntax error: $(basename $file)"
+                check_fail "Syntax error: $(basename "$file")"
             fi
         fi
     done

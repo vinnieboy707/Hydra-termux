@@ -24,11 +24,11 @@ get_timestamp() {
 # Get log level name
 get_level_name() {
     case $1 in
-        $LOG_LEVEL_DEBUG) echo "DEBUG" ;;
-        $LOG_LEVEL_INFO) echo "INFO" ;;
-        $LOG_LEVEL_WARN) echo "WARN" ;;
-        $LOG_LEVEL_ERROR) echo "ERROR" ;;
-        $LOG_LEVEL_FATAL) echo "FATAL" ;;
+        "$LOG_LEVEL_DEBUG") echo "DEBUG" ;;
+        "$LOG_LEVEL_INFO") echo "INFO" ;;
+        "$LOG_LEVEL_WARN") echo "WARN" ;;
+        "$LOG_LEVEL_ERROR") echo "ERROR" ;;
+        "$LOG_LEVEL_FATAL") echo "FATAL" ;;
         *) echo "UNKNOWN" ;;
     esac
 }

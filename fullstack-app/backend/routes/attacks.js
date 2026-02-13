@@ -3,72 +3,65 @@ const { authMiddleware } = require('../middleware/auth');
 const { vpnCheckMiddleware } = require('../middleware/vpn-check');
 const { run, get, all } = require('../database');
 const AttackService = require('../services/attackService');
+const logger = require('../utils/logger');
+const { asyncHandler, AppError } = require('../middleware/errorHandler');
 
 const router = express.Router();
 const attackService = new AttackService();
 
 // Get all attacks
-router.get('/', authMiddleware, async (req, res) => {
-  try {
-    const { status, protocol, limit = 50, offset = 0 } = req.query;
-    const parsedLimit = parseInt(limit);
-    const parsedOffset = parseInt(offset);
-    
-    // Build query based on filters to avoid dynamic SQL concatenation
-    let sql, params;
-    
-    if (status && protocol) {
-      sql = 'SELECT * FROM attacks WHERE user_id = ? AND status = ? AND protocol = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
-      params = [req.user.id, status, protocol, parsedLimit, parsedOffset];
-    } else if (status) {
-      sql = 'SELECT * FROM attacks WHERE user_id = ? AND status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
-      params = [req.user.id, status, parsedLimit, parsedOffset];
-    } else if (protocol) {
-      sql = 'SELECT * FROM attacks WHERE user_id = ? AND protocol = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
-      params = [req.user.id, protocol, parsedLimit, parsedOffset];
-    } else {
-      sql = 'SELECT * FROM attacks WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
-      params = [req.user.id, parsedLimit, parsedOffset];
-    }
-    
-    const attacks = await all(sql, params);
-    res.json({ attacks });
-  } catch (error) {
-    console.error('Error fetching attacks:', error);
-    res.status(500).json({ error: 'Failed to fetch attacks' });
+router.get('/', authMiddleware, asyncHandler(async (req, res) => {
+  const { status, protocol, limit = 50, offset = 0 } = req.query;
+  const parsedLimit = parseInt(limit);
+  const parsedOffset = parseInt(offset);
+  
+  // Build query based on filters to avoid dynamic SQL concatenation
+  let sql, params;
+  
+  if (status && protocol) {
+    sql = 'SELECT * FROM attacks WHERE user_id = ? AND status = ? AND protocol = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params = [req.user.id, status, protocol, parsedLimit, parsedOffset];
+  } else if (status) {
+    sql = 'SELECT * FROM attacks WHERE user_id = ? AND status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params = [req.user.id, status, parsedLimit, parsedOffset];
+  } else if (protocol) {
+    sql = 'SELECT * FROM attacks WHERE user_id = ? AND protocol = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params = [req.user.id, protocol, parsedLimit, parsedOffset];
+  } else {
+    sql = 'SELECT * FROM attacks WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params = [req.user.id, parsedLimit, parsedOffset];
   }
-});
+  
+  const attacks = await all(sql, params);
+  logger.debug('Attacks fetched', { userId: req.user.id, count: attacks.length });
+  res.json({ attacks });
+}));
 
 // Get attack by ID
-router.get('/:id', authMiddleware, async (req, res) => {
-  try {
-    const attack = await get(
-      'SELECT * FROM attacks WHERE id = ? AND user_id = ?',
-      [req.params.id, req.user.id]
-    );
-    
-    if (!attack) {
-      return res.status(404).json({ error: 'Attack not found' });
-    }
-    
-    // Get results
-    const results = await all(
-      'SELECT * FROM results WHERE attack_id = ?',
-      [req.params.id]
-    );
-    
-    // Get logs
-    const logs = await all(
-      'SELECT * FROM attack_logs WHERE attack_id = ? ORDER BY timestamp DESC LIMIT 100',
-      [req.params.id]
-    );
-    
-    res.json({ attack, results, logs });
-  } catch (error) {
-    console.error('Error fetching attack:', error);
-    res.status(500).json({ error: 'Failed to fetch attack' });
+router.get('/:id', authMiddleware, asyncHandler(async (req, res) => {
+  const attack = await get(
+    'SELECT * FROM attacks WHERE id = ? AND user_id = ?',
+    [req.params.id, req.user.id]
+  );
+  
+  if (!attack) {
+    throw new AppError('Attack not found', 404);
   }
-});
+  
+  // Get results
+  const results = await all(
+    'SELECT * FROM results WHERE attack_id = ?',
+    [req.params.id]
+  );
+  
+  // Get logs
+  const logs = await all(
+    'SELECT * FROM attack_logs WHERE attack_id = ? ORDER BY timestamp DESC LIMIT 100',
+    [req.params.id]
+  );
+  
+  res.json({ attack, results, logs });
+}));
 
 // Create new attack (with VPN check)
 router.post('/', authMiddleware, vpnCheckMiddleware({ enforceVPN: true, trackRotation: true }), async (req, res) => {

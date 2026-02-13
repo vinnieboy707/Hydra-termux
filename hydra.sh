@@ -410,7 +410,8 @@ view_attack_reports() {
     fi
     
     # Find all report files
-    local reports=$(find "$report_dir" -name "attack_report_*.md" -type f 2>/dev/null | sort -r)
+    local reports
+    reports=$(find "$report_dir" -name "attack_report_*.md" -type f 2>/dev/null | sort -r)
     
     if [ -z "$reports" ]; then
         log_warning "No attack reports found"
@@ -423,7 +424,8 @@ view_attack_reports() {
     fi
     
     # Count reports
-    local report_count=$(echo "$reports" | wc -l)
+    local report_count
+    report_count=$(echo "$reports" | wc -l)
     log_success "Found $report_count attack report(s)"
     echo ""
     
@@ -433,7 +435,8 @@ view_attack_reports() {
     
     local index=1
     echo "$reports" | while IFS= read -r report; do
-        local report_name=$(basename "$report")
+        local report_name
+        report_name=$(basename "$report")
         local report_date
         # Try GNU coreutils stat (-c) first; fall back to BSD/macOS stat (-f) if needed
         if stat -c %y "$report" >/dev/null 2>&1; then
@@ -443,10 +446,13 @@ view_attack_reports() {
         else
             report_date="unknown"
         fi
-        local report_size=$(du -h "$report" 2>/dev/null | cut -f1)
+        local report_size
+        report_size=$(du -h "$report" 2>/dev/null | cut -f1)
         
         # Extract protocol and target from filename if possible
-        local protocol=$(echo "$report_name" | sed 's/attack_report_\([^_]*\)_.*/\1/')
+        local protocol
+        protocol="${report_name#attack_report_}"
+        protocol="${protocol%%_*}"
         
         printf "${YELLOW}%2d)${NC} %-15s ${CYAN}%-20s${NC} (%s)\n" \
             "$index" "$protocol" "$report_date" "$report_size"
@@ -468,7 +474,8 @@ view_attack_reports() {
         1)
             echo ""
             read -r -p "Enter report number to view: " report_num
-            local selected_report=$(echo "$reports" | sed -n "${report_num}p")
+            local selected_report
+            selected_report=$(echo "$reports" | sed -n "${report_num}p")
             if [ -n "$selected_report" ] && [ -f "$selected_report" ]; then
                 echo ""
                 print_message "Opening report: $(basename "$selected_report")" "$GREEN"
@@ -485,7 +492,8 @@ view_attack_reports() {
             fi
             ;;
         2)
-            local latest_report=$(echo "$reports" | head -1)
+            local latest_report
+            latest_report=$(echo "$reports" | head -1)
             if [ -n "$latest_report" ] && [ -f "$latest_report" ]; then
                 echo ""
                 print_message "Opening latest report: $(basename "$latest_report")" "$GREEN"
@@ -500,9 +508,9 @@ view_attack_reports() {
             fi
             ;;
         3)
-            local archive_file="$SCRIPT_DIR/attack_reports_$(date +%Y%m%d_%H%M%S).tar.gz"
-            tar -czf "$archive_file" -C "$report_dir" . 2>/dev/null
-            if [ $? -eq 0 ]; then
+            local archive_file
+            archive_file="$SCRIPT_DIR/attack_reports_$(date +%Y%m%d_%H%M%S).tar.gz"
+            if tar -czf "$archive_file" -C "$report_dir" . 2>/dev/null; then
                 log_success "Reports exported to: $archive_file"
             else
                 log_error "Failed to export reports"

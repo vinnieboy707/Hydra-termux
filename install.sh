@@ -123,7 +123,8 @@ install_hydra() {
     fi
     
     # Create secure temporary log file
-    local hydra_log=$(mktemp)
+    local hydra_log
+    hydra_log=$(mktemp)
     
     # Attempt 1: Try standard 'hydra' package
     print_message "   Attempting: pkg install hydra..." "$CYAN"
