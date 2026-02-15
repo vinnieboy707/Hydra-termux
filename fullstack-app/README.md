@@ -96,6 +96,27 @@ npm install --legacy-peer-deps --maxsockets=1
 npm run health-check
 ```
 
+**Module not found errors after updating dependencies:**
+If you see errors like `Cannot find module 'bcryptjs'` or similar after a dependency update (e.g., from Dependabot), you need to reinstall dependencies:
+
+```bash
+# For backend
+cd fullstack-app/backend
+npm install
+
+# For frontend
+cd fullstack-app/frontend
+npm install
+```
+
+Or simply re-run the setup script which will handle it automatically:
+```bash
+cd fullstack-app
+./start.sh
+```
+
+**Note:** When `package.json` or `package-lock.json` files are updated, always run `npm install` in the respective directory to update your `node_modules` folder with the new package versions.
+
 ---
 
 ## ✨ What's Included
