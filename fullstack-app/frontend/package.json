@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
-    "axios": "^1.6.5",
+    "axios": "^1.13.5",
     "chart.js": "^4.4.1",
     "classnames": "^2.5.1",
     "crypto-js": "^4.2.0",
