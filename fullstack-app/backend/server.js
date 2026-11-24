@@ -6,7 +6,8 @@ const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const http = require('http');
 const WebSocket = require('ws');
-require('dotenv').config();
+// Keys come from the one shared secrets file (see utils/loadEnv.js).
+require('./utils/loadEnv').loadEnv({ project: 'hydra' });
 
 const logger = require('./utils/logger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
