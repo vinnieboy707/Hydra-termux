@@ -1,0 +1,12 @@
+{
+  "system": {
+    "name": "DIG_AI_STRICT_DEPLOY",
+    "version": "1.0.0",
+    "strict_mode": true
+  },
+  "models": {
+    "darkbert_path": "exploit_core/dark_bert.py",
+    "llama_path": "exploit_core/llama_payloads.py"
+  },
+  "hardware": ["flipper_zero_2.0", "raspberry_pi"]
+}

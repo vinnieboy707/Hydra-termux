@@ -1,0 +1,36 @@
+name: Chronos Production CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm install --silent
+
+    - name: Run 6-Module Compliance Audit
+      run: node verify_all_6_modules_compliance.js
+
+    - name: Run Adaptive Parameter Optimizer Tests
+      run: node test_adaptive_optimizer.js
+
+    - name: Run Notification Policy Tests
+      run: node test_notification_policy.js

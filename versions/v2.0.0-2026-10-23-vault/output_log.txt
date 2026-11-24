@@ -1,0 +1,2 @@
+◇ injected env (17) from .env
+❌ Error: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables.

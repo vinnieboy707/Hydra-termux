@@ -1,0 +1,6 @@
+{
+  "windowStartUTC": "02:00",
+  "windowEndUTC": "04:00",
+  "maxBatchSize": 50,
+  "enabled": true
+}

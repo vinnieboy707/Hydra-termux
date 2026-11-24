@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+echo "========================================================"
+echo "CHRONOS OS // CLI HEALTH & COMPLIANCE PROBE"
+echo "========================================================"
+node validate_system_health.js
+node verify_all_6_modules_compliance.js
+echo "========================================================"
+echo "✅ HEALTH & COMPLIANCE PROBE COMPLETED"
+echo "========================================================"

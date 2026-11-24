@@ -1,0 +1,7 @@
+# Daily Log: $(date +%F)
+## Goals:
+- [ ] Task 1
+- [ ] Task 2
+
+## Thoughts:
+- Type your notes here.

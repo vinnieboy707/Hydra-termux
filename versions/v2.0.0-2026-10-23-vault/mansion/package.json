@@ -1,0 +1,36 @@
+{
+  "name": "abandoned-asset-intelligence-app",
+  "version": "1.0.0",
+  "description": "Full-stack intelligence platform for identifying abandoned properties.",
+  "main": "server.js",
+  "scripts": {
+    "test": "npx jest",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.12.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "google-auth-library": "^11.0.2",
+    "sqlite3": "^5.1.7",
+    "string-similarity": "^4.0.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.2",
+    "@types/sqlite3": "^3.1.11",
+    "jest": "^29.7.0",
+    "supertest": "^7.2.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

@@ -1,0 +1,113 @@
+{
+  "system": "CHRONOS_OS_REVENUE_FORTRESS",
+  "version": "2.1.0",
+  "mode": "24_7_continuous_operational",
+  "unified_ledger": "unified_financial_ledger.wal",
+  "tap_to_pay": {
+    "enabled": true,
+    "spending_gateway": "http://localhost:3800/tap-pay",
+    "instant_liquidity_ratio": 1.00
+  },
+  "revenue_streams": [
+    {
+      "id": "STREAM_01",
+      "name": "Autonomous Micro-Arbitrage",
+      "category": "High-Frequency DeFi",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.15,
+      "treasury_ratio": 0.60,
+      "spendable_ratio": 0.40,
+      "settlement_frequency_sec": 5
+    },
+    {
+      "id": "STREAM_02",
+      "name": "SaaS Tier-1 Subscriptions",
+      "category": "Recurring Enterprise",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.15,
+      "treasury_ratio": 0.80,
+      "spendable_ratio": 0.20,
+      "settlement_frequency_sec": 10
+    },
+    {
+      "id": "STREAM_03",
+      "name": "Decentralized API Monetization",
+      "category": "Developer Gateways",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.10,
+      "treasury_ratio": 0.70,
+      "spendable_ratio": 0.30,
+      "settlement_frequency_sec": 5
+    },
+    {
+      "id": "STREAM_04",
+      "name": "Automated Digital Product Sales",
+      "category": "E-Commerce / Assets",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.10,
+      "treasury_ratio": 0.70,
+      "spendable_ratio": 0.30,
+      "settlement_frequency_sec": 15
+    },
+    {
+      "id": "STREAM_05",
+      "name": "Affiliate & Referral Network Yields",
+      "category": "Network Growth",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.10,
+      "treasury_ratio": 0.70,
+      "spendable_ratio": 0.30,
+      "settlement_frequency_sec": 20
+    },
+    {
+      "id": "STREAM_06",
+      "name": "Validator Staking & Consensus Rewards",
+      "category": "Proof-of-Stake",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.10,
+      "treasury_ratio": 0.85,
+      "spendable_ratio": 0.15,
+      "settlement_frequency_sec": 30
+    },
+    {
+      "id": "STREAM_07",
+      "name": "Distributed Compute Node Rentals",
+      "category": "Cloud Infrastructure",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.10,
+      "treasury_ratio": 0.75,
+      "spendable_ratio": 0.25,
+      "settlement_frequency_sec": 10
+    },
+    {
+      "id": "STREAM_08",
+      "name": "Data Oracle & Feed Verification",
+      "category": "Web3 Infrastructure",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.10,
+      "treasury_ratio": 0.70,
+      "spendable_ratio": 0.30,
+      "settlement_frequency_sec": 5
+    },
+    {
+      "id": "STREAM_09",
+      "name": "Content Syndication & Media Licensing",
+      "category": "Intellectual Property",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.05,
+      "treasury_ratio": 0.80,
+      "spendable_ratio": 0.20,
+      "settlement_frequency_sec": 60
+    },
+    {
+      "id": "STREAM_10",
+      "name": "Automated Liquidity Provisioning (LP)",
+      "category": "AMM Yields",
+      "status": "ACTIVE_24_7",
+      "allocation_weight": 0.05,
+      "treasury_ratio": 0.65,
+      "spendable_ratio": 0.35,
+      "settlement_frequency_sec": 15
+    }
+  ]
+}

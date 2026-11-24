@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+dist/
+build/
+
+# Environment & Secrets
+.env
+.gemini/
+.ssh/
+.suroot/
+.config/
+.cache/
+.local/
+.npm/
+.pm2/
+.postgres/
+.cargo/
+.foundry/
+.codex/
+.apify/
+.cloudflared/
+
+# Logs & Temporary Data
+logs/
+*.log
+*.wal
+*.rdb
+session_checkpoint.json
+artillery_checkpoint.json
+combined_sessions.jsonl
+error_audit.jsonl
+unresolved-audit.log
+downloads/
+archives/
+
+# Production DBs & runtime logs
+chronos_production.db
+*.log
+data/
+.env
+*.db
+*.wal
+data/paper_trade_events.jsonl
+unresolved-audit.log
+node_modules/
