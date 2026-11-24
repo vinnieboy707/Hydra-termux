@@ -1,133 +1,127 @@
-# Changelog
+# Chronos consolidation — changelog
 
-All notable changes to Hydra-Termux will be documented in this file.
+Chronological record of every version in `versions/`, what each contains, and **exactly what
+differs between them**. The complete file-by-file lists (Added / Removed / Changed / Identical for
+each step) are in **[versions/DIFF_MATRIX.md](versions/DIFF_MATRIX.md)**; this file is the readable
+summary. For a live diff: `git diff v1.0.0 v2.0.0`, `git diff v2.0.0 v3.0.0`, `git diff v3.0.0 v4.0.0`.
 
-## [2.0.1] - 2025-12-31 - 10000% Optimization Update
+## Headline
 
-### 🚀 Major Optimizations
-- **10000% Protocol Optimization Framework** - Comprehensive enhancement across all attack vectors
-- **All 8 Attack Scripts Optimized**:
-  - SSH: 2x faster (32 threads, 15s timeout)
-  - FTP: 3x faster (48 threads, 10s timeout, anonymous priority)
-  - MySQL: 50% faster (24 threads, blank password priority)
-  - PostgreSQL: 25% faster (20 threads, postgres user priority)
-  - RDP: 2x faster (8 threads, 45s timeout, careful lockout avoidance)
-  - SMB: 2x faster (16 threads, guest account priority)
-  - Web: 2x faster (32 threads, 13+ admin paths, WordPress priority)
-  - Multi-Protocol: Enhanced with 13+ protocol mappings, parallel execution
+The three source copies **overlap almost not at all**. These are not incremental edits of one tree —
+they are three divergent snapshots the code was spread across:
 
-### ✨ New Features
-- **optimized_attack_profiles.conf** - 18KB of attack intelligence and strategies
-- **--tips Flag** - Added to all attack scripts for protocol-specific guidance
-- **Enhanced Target Scanner** - 35+ protocol mappings with success rates and attack strategies
-- **Results Viewer Enhancement** - Now shows 30-day attack history (was same-day only)
-- **Categorized Output** - Services grouped by type (Remote Access, Database, Web, etc.)
-- **Success Rate Statistics** - Real-world penetration testing data integrated
-- **Priority Username Lists** - Ordered by actual success rates (e.g., root: 45%)
-- **Blank Password Priority** - Tried first for 5-50% instant success depending on service
+| Step | Added | Removed | Changed | Identical |
+|------|------:|--------:|--------:|----------:|
+| v1 → v2 | 435 | 302 | 3 | 0 |
+| v2 → v3 | 96 | 436 | 2 | 0 |
+| v3 → v4 | 12 | 0 | 0 | 98 |
 
-### 📊 Performance Improvements
-- Thread optimization per protocol (8-48 threads based on capacity)
-- Timeout optimization (10-45s based on protocol response time)
-- Username ordering by success statistics
-- Blank password checks prioritized
-- Protocol-specific attack strategies
-
-### 📚 Documentation
-- Added `/docs/OPTIMIZATION_GUIDE.md` - Complete optimization guide (13KB)
-- Updated README.md with optimization features
-- Enhanced help messages in all scripts with visual indicators (🚀)
-- Added optimization tips for each protocol
-
-### 🔧 Technical Details
-- Auto-loading of optimization profiles on script startup
-- Visual optimization indicators in all scripts
-- Protocol-specific configuration integration
-- Enhanced error messages and guidance
-- Improved categorization and display formatting
-
-## [2.0.0] - 2025-01-01 - Ultimate Edition
-
-### Added
-- **8 Pre-built Attack Scripts**:
-  - SSH Admin Attack with resume support
-  - FTP Admin Attack with timeout handling
-  - Web Admin Attack with form detection
-  - RDP Admin Attack with lockout prevention
-  - MySQL Admin Attack with connection strings
-  - PostgreSQL Admin Attack
-  - SMB Admin Attack with domain support
-  - Multi-Protocol Auto Attack with nmap integration
-
-- **Utility Scripts**:
-  - Wordlist Download Manager (SecLists integration)
-  - Wordlist Generator (combine, dedupe, sort)
-  - Target Scanner (nmap wrapper with multiple scan types)
-  - Results Viewer (filter, export, manage results)
-
-- **Enhanced Main Launcher**:
-  - Beautiful ASCII art banner
-  - Interactive menu system (18 options)
-  - Quick access to all tools
-  - Configuration management
-  - Update system
-
-- **Configuration System**:
-  - hydra.conf with customizable settings
-  - Default username and password lists
-  - Centralized configuration management
-
-- **Logging System**:
-  - Timestamped log entries
-  - Color-coded output
-  - JSON results tracking
-  - Export to TXT, CSV, JSON formats
-  - Automatic log rotation
-
-- **Documentation**:
-  - Comprehensive README.md
-  - Usage guide (docs/USAGE.md)
-  - Examples (docs/EXAMPLES.md)
-  - Contributing guidelines
-  - MIT License
-
-### Enhanced
-- **Installation Script**:
-  - VPN check and warning
-  - Additional packages (nmap, jq, figlet, termux-api)
-  - Directory structure creation
-  - Verification of installed components
-  - Optional wordlist download
-
-- **Security Features**:
-  - VPN usage reminder
-  - Rate limiting options
-  - Random delay between attempts
-  - Resume support for interrupted attacks
-
-### Fixed
-- Improved error handling across all scripts
-- Better input validation
-- Graceful degradation when tools unavailable
-
-## [1.0.0] - 2024-12-01
-
-### Added
-- Initial release
-- Basic Hydra installation script
-- README with installation instructions
-- Package management via need.txt
-
-### Features
-- Simple installation process
-- Termux optimization
-- Basic documentation
+Between v1 and v2 only **3** paths exist in both (`.gitignore`, `README.md`, `package.json`) — and
+all three changed. Between v2 and v3 only **2** paths exist in both (`contracts/ChronosFlashArb.sol`,
+`scripts/audit_ledger.ts`) — and both changed. So the lineage is best read as: a Termux pen-test/
+full-stack app (v1) → a broad Chronos "vault" workspace (v2) → a focused arbitrage swarm (v3) →
+the consolidated go-forward (v4).
 
 ---
 
-## Version Numbering
+## v1.0.0 — 2026-02-24 — Hydra-Termux (the base)
+`versions/v1.0.0-2026-02-24-hydra-termux/` · 305 files · source: GitHub `vinnieboy707/Hydra-termux` @ `main`
 
-This project follows [Semantic Versioning](https://semver.org/):
-- **MAJOR** version for incompatible changes
-- **MINOR** version for new functionality
-- **PATCH** version for bug fixes
+The original repo everything traces back to. A Termux-oriented brute-force / penetration-testing
+suite plus a separate full-stack web app.
+
+Top-level: `fullstack-app/` (130 — React frontend + Node backend), `scripts/` (59), `docs/` (32),
+`.github/` (8), `Library/` (7), `config/` (4), Docker/compose/nginx/monitoring, `hydra.sh`,
+`install.sh`. Full git history (306 commits) is preserved — this version is the branch point.
+
+Excluded: nothing added or removed; this is the repo as-is. (It contains only env-var references
+and placeholder templates, no live secrets.)
+
+## v2.0.0 — 2026-10-23 — ChronosMasterVault / "repo" (the bridge)
+`versions/v2.0.0-2026-10-23-vault/` · 438 files · source: Google Drive `ChronosMasterVault/repo`
+
+The broadest Chronos snapshot. This is where the project became "Chronos": a large multi-part
+workspace.
+
+Top-level: `src/` (128), root scripts (112), `scripts/` (33), `mansion/` (32), `fullstack-app/`
+(31), `api-dashboard-swarm/` (16), `data/` (15), `arbitrage_engine/` (15), `dig-ai-system/` +
+`dig_ai_production/` (11), `exploit_core/` (2), `alchemy_project/`, `apps/`, `contracts/` (1),
+and ~20 agent `*-skill/` folders (accessibility-auditor, alert-dispatcher, auth-guard, threat-
+detector, rate-limiter, redis-healer, etc.). Governance/policy docs and many `verify_*` / `test_*`
+root scripts.
+
+**Difference from v1:** effectively a complete replacement. 435 files added, 302 removed. The only
+shared paths are `.gitignore`, `README.md`, `package.json`, and all three were rewritten. None of
+v1's `fullstack-app/` or Termux tooling carried over at the path level.
+
+Excluded from this version (retrieved but deliberately left out):
+- Secrets (6): `.env`, `.env.production`, `.env.example`, `arbitrage_engine/.env.example`,
+  `scripts/validate_secrets.mjs`, `scripts/configure-secrets.mjs`
+- Databases (8): `vault_store.db(+ -shm/-wal)`, `chronos_production.db`, `data/chronos_production.db`,
+  `arbitrage_engine/vault_store.db`, `arbitrage_engine/arbitrage_pipeline.db`,
+  `arbitrage_engine/data/arbitrage.db`
+- Large/noise: `data/telemetry_stream.jsonl` (2.8 MB), `unresolved-audit.log` (549 KB)
+- Vendored/generated trees pruned entirely (~2,168 files): `google-cloud-sdk/`, `__pycache__/`
+  (68 instances), `dist/`
+- 24 genuine zero-byte files preserved as empty (e.g. `KILL_SWITCH`, empty `__init__.py`).
+
+## v3.0.0 — 2026-11-17 — Chronos arbitrage swarm
+`versions/v3.0.0-2026-11-17-arb-swarm/` · 98 files · source: Google Drive `chronos_workspace_backup_…json.gz`
+
+A focused DeFi arbitrage/execution swarm — the newest reachable complete snapshot.
+
+Top-level: `scripts/` (87 — mostly `.cjs` swarm/deploy/execution engines: `chronos_master_swarm`,
+`arb-swarm-worker`, `deploy_*`, `gas_monitor`, `policy_guard`, `safe_executor`, `profit_dashboard`,
+monitoring/health), `contracts/` (7 Solidity flash-arb contracts), `artifacts/` (4 compiled).
+
+**Difference from v2:** 96 added, 436 removed, 2 changed. The broad v2 workspace (src/mansion/
+dig-ai/skills/arbitrage_engine/fullstack-app) is gone; what remains and grows is the swarm's
+scripts and contracts. The two shared files both changed between Oct 23 and Nov 17:
+- `contracts/ChronosFlashArb.sol` — rewritten, 225 → 156 lines.
+- `scripts/audit_ledger.ts` — 53 → 55 lines, ~10 lines changed.
+86 of the 87 scripts here are new relative to v2; v3 has 7 contracts vs v2's 1.
+
+Excluded: `.env`, `data/vault_store.db*`, `data/vault_store.sqlite*`, `data/real_estate_master.db`,
+`data/wallet_ledger.json`, and 29 runtime `logs/` + `.jsonl` files.
+
+Not retrieved: the 194 MB `chronos_workspace_backup_1794945173.tar.gz` (same day) — the Drive
+connector can't hand over a file that large, so v3 was rebuilt from the same-day JSON content
+backup instead. The phone/Termux working copy is also out of reach, so a copy newer than Nov 17,
+if one exists, is not represented here.
+
+## v4.0.0 — 2026-11-24 — Consolidated go-forward
+`versions/v4.0.0-consolidated/` · 98 + 11 files · source: v3.0.0 + imports from the other projects
+
+v3 unchanged (all 98 files byte-identical) plus a new `integrations/` folder holding 11 reusable
+modules pulled from Chenzo's other repos, each with a provenance header, reading all secrets from
+env vars. See `versions/v4.0.0-consolidated/integrations/README.md` for the manifest and rationale.
+
+**Difference from v3:** 12 files added (the 11 modules + an `integrations/README.md`), nothing
+removed, nothing changed.
+
+Imported:
+- From `Assets-in-control-` (`server/`): `onChainVerification.js`, `blockchain.js`, `priceService.js`,
+  `validationChain.js`, `errorRecovery.js`, `recoveryMiddleware.js`, `rateLimiter.js`
+- From `daugherty-INC` (`backend/`): `asyncHandler.js`, `validate.js`
+- From `Vip-Registatiom` (`backend/`): `logger.ts`, `errorHandler.ts`
+
+Not imported: `public-record` (a Python public-records app — belongs to the real-estate side, not a
+DeFi swarm); `Hernandez_Advertisment` (README only); the other projects' frontends/routes/models
+(app-specific scaffolding, not reusable infrastructure). The imported modules are staged, not yet
+wired into the swarm scripts — that is a deliberate follow-up so you can review them first.
+
+---
+
+## Security note — secrets found hardcoded in source (redacted, not committed)
+
+While consolidating, live credentials were found **hardcoded directly in source files** (not in
+`.env`). They were replaced in place with `REDACTED_SECRET_MOVED_TO_ENV` / an env-var reference, so
+no secret is committed or pushed. The real values are **not** reproduced anywhere here. These keys
+should be treated as exposed and **rotated**:
+
+- `versions/v2.0.0-2026-10-23-vault/check_real_onchain_balance.js:11` — a hardcoded wallet private key.
+- `versions/v3.0.0-2026-11-17-arb-swarm/scripts/master_audit_and_integrate.js:50` — an OpenRouter API key
+  (same file carried into `versions/v4.0.0-consolidated/`).
+
+Each version's code should read these from environment variables instead (the separate env/key
+consolidation work covers that). Flagging so they can be rotated.
