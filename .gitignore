@@ -49,3 +49,13 @@ fullstack-app/frontend/node_modules/
 fullstack-app/frontend/build/
 fullstack-app/frontend/.env.local
 fullstack-app/frontend/.env.production.local
+
+# Secrets live in the one shared file (APEX_ENV_FILE, default ~/.config/apex/secrets.env).
+# Never commit a real env file; only templates and examples belong in the repo.
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.template
+!.env.*.template
+secrets.env
