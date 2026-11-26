@@ -1,0 +1,24 @@
+{
+  "name": "chronos-console",
+  "version": "2.9.19",
+  "private": true,
+  "description": "Read-only flash-loan opportunity console for Arbitrum One: live terminal dashboard, scanner, optimizer, policies, measurement gate. Sends no transactions.",
+  "bin": {
+    "chronos": "bin/chronos.cjs"
+  },
+  "scripts": {
+    "start": "node bin/chronos.cjs",
+    "doctor": "node bin/chronos.cjs doctor",
+    "scan": "node bin/chronos.cjs scan",
+    "measure": "node bin/chronos.cjs measure",
+    "test": "node --require ./test/isolate.cjs --test --test-timeout=600000 test/engine.test.cjs test/chain.test.cjs test/batch.test.cjs test/realized.test.cjs test/execution.test.cjs test/sync.test.cjs test/agents.test.cjs test/deploy.test.cjs test/payout.test.cjs test/device.test.cjs test/console.test.cjs test/setup.test.cjs test/engine-service.test.cjs test/autopilot.test.cjs",
+    "devchain": "node test/devchain.cjs"
+  },
+  "dependencies": {
+    "ethers": "6.17.0"
+  },
+  "devDependencies": {
+    "ganache": "7.9.2",
+    "solc": "0.8.24"
+  }
+}

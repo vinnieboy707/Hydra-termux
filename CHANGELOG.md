@@ -15,6 +15,7 @@ they are three divergent snapshots the code was spread across:
 | v1 → v2 | 435 | 302 | 3 | 0 |
 | v2 → v3 | 96 | 436 | 2 | 0 |
 | v3 → v4 | 12 | 0 | 0 | 98 |
+| v4 → v5 | 259 | 110 | 0 | 0 |
 
 Between v1 and v2 only **3** paths exist in both (`.gitignore`, `README.md`, `package.json`) — and
 all three changed. Between v2 and v3 only **2** paths exist in both (`contracts/ChronosFlashArb.sol`,
@@ -109,6 +110,44 @@ Not imported: `public-record` (a Python public-records app — belongs to the re
 DeFi swarm); `Hernandez_Advertisment` (README only); the other projects' frontends/routes/models
 (app-specific scaffolding, not reusable infrastructure). The imported modules are staged, not yet
 wired into the swarm scripts — that is a deliberate follow-up so you can review them first.
+
+## v5.0.0 — 2026-11-26 — chronos-console 2.9.19 (newest engine)
+`versions/v5.0.0-2026-11-26-console/` · 259 files · source: Google Drive `chronos-console-2.9.19.tgz` (uploaded 2026-11-26)
+
+The newest Chronos, and the one the live engine now runs. The loose Nov-17 arbitrage swarm (v3) has been
+re-engineered into a single structured package, `chronos-console` v2.9.19: a self-running flash-loan arbitrage
+system for Arbitrum One with a shadow-test gate before any live trade, a terminal dashboard (TUI), an autopilot
+installer, device pairing, phone alerts, and a one-script Google Cloud deployment.
+
+Top-level: `lib/` (97 — engine, chain, scanner, optimizer, policies, payout, measurement, `kms.cjs`, `walletbridge.cjs`),
+`test/` (88 — a real test suite with mocks **and** on-chain/devchain fixtures), `tui/` (17 — the dashboard),
+`docs/` (17 — generated-and-checked reference: ARCHITECTURE, CONFIGURATION, COMMANDS, SECURITY, TESTING, API…),
+`server/` (13 — Supabase edge functions: alerts, decisions, ingest, insights, release, vault + `schema.sql`),
+`contract/` + `contracts/v2/` (Solidity + compiled ABIs), `cloud/` and `sync/` (GCP + laptop/phone setup), and the
+`bin/chronos.cjs` CLI. `package.json` pins `ethers 6.17.0`, `ganache 7.9.2`, `solc 0.8.24`.
+
+**Security posture (notable upgrade):** there is **no private key anywhere in this code**. Trades are signed by an
+HSM-protected secp256k1 key in Google Cloud KMS that cannot be exported (`lib/kms.cjs`); the owner key for `chronos
+deploy` is read from the environment for that run only and never written. The secret scan found **no hardcoded live
+credentials** — the only key-shaped strings are the public secp256k1 group order, compiled contract bytecode in ABI
+JSON, on-chain transaction hashes in fixtures, and ganache's documented public test keys in `test/`. One synthetic
+`sk_live_…` string used as **input** to a redaction test (`test/console.test.cjs`, which asserts that `redact()`
+scrubs keys from the terminal) was replaced with an obviously-fake placeholder so it no longer trips secret scanners;
+the test still passes. This directly honours the preference that every mock in tests has a real counterpart: the
+suite exercises both mocks (`test/mocks/`, `test/fixtures/`) and a live devchain.
+
+**Difference from v4:** 259 added, 110 removed, 0 changed, 0 identical — it shares **no path** with v4 and only two
+basenames with v3 (`ChronosFlashArb.sol`, `ChronosFlashArb.json`). So, as with every earlier step, this is a
+reorganization rather than an incremental edit: the flat `scripts/*.cjs` swarm became a packaged, tested `lib/`+`tui/`
+console, and v4's staged `integrations/` do not carry into it.
+
+Excluded (retrieved but deliberately left out):
+- `vendor/deps.tgz` (681 KB bundled dependency archive — a vendored binary blob, rebuilt from `vendor/build-deps.sh`).
+- Kept: `.env.scanner.example` (a config **template** — every value commented out, no secrets), and `vendor/build-deps.sh`.
+
+Not retrieved newer than this: none found. This 1.44 MB `.tgz` is the copy that was "newer than Nov 17" and out of
+reach when v3 was built; it is now the newest reachable Chronos. (The 194 MB Nov-17 tarball remains too large for the
+Drive connector, but its source is already represented by v3 via the companion JSON backup.)
 
 ---
 

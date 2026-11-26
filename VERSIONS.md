@@ -15,6 +15,7 @@ added it, so `git diff v1.0.0 v3.0.0` (etc.) gives you the exact file-by-file di
 | **v2.0.0** | 2026-10-23 | `ChronosMasterVault/repo` (Google Drive) | Broad Chronos "vault" workspace: src, arbitrage engine, agent-skill system, dig-ai, fullstack-app | 438 |
 | **v3.0.0** | 2026-11-17 | `chronos_workspace_backup` (Google Drive) | Chronos arbitrage/DeFi swarm (Solana/Arbitrum), scripts + contracts | 98 |
 | **v4.0.0** | 2026-11-24 | v3.0.0 + imports | Consolidated go-forward: v3 plus reusable modules pulled from the other projects | 98 + 11 |
+| **v5.0.0** | 2026-11-26 | `chronos-console-2.9.19.tgz` (Google Drive) | **Newest engine.** The arb swarm re-engineered into a packaged, test-covered CLI/TUI console with a KMS-signed executor | 259 |
 
 \* Authored source files only. Vendored dependency trees (`google-cloud-sdk`, `node_modules`,
 `__pycache__`, build output), secrets (`.env*`), databases (`*.db`, `*.sqlite`) and runtime logs
@@ -47,5 +48,7 @@ in `CHANGELOG.md` and `versions/DIFF_MATRIX.md`.
   hand over a file that large. v3 above was reconstructed instead from the **companion JSON backup**
   taken the same day, which stores every source file's text — so v3 is complete at the source level,
   but the tarball's binary payload (node_modules, compiled output) is not included.
-- The **phone / Termux working copy** is not reachable from here, so if there is a copy newer than
-  Nov 17, it is not represented. Say the word and tell me how to reach it.
+- The copy **newer than Nov 17** that was out of reach when v3 was built is now captured: it was uploaded to
+  Drive as `chronos-console-2.9.19.tgz` (1.44 MB, 2026-11-26) and is included above as **v5.0.0**. No copy newer
+  than that was found in Drive. If a still-newer build exists only on the phone/Termux, say the word and tell me
+  how to reach it.

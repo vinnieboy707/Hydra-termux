@@ -14,6 +14,7 @@ versions/
   v2.0.0-2026-10-23-vault/          ← Chronos workspace from Google Drive (ChronosMasterVault)
   v3.0.0-2026-11-17-arb-swarm/      ← Chronos arbitrage swarm (Nov 17 backup)
   v4.0.0-consolidated/              ← v3 + reusable modules imported from the other projects
+  v5.0.0-2026-11-26-console/        ← newest engine: chronos-console 2.9.19 (packaged, tested, KMS-signed)
 VERSIONS.md   ← the index: what each version is, dates, provenance, what was excluded
 CHANGELOG.md  ← the file-by-file differences between versions
 ```

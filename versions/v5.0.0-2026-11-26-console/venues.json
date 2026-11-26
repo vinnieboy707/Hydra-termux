@@ -1,0 +1,122 @@
+{
+  "_note": "Addresses marked from_your_files come from files in your snapshot/Drive. Addresses marked recall were written from memory and are NOT trusted: the scanner checks each one on-chain at startup (factory() / feeAmountTickSpacing) and disables any venue that fails the check. executable=true only where the Drive ChronosFlashArb.sol can actually call the router (Uniswap V3 8-field exactInputSingle, or standard UniswapV2 swapExactTokensForTokens).",
+  "venues": [
+    {
+      "id": "uniswap_v3",
+      "kind": "v3",
+      "executable": true,
+      "factory": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+      "quoter": "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+      "router": "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+      "fees": [
+        100,
+        500,
+        3000,
+        10000
+      ],
+      "source": "router+quoter from_your_files; factory recall"
+    },
+    {
+      "id": "pancake_v3",
+      "kind": "v3",
+      "executable": true,
+      "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "quoter": "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997",
+      "router": "0x1b81D678ffb9C0263b24A97847620C99d213eB14",
+      "fees": [
+        100,
+        500,
+        2500,
+        10000
+      ],
+      "source": "quoter and WETH/USDC pool 0x7fCDC35463E3770c2fB992716Cd070B63540b947 from_your_files (erc4337-paymaster-relayer.js, apex-mainnet-production.js). Verified on Arbitrum One via Blockscout 2026-11-23: pool.factory(), quoter.factory() and router.factory() all return this factory; feeAmountTickSpacing(500)=10; router exactInputSingle takes the 8-field struct with deadline your contract sends. Your contract owner must setRouter(router, true) before it can trade here; the shadow preflight reports it until then."
+    },
+    {
+      "id": "sushi_v3",
+      "kind": "v3",
+      "executable": true,
+      "factory": "0x1af415a1EbA07a4986a52B6f2e7dE7003D82231e",
+      "quoter": "0x0524E833cCD057e4d7A296e3aaAb9f7675964Ce1",
+      "router": "0x8A21F6768C1f8075791D08546Dadf6daA0bE820c",
+      "fees": [
+        100,
+        500,
+        3000,
+        10000
+      ],
+      "source": "Verified on Arbitrum One via Blockscout 2026-11-23: router.factory() returns this factory; router ABI exactInputSingle takes the 8-field struct with deadline that your contract sends. quoter recall (checked at startup: quoter.factory() must match). Owner must setRouter (chronos deploy does it)."
+    },
+    {
+      "id": "sushi_v2",
+      "kind": "v2",
+      "executable": true,
+      "factory": "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",
+      "router": "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
+      "source": "router from_your_files; factory recall"
+    },
+    {
+      "id": "camelot_v2",
+      "kind": "v2",
+      "executable": false,
+      "factory": "0x6EcCab422D763aC031210895C81787E87B43A652",
+      "router": "0xc873fEcbd354f5A56E00E710B90EF4201db2448d",
+      "source": "router from_your_files; factory recall. Not executable: Camelot's swap function takes a referrer argument the Drive contract does not send"
+    },
+    {
+      "id": "uniswap_v2",
+      "kind": "v2",
+      "executable": true,
+      "factory": "0xf1D7CC64Fb4452F05c498126312eBE29f30Fbcf9",
+      "router": "0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24",
+      "source": "Verified on Arbitrum One via Blockscout 2026-11-23: router.factory() returns this factory (checked again at every startup). Standard swapExactTokensForTokens. Fee derived each run from a real quote against real reserves."
+    },
+    {
+      "id": "pancake_v2",
+      "kind": "v2",
+      "executable": true,
+      "factory": "0x02a84c1b3BBD7401a5f7fa98a384EBC70bB5749E",
+      "router": "0x8cFe327CEc66d1C090Dd72bd0FF11d690C33a2Eb",
+      "source": "Verified on Arbitrum One via Blockscout 2026-11-23: router.factory() returns this factory (checked again at every startup). Fee derived each run from a real quote against real reserves."
+    },
+    {
+      "id": "curve_stable",
+      "kind": "curve",
+      "executable": true,
+      "pools": [
+        {
+          "address": "0x49b720F1Aab26260BEAec93A7BeB5BF2925b2A8F",
+          "coins": [
+            "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+            "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+          ],
+          "name": "USDC/USDT0 (StableSwap-NG)"
+        },
+        {
+          "address": "0x7f90122BF0700F9E7e1F688fe926940E8839F353",
+          "coins": [
+            "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
+            "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+          ],
+          "name": "2pool USDC.e/USDT0"
+        },
+        {
+          "address": "0xec090cf6DD891D2d014beA6edAda6e05E025D93d",
+          "coins": [
+            "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5",
+            "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+          ],
+          "name": "crvUSD/USDC (StableSwap-NG)"
+        },
+        {
+          "address": "0x73aF1150F265419Ef8a5DB41908B700C32D49135",
+          "coins": [
+            "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5",
+            "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+          ],
+          "name": "crvUSD/USDT0 (StableSwap-NG)"
+        }
+      ],
+      "source": "Curve API pool lists (research/venues-v23.md, accepted 2026-11-25); each pool's coins are checked on chain at start and a pool that does not match is dropped. Tradeable only through contract v2.3+ that allowlists the pool."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "note": "what is deployed on your Supabase project (functions and the schema applied); written right after each deploy/migration",
+  "at": "2026-11-26T11:11:55.096Z",
+  "schema": "a70bb768815698c4019f79539f1d12c82f09867c5e67cb9f7c55204f77850b5b",
+  "functions": {
+    "alerts": "187506db418f25a27487749337b03bab7cc654c9512d77a66a491f765f585b13",
+    "decisions": "3c75ae93eda21adcffb874c12e818e2f86f51c93797c60984c7cfdbb58e6d9cc",
+    "ingest": "680f128ca5deb80ad45b44681d9d8e5c89df17638ad9a6de2ed524190e1d4ad9",
+    "insights": "c9fc7434d54a95da0a9809a0a7eac15164a43d7b075e932096f50e8ca477762c",
+    "release": "e3f858c9f5bf981f61ba283b69bfef99da0e2c110d346f0d948d679da3e4cba1",
+    "vault": "5f1d199c598efd9f3d73e6c38278ab69f9a43683b2f1d23362244c73ae77b3a6"
+  }
+}
