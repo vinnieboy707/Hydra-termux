@@ -1,0 +1,38 @@
+name: CI
+
+# Continuous integration for the chronos-console engine (repo root).
+# Runs the project's own Node test suite on every push and pull request.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check (all .cjs/.js, excluding the versions/ archive)
+        run: |
+          find . -path ./versions -prune -o -path ./node_modules -prune -o \
+            \( -name '*.cjs' -o -name '*.js' -o -name '*.mjs' \) -type f -print0 \
+            | xargs -0 -n1 node --check
+
+      - name: Test suite
+        run: npm test
