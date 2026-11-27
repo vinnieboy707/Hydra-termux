@@ -1,11 +1,16 @@
 # Chronos — Consolidated Version Lineage
 
 This branch (`chronos-consolidation`) brings every scattered copy of Chronos into **one
-repository**, each copy preserved as a **complete, self-contained snapshot** under
-`versions/`, in **chronological order**, oldest first. Nothing is deleted or merged
-destructively — you can open any version and see the whole thing as it was.
+repository**, each copy preserved as a **complete, self-contained snapshot**, in **chronological
+order**, oldest first. Nothing is deleted or merged destructively — you can open any version and
+see the whole thing as it was.
 
-Each version also has an annotated git tag (`v1.0.0` … `v4.0.0`) pointing at the commit that
+**The newest copy, v5.0.0 (`chronos-console` 2.9.19), is the live app and lives at the repository
+root** — it is the version the phones and laptop run 24/7, it is packaged and test-covered, and it
+holds no private key in code (KMS-signed executor). The four earlier copies (v1–v4) are archived
+under `versions/`.
+
+Each version also has an annotated git tag (`v1.0.0` … `v5.0.0`) pointing at the commit that
 added it, so `git diff v1.0.0 v3.0.0` (etc.) gives you the exact file-by-file difference.
 `CHANGELOG.md` spells those differences out in prose.
 
@@ -15,7 +20,7 @@ added it, so `git diff v1.0.0 v3.0.0` (etc.) gives you the exact file-by-file di
 | **v2.0.0** | 2026-10-23 | `ChronosMasterVault/repo` (Google Drive) | Broad Chronos "vault" workspace: src, arbitrage engine, agent-skill system, dig-ai, fullstack-app | 438 |
 | **v3.0.0** | 2026-11-17 | `chronos_workspace_backup` (Google Drive) | Chronos arbitrage/DeFi swarm (Solana/Arbitrum), scripts + contracts | 98 |
 | **v4.0.0** | 2026-11-24 | v3.0.0 + imports | Consolidated go-forward: v3 plus reusable modules pulled from the other projects | 98 + 11 |
-| **v5.0.0** | 2026-11-26 | `chronos-console-2.9.19.tgz` (Google Drive) | **Newest engine.** The arb swarm re-engineered into a packaged, test-covered CLI/TUI console with a KMS-signed executor | 259 |
+| **v5.0.0** | 2026-11-26 | `chronos-console-2.9.19.tgz` (Google Drive) | **Newest engine — now the live app at the repo root.** The arb swarm re-engineered into a packaged, test-covered CLI/TUI console with a KMS-signed executor | 259 |
 
 \* Authored source files only. Vendored dependency trees (`google-cloud-sdk`, `node_modules`,
 `__pycache__`, build output), secrets (`.env*`), databases (`*.db`, `*.sqlite`) and runtime logs
@@ -39,7 +44,7 @@ system**:
 **v2 is the bridge** between them — a broad "vault" workspace (src, arbitrage engine, a ~20-folder
 agent/skill system, dig-ai, fullstack-app, governance policies). But the overlap is small even so:
 v1↔v2 share only 3 paths and v2↔v3 only 2, each of them changed. The full file-by-file breakdown is
-in `CHANGELOG.md` and `versions/DIFF_MATRIX.md`.
+in `CHANGELOG.md` and `DIFF_MATRIX.md`.
 
 ## What could not be retrieved
 
