@@ -1,0 +1,406 @@
+{
+  "_about": "Every stand-in the engine's tests use, paired with the real system it stands in for and the check in lib/realcheck.cjs (chronos verify-real) that runs the same behaviour against that real system. test/realcheck.test.cjs fails if a stand-in is missing here, an entry names a stand-in that no longer exists, or a named check does not exist. Attack stand-ins (built to misbehave) are paired with the check proving the real system behaves.",
+  "contracts": {
+    "MockERC20": {
+      "real": "USDC, WETH and the other Aave reserves on Arbitrum One",
+      "checks": [
+        "multicall3",
+        "aave-reads"
+      ]
+    },
+    "MockAave": {
+      "real": "Aave V3 Pool 0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+      "checks": [
+        "aave-reads"
+      ]
+    },
+    "MockAP": {
+      "real": "Aave V3 PoolAddressesProvider (read through the pool)",
+      "checks": [
+        "aave-reads"
+      ]
+    },
+    "MockOracle": {
+      "real": "Aave V3 price oracle (read through the addresses provider)",
+      "checks": [
+        "aave-reads"
+      ]
+    },
+    "MockV3Factory": {
+      "real": "Uniswap / Sushi / Pancake V3 factories in venues.json",
+      "checks": [
+        "venues-real"
+      ]
+    },
+    "MockV3Pool": {
+      "real": "the real V3 pools those factories return",
+      "checks": [
+        "venues-real",
+        "real-quote"
+      ]
+    },
+    "MockQuoter": {
+      "real": "the real QuoterV2 contracts in venues.json",
+      "checks": [
+        "venues-real",
+        "real-quote"
+      ]
+    },
+    "MockV2Factory": {
+      "real": "Uniswap / Sushi / Pancake / Camelot V2 factories in venues.json",
+      "checks": [
+        "venues-real"
+      ]
+    },
+    "MockV2Router": {
+      "real": "the real V2 routers in venues.json",
+      "checks": [
+        "venues-real"
+      ]
+    },
+    "MockMulticall3": {
+      "real": "Multicall3 0xcA11bde05977b3631167028862bE2a173976CA11",
+      "checks": [
+        "multicall3"
+      ]
+    },
+    "BrokenMulticall": {
+      "real": "Multicall3 (attack stand-in: the real one answers)",
+      "checks": [
+        "multicall3"
+      ]
+    }
+  },
+  "fixtures": {
+    "ChronosFlashArb.json": {
+      "real": "your deployed contract (CHRONOS_FLASH_ARB_ADDRESS)",
+      "checks": [
+        "contract-deployed"
+      ]
+    },
+    "MockAavePool.json": {
+      "real": "Aave V3 Pool",
+      "checks": [
+        "aave-reads",
+        "contract-v2-probe"
+      ]
+    },
+    "MockRouter.json": {
+      "real": "Uniswap / Sushi / Pancake V3 routers",
+      "checks": [
+        "venues-real",
+        "contract-v2-probe"
+      ]
+    },
+    "MockToken.json": {
+      "real": "USDC / WETH / DAI",
+      "checks": [
+        "aave-reads",
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockToken.json": {
+      "real": "USDC / WETH / DAI",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockNoReturnToken.json": {
+      "real": "USDT",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockWETH.json": {
+      "real": "WETH9",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockAavePool.json": {
+      "real": "Aave V3 Pool",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockBalancerVaultFull.json": {
+      "real": "Balancer V2 Vault + ProtocolFeesCollector",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockRouter.json": {
+      "real": "Uniswap / Sushi / Pancake V3 routers",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockV2Router.json": {
+      "real": "Uniswap / Sushi / Pancake V2 routers",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockV3Factory.json": {
+      "real": "Uniswap / Sushi / Pancake V3 factories",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockV3Pool.json": {
+      "real": "Uniswap V3 USDC/WETH 0.05% pool",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockV2Factory.json": {
+      "real": "Uniswap / Sushi / Pancake V2 factories",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockV2Pair.json": {
+      "real": "the real WETH/USDC V2 pairs",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockLaxRouter.json": {
+      "real": "attack stand-in: the real routers pay what they report",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockMorpho.json": {
+      "real": "Morpho Blue 0x6c247b1F6182318877311737BaC0844bAa518F5e on Arbitrum One",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockPoolManager.json": {
+      "real": "Uniswap V4 PoolManager 0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32 on Arbitrum One",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockCurvePool.json": {
+      "real": "Curve StableSwap-NG USDC/USDT0 pool 0x49b720F1Aab26260BEAec93A7BeB5BF2925b2A8F on Arbitrum One",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockV3FactoryTS.json": {
+      "real": "Aero Slipstream CL factory 0x88a60ee77392577c355C0acb2A8d476D5a4EC03a on Arbitrum One (pools by tick spacing)",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    },
+    "v2/MockAlgebraFactory.json": {
+      "real": "Camelot V3 (Algebra) factory 0x1a3c9B1d2F0529D97f2afC5136Cc23e58f1FD35B on Arbitrum One (one pool per pair)",
+      "checks": [
+        "contract-v2-probe"
+      ]
+    }
+  },
+  "fakes": {
+    "devchain.cjs": {
+      "real": "Arbitrum One through your RPC",
+      "checks": [
+        "rpc-is-arbitrum",
+        "backup-nodes"
+      ]
+    },
+    "fakeKms": {
+      "real": "your Cloud KMS HSM key (CHRONOS_EXECUTOR_KMS_KEY)",
+      "checks": [
+        "kms-signer"
+      ]
+    },
+    "fakeNotifyBin": {
+      "real": "termux-notification on your phone",
+      "checks": [
+        "phone-notify"
+      ]
+    },
+    "fakeSync": {
+      "real": "your Supabase ingest + release service",
+      "checks": [
+        "device-service"
+      ]
+    },
+    "server:device.test.cjs": {
+      "real": "your Supabase release service",
+      "checks": [
+        "device-service"
+      ]
+    },
+    "server:sync.test.cjs": {
+      "real": "your Supabase ingest",
+      "checks": [
+        "device-service"
+      ]
+    },
+    "server:execution.test.cjs": {
+      "real": "Cloud KMS",
+      "checks": [
+        "kms-signer"
+      ]
+    },
+    "server:engine-service.test.cjs": {
+      "real": "your alert webhook and phone notifications",
+      "checks": [
+        "alert-webhook",
+        "phone-notify",
+        "notify-webhook"
+      ]
+    },
+    "feed:blockfeed.test.cjs": {
+      "real": "your Arbitrum websocket node (ARBITRUM_WSS_URL)",
+      "checks": [
+        "wss-feed"
+      ]
+    },
+    "feed:resolver.test.cjs": {
+      "real": "your Arbitrum websocket node (ARBITRUM_WSS_URL)",
+      "checks": [
+        "wss-feed"
+      ]
+    },
+    "fetch:resolver.test.cjs": {
+      "real": "your alert webhook",
+      "checks": [
+        "alert-webhook"
+      ]
+    },
+    "fetch:agents.test.cjs": {
+      "real": "OpenRouter (your AI agent key and model)",
+      "checks": [
+        "ai-agent"
+      ]
+    },
+    "portal:render_test.js": {
+      "real": "your Supabase project behind the portal (also portal/real_check.sql)",
+      "checks": [
+        "portal-backend"
+      ]
+    },
+    "fetch:alerts.test.cjs": {
+      "real": "your project's alerts function (device-signed), your own webhook, and OpenRouter's model list",
+      "checks": [
+        "alert-webhook",
+        "notify-webhook",
+        "ai-agent"
+      ]
+    },
+    "feed:providers.test.cjs": {
+      "real": "your websocket feeds and every https node you set, on the plans you are on (Infura, SwiftNodes, others)",
+      "checks": [
+        "node-plans",
+        "wss-feed"
+      ]
+    },
+    "fetch:vpaudit.test.cjs": {
+      "real": "arbitrum.blockscout.com (CHRONOS_BLOCKSCOUT_URL), answered in the shapes the live deployment returned",
+      "checks": [
+        "blockscout-witness"
+      ]
+    },
+    "fetch:vpbrain.test.cjs": {
+      "real": "OpenRouter and Anthropic with your keys (every key in the rotation), the allowlisted documentation hosts and arbitrum.blockscout.com",
+      "checks": [
+        "ai-agent",
+        "blockscout-witness"
+      ]
+    },
+    "fakeRealtime": {
+      "real": "Supabase Realtime of your project (topic chronos-pool-moves), fed by the ingest function",
+      "checks": [
+        "relay-realtime"
+      ]
+    },
+    "fetch:spend.test.cjs": {
+      "real": "OpenRouter chat completions (your AI key and model): each real call is counted against the daily cap",
+      "checks": [
+        "ai-agent"
+      ]
+    },
+    "fakeChain": {
+      "real": "the key agent on your phone signing for your real contract on Arbitrum One (chronos executor status / verify-real)",
+      "checks": [
+        "executor-agent"
+      ]
+    },
+    "fakeAgent": {
+      "real": "the key agent on your phone (lib/keyagent.cjs), probed by chronos verify-real: it must refuse non-trades and sign as your executor",
+      "checks": [
+        "executor-agent"
+      ]
+    },
+    "server:blockfeed.test.cjs": {
+      "real": "your real websocket nodes (ARBITRUM_WSS_URL\u2026) through the block feed",
+      "checks": [
+        "wss-feed"
+      ]
+    },
+    "fakeRclone": {
+      "real": "rclone with your gdrive: remote on the phone (the key pull on update)",
+      "checks": [
+        "drive-remote"
+      ]
+    },
+    "fakeFetch": {
+      "real": "api.1inch.dev and api.etherscan.io with your real keys",
+      "checks": [
+        "data-apis"
+      ]
+    },
+    "fakeExplorer": {
+      "real": "arbitrum.blockscout.com and api.etherscan.io (V2, chainid 42161)",
+      "checks": [
+        "blockscout-witness"
+      ]
+    },
+    "fetch:witness.test.cjs": {
+      "real": "arbitrum.blockscout.com and api.etherscan.io answering the witness check",
+      "checks": [
+        "blockscout-witness"
+      ]
+    },
+    "fakeSpeech": {
+      "real": "your device's text-to-speech (termux-tts-speak on the phone)",
+      "checks": [
+        "narrate-voice"
+      ]
+    },
+    "fakeKeys": {
+      "real": "your keyboard in Termux (space, n, r, q) while chronos narrate runs; the voice it controls is checked by narrate-voice",
+      "checks": [
+        "narrate-voice"
+      ]
+    },
+    "fakeEtherscan": {
+      "real": "api.etherscan.io (V2) with your key on Arbitrum One and Base",
+      "checks": [
+        "aave-liquidation-sources"
+      ]
+    },
+    "fetch:liquidations.test.cjs": {
+      "real": "api.etherscan.io (V2) answering chronos liquidations on Arbitrum One and Base",
+      "checks": [
+        "aave-liquidation-sources"
+      ]
+    },
+    "fakeNode": {
+      "real": "your RPC nodes (ARB_RPC_URL\u2026), each through the fast-fail client",
+      "checks": [
+        "burst-nodes"
+      ]
+    },
+    "server:fan.test.cjs": {
+      "real": "a rate-limited or hung real RPC node",
+      "checks": [
+        "burst-nodes"
+      ]
+    }
+  }
+}

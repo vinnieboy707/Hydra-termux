@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+echo "========================================================"
+echo "CHRONOS OS // CLI SYNC & MONEY SYSTEMS VERIFICATION"
+echo "========================================================"
+if [ -f sync_and_bootstrap.sh ]; then
+    ./sync_and_bootstrap.sh
+else
+    node verify_all_money_systems.js
+fi
+echo "========================================================"
+echo "✅ SYNC & MONEY SYSTEMS VERIFICATION COMPLETED"
+echo "========================================================"

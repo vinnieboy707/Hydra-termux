@@ -1,0 +1,18 @@
+{
+  "system": {
+    "name": "DIG_AI_STRICT",
+    "version": "1.0.0",
+    "mode": "strict_compliant"
+  },
+  "models": {
+    "darkbert_path": "exploit_core/dark_bert.py",
+    "llama_path": "exploit_core/llama_payloads.py",
+    "hacker_gpt_path": "exploit_core/hacker_gpt.py",
+    "strict_validator_path": "exploit_core/strict_validator.py"
+  },
+  "hardware": ["flipper_zero_2.0", "raspberry_pi"],
+  "network": {
+    "hydra_enabled": true,
+    "tor_circuit": true
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "version": "10.0.0-max",
+  "engine": "unified-swarm-orchestrator",
+  "models": {
+    "fable-5-1": {
+      "identifier": "claude-fable-5-1",
+      "class": "mythos-frontier",
+      "effort": "max",
+      "contextWindow": 1048576,
+      "adaptiveThinking": true,
+      "features": [
+        "long-horizon-agentic-coding",
+        "cross-codebase-refactoring",
+        "asynchronous-knowledge-work",
+        "terminal-bench-harness"
+      ]
+    },
+    "opus-5-5": {
+      "identifier": "claude-opus-5-5",
+      "class": "enterprise-workhorse",
+      "effort": "max",
+      "contextWindow": 1000000,
+      "adaptiveThinking": true,
+      "features": [
+        "adaptive-reasoning-strata",
+        "sqlite-wal-telemetry",
+        "zero-data-retention-sync",
+        "high-frequency-tool-use"
+      ]
+    }
+  },
+  "executionParameters": {
+    "maxTokenOutput": 128000,
+    "thinkingDisplay": "updates",
+    "strictBlockVerification": true,
+    "mcpAutoDiscovery": true
+  },
+  "securityGuardrails": {
+    "preActionClassifier": "enabled",
+    "sandboxIsolation": "strict",
+    "failClosedOnAuditFailure": true,
+    "maxUnattendedExecutionHours": 4,
+    "restrictedExecutionPaths": [
+      "sys/net/interfaces",
+      "wallet/private-keys",
+      "vault/unencrypted"
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAI App | Operational Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+    <div class="p-4 md:p-6 grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <aside class="xl:col-span-1 space-y-6">
+            <div class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800">
+                <h2 class="text-xl font-bold text-purple-400 mb-4">System Telemetry</h2>
+                <div id="telemetry" class="space-y-2 text-sm text-gray-300">Loading...</div>
+            </div>
+        </aside>
+        <main class="xl:col-span-3 space-y-6">
+            <h1 class="text-3xl font-extrabold text-white">Abandoned Asset Intelligence App</h1>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="stats"></div>
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800">
+                <div id="map" class="h-96 w-full rounded-xl"></div>
+            </div>
+            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                <h3 class="text-lg font-semibold mb-3">Intelligence Search & Action</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="searchQuery" class="flex-grow bg-gray-800 border-none rounded-lg p-2 text-sm" placeholder="Search property...">
+                    <button onclick="runSearch()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">Search</button>
+                    <button onclick="loadNearbyProperties()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium">Find Closest</button>
+                </div>
+                <div id="intelligenceContent" class="mt-4 p-4 bg-gray-800 rounded-lg text-sm">Select a property.</div>
+            </div>
+            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-gray-400 border-b border-gray-800">
+                        <tr><th class="p-3">Address</th><th class="p-3">Score</th><th class="p-3">Pathway</th><th class="p-3">Actions</th></tr>
+                    </thead>
+                    <tbody id="matchesBody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

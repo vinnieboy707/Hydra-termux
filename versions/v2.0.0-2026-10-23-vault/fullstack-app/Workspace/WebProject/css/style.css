@@ -1,0 +1,7 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f2f5;
+    padding-top: 50px;
+}
+#msg { color: blue; font-weight: bold; }

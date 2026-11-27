@@ -1,0 +1,61 @@
+# Logs
+logs/
+*.log
+
+# Results and outputs
+results/
+*.csv
+results/*.json
+logs/*.json
+
+# Wordlists (downloaded)
+wordlists/
+
+# ALHacking downloaded tools
+Tools/
+.onboarding_complete
+
+# Backups
+*.bak
+*.backup
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Credentials and sensitive data
+*.key
+*.pem
+credentials.txt
+secrets.txt
+
+# Full-stack app
+fullstack-app/backend/node_modules/
+fullstack-app/backend/.env
+fullstack-app/backend/database.sqlite
+fullstack-app/frontend/node_modules/
+fullstack-app/frontend/build/
+fullstack-app/frontend/.env.local
+fullstack-app/frontend/.env.production.local
+
+# Secrets live in the one shared file (APEX_ENV_FILE, default ~/.config/apex/secrets.env).
+# Never commit a real env file; only templates and examples belong in the repo.
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.template
+!.env.*.template
+secrets.env

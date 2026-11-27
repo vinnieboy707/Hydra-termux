@@ -1,0 +1,9 @@
+{
+  "server": {
+    "port": 3000,
+    "env": "development"
+  },
+  "database": {
+    "path": "./data/app.db"
+  }
+}

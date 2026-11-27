@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "fable-5-1-max-harness": {
+      "command": "node",
+      "args": ["./scripts/mcp/fable-harness-server.js"],
+      "env": {
+        "MODEL_ID": "claude-fable-5-1",
+        "EFFORT_LEVEL": "max",
+        "PARALLEL_TOOL_BATCHING": "enabled",
+        "VERIFICATION_LOOP": "strict"
+      }
+    },
+    "opus-5-5-max-vault": {
+      "command": "node",
+      "args": ["./scripts/mcp/opus-vault-server.js"],
+      "env": {
+        "MODEL_ID": "claude-opus-5-5",
+        "EFFORT_LEVEL": "max",
+        "FAST_MODE": "false",
+        "SQLITE_WAL_SYNC": "NORMAL"
+      }
+    }
+  }
+}

@@ -1,823 +1,398 @@
-# 🐍 Hydra-Termux Ultimate Edition
+# ◆ Chronos console
 
-<div align="center">
+<!-- GENERATED:nav -->
+**Project home** · [Docs home](docs/README.md) · [Company](docs/COMPANY.md) · [Architecture](docs/ARCHITECTURE.md) · [Configuration](docs/CONFIGURATION.md) · [Commands](docs/COMMANDS.md) · [Operations](docs/OPERATIONS.md) · [Security](docs/SECURITY.md) · [Testing](docs/TESTING.md) · [Releasing](docs/RELEASING.md) · [Server API](docs/API.md) · [Changelog](CHANGELOG.md)
+<!-- /GENERATED:nav -->
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Platform](https://img.shields.io/badge/platform-Termux-orange)
-![Status](https://img.shields.io/badge/status-active-success)
-![CI](https://img.shields.io/badge/CI-passing-brightgreen)
-![Security](https://img.shields.io/badge/security-scanned-brightgreen)
-![Deployment](https://img.shields.io/badge/deployment-automated-blue)
+A flash-loan arbitrage system for Arbitrum One that runs itself: a 24/7 engine with a **shadow test** of your own
+contract and **automatic live execution** once the shadow test proves profit, a terminal dashboard, an autopilot
+installer, phone alerts and a one-script Google Cloud deployment. There is **no private key anywhere in this code**:
+trades are signed by an HSM key in Google Cloud KMS that cannot be exported, and `chronos deploy` uses your owner key
+from your `.env` if you keep one there, otherwise asks for it hidden for that run only; Chronos never writes it.
 
-**A powerful brute-force tool suite optimized for Termux on Android devices**
+<!-- GENERATED:version -->
+Version **2.9.19**.
+<!-- /GENERATED:version -->
 
-**🆕 NEW: AI-Powered Onboarding System** - Interactive tutorial guides you through your first login and teaches you how to use the app efficiently!
+**Documentation:** [architecture](docs/ARCHITECTURE.md) · [configuration](docs/CONFIGURATION.md) ·
+[commands](docs/COMMANDS.md) · [operations](docs/OPERATIONS.md) · [security](docs/SECURITY.md) ·
+[testing](docs/TESTING.md) · [releasing](docs/RELEASING.md) · [changelog](CHANGELOG.md).
+Reference sections are generated from the code and checked on every test run and every package build.
 
-**🚀 NEW: Full-Stack Web Application** - Professional web interface with real-time monitoring, attack orchestration, and comprehensive management features. See [fullstack-app/README.md](fullstack-app/README.md)
+## What Chronos is, and what it is not
+Chronos is one thing: a flash-loan **arbitrage** engine for Arbitrum One with its own payout, tracking and device
+control. Its revenue is the profit your contract makes, proven by receipts. It does **not** run your other businesses
+(cleaning, cloud services, real-estate data and so on): their income does not pass through a smart contract, so it
+can only be **recorded** — in the portal's *Other income* ledger, by you, each entry with its evidence — not earned or
+moved by this code.
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [**Full-Stack App**](#-full-stack-web-application-new) • [**Quick Scripts**](#-quick-attack-scripts) • [Documentation](#-documentation) • [Legal](#️-legal-disclaimer)
+## Start here
+**Any device, one command** (Termux on Android, or Linux/macOS with Node 18+):
 
-</div>
+    sh -c "$(curl -fsSL https://qpjbikkfkpzywyzanrgv.supabase.co/functions/v1/release)"
+
+It makes this device's key and shows a **pairing code**; approve that code in your portal → *Devices*. Then it
+downloads the newest private release (sha256-checked), installs or upgrades it, runs `chronos deploy` (your contract;
+nothing is sent until you type YES) and opens the dashboard. Run it again any time: it is also the update.
+**First device ever** (nothing published yet): put `chronos-console.tgz` in Downloads and run
+`sh /sdcard/Download/go.sh` or extract and run `sh chronos-console/go.sh` — it installs from Downloads and, if you approved
+the device with *may publish*, publishes it for your other devices.
+
+| # | Where | What you type | What happens |
+|---|---|---|---|
+| 1 | phone | the one command above | device approved, installed, engine running in shadow, contract deployed |
+| 2 | phone | `chronos cloud-pack` | writes `chronos-settings.env` (your settings, no secrets) |
+| 3 | Google Cloud Shell | upload `chronos-console.tgz` + `chronos-settings.env`, then `tar xzf chronos-console.tgz && bash chronos-console/cloud/gcp-setup.sh PROJECT_ID` | HSM key, VM, secrets (typed hidden); prints your executor address |
+| 4 | phone | `chronos set CHRONOS_EXECUTOR_ADDRESS 0x…` then `chronos deploy` | makes the executor an operator and sends it the gas it lacks |
+| 5 | portal | approve the device named `chronos-engine` (the cloud engine) | the portal fills with both engines' records; nothing to copy |
+| 6 | phone, when profit is in the contract | `chronos payout` | T1 reserve to `TAX_RESERVE_VAULT`, the rest to `PAYOUT_WALLET_ADDRESS` |
+
+After step 4 the cloud engine shadow-tests your contract every scan and switches to live by itself when your rules are
+met.
+
+## Payouts (chronos payout)
+The contract can only withdraw to its owner, so `chronos payout` (your owner key, typed hidden or from .env, never
+stored) withdraws each token to the owner wallet and sends it on in the same run:
+* **Amounts**: the contract's balances at one block, each confirmed by a second source (second node at that block, or
+  Blockscout). A token the sources disagree on is not paid out that run.
+* **Policy T1**: reserve = `POLICY_T1_TAX_BPS` (30%) of *net* = value − the gas every execution paid since your last
+  payout (from each receipt, succeeded or reverted), at the Aave oracle prices of that moment; rounded up, never short.
+* Every transaction is listed with its cost before you type YES; `--plan` sends nothing. A run that stops part-way is
+  finished by the next one. Each transaction hash goes to `data/payouts.jsonl` and the portal's *Payouts*.
+
+## Devices and private releases
+Every device holds its own Ed25519 key (`~/.chronos/device.key`, mode 600; never leaves the device). A device that asks
+to join shows a pairing code; nothing is served to it until you approve that code in the portal. You choose which
+devices may *publish*. Releases live in a private Supabase Storage bucket; an approved device gets a 120-second link and
+checks the sha256 before installing. The engine checks for a newer release every 6 hours and offers it (phone alert +
+dashboard header); `chronos update` installs it. Revoke a device in the portal and it gets nothing from then on.
+`chronos device` shows this device's status and pairing code; `chronos publish` publishes the newest archive in
+Downloads.
+
+## Other income (portal)
+For income that does not land in a crypto wallet. Each entry needs a date, business, amount, currency, how it was paid
+and evidence (invoice number, bank reference, link); amounts cannot be edited after saving (delete and re-enter), so
+the ledger stays an honest record. Totals are shown per currency, with what you set aside for tax.
+
+## Install from a downloaded archive (what the one command does for you)
+    F=$(ls -t /sdcard/Download/chronos-console*.tgz | head -1)
+    tar xzf "$F" -C ~/workspaces/chronos-master-workspace/ && cd ~/workspaces/chronos-master-workspace/chronos-console && sh install.sh
+
+`install.sh` works **offline** and shows a 5-step progress bar: it checks every file against the seal the archive
+shipped with, unpacks the runtime library from the sealed bundle (`vendor/deps.tgz`: ethers 6.17.0 and its
+dependencies, 0.7 MB; no network, no npm), installs the `chronos` command and a Termux:Widget shortcut, seals and locks
+the code and the library, then runs the **autopilot** (each step timed, summary bar at the end):
+
+| Step | What it does |
+|---|---|
+| Integrity | refuses to continue if any code file or library differs from the seal |
+| .env | finds or creates it, sets permissions 600 (Policy S0) |
+| Drive keys | if rclone has your `gdrive:` remote, pulls only .env-style files to a private folder |
+| Import | every key with exactly one value on the phone is tested (live where possible) and saved; conflicts are left for you; the pulled Drive copies are deleted afterwards |
+| Settings | missing scanner/measurement/policy values get suggested starting values (listed in `data/defaults_applied.json`) |
+| Backup scripts | disables the lines that put `.env` into Drive backups (backup kept, syntax checked, multi-line cases left to you) |
+| Quarantine | moves known fake-profit scripts to `_quarantine/` |
+| Engine | starts the 24/7 engine under PM2 early, so it is already scanning while the checks below run; boot start via Termux:Boot, Termux wake lock |
+| Node · audit · gas · profit | run at the same time: RPC probe, `src/registry.ts` audit, gas from your receipts, realized profit |
+| First scan | taken from the engine (or scanned here with `--no-service`) and reported |
+| Report | what came online, and the short list only you can do (also in `data/autopilot_report.txt`) |
+
+Run it again any time: `chronos autopilot` (safe to repeat; it only changes what still needs changing).
+Flags: `--no-service`, `--no-drive`, `--no-scan`; `sh install.sh --no-auto` installs only. Installing a new version
+over an old one keeps `data/` (history, measurements, keys for signed state) and moves files the new version no longer
+ships to `data/leftovers-<time>/` instead of deleting them.
+
+## The money panel
+The first thing on the Overview (and in full on the Measure tab), on every screen width:
+
+    Making money?   NO   no Arbitrage receipts from your contract yet
+    Path to profit  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━───────────────────────────  3/7 done
+    Blocking now    4 · GO verdict from a measurement run
+      why   episodes 3/5 · distinct blocks 1/5 · $/day after 10 more min
+      fix   nothing to do: keep the engine running, it measures continuously
+      time  about 10 min at the current rate
+    Upside          $/day shown after 10 more min of data · 3 opportunities in 1 scan
+
+* **Making money?** comes only from receipts of your contract (YES shows net after gas and the count of verified
+  executions; executions that lost money are named as such).
+* **Blocking now** is the first unmet stage of the path to profit, with **why** (from the last real scan: rejection
+  mix, the closest route's gross − flash fee − gas = net and how far it is below your floor, node or scan errors),
+  **fix** (what to press or set, or "nothing to do" when the engine handles it) and **time**.
+* **Time** is a rate from this session's own data when one exists; when it depends on the market it says so
+  ("cannot be estimated") instead of guessing. The scan progress bar shows on the engine card while a scan runs.
+
+The same status is **pinned in your phone's notification shade** while the engine runs (Termux:API): headline
+(stage N of 7, or PROFITING with the net), progress bar, blocker, time, best quote now, with **Scan now** and
+**Pause / Resume** buttons. It is edited in place without sound, refreshed after scans (at most once a minute unless
+the stage changes), and turns into a dismissible "engine stopped" notice when the engine stops.
+
+## Use
+    chronos               dashboard (follows the background engine when it runs)
+    chronos service …     install | status | start | stop | restart | logs | uninstall
+    chronos setup         keys (masked paste, tested), settings, action checklist   (or press e)
+    chronos doctor        settings, policies, nodes, services, integrity as text
+    chronos scan | measure | audit | gas 0xTX… | verify | seal | unlock | test
+
+Dashboard tabs: **1 Overview** (money panel, MODE shadow ↔ live with the switch conditions, gas, best opportunity,
+engine with live scan progress, verified balances, opportunities (profitable ones only), GO/NO-GO, recent scans) ·
+**2 Routes** (profitable opportunities only; enter: legs, costs, every guardrail ✓/✗, the exact contract call) ·
+**3 Measure** (money panel and MODE in full with the last shadow runs, path to profit, GO/NO-GO, session, episodes, edge) · **4 Policies** (P0 G1 T1 S0 INT, gas, floor, impact, drawdown, every parameter) ·
+**5 System** (nodes, services, engine, alerts, batching, venues, Aave, registry audit, on-chain record, integrity,
+realized profit, capabilities). Keys: `r` scan now · `p` pause/resume the engine · `L` scan in this window ·
+`a` audit · `n` probe nodes · `e` setup · `?` help · `q` quit.
+
+## Shadow test → live execution (automatic)
+* **Shadow test** (always on): for the best approved routes of every scan, the engine checks every requirement of
+  your ChronosFlashArb and of Aave for that exact call (deployed, not paused, executor is an operator, both routers
+  allowed, amount within `maxLoan`, the contract's pool is Aave's, legs within `MAX_LEGS`, minProfit > 0, deadline,
+  reserve active/not frozen/not paused/flash-loan enabled, Aave liquidity), then runs `execute(...)` as an `eth_call`
+  from your executor at the scan block. The profit is the contract's own return value; a failure is the contract's
+  own error, decoded (e.g. `Unprofitable(...)`, `Slippage()`), and a failed requirement names the owner call that fixes it.
+* **Switch to LIVE** when all hold: executor ready (KMS key reachable, operator on the contract, gas ETH ≥
+  `EXEC_MIN_GAS_ETH`), shadow wins in 24 h ≥ `PROMOTE_MIN_WINS`, win rate ≥ `PROMOTE_MIN_WIN_RATE_BPS`, simulated
+  $/day ≥ `GO_MIN_USD_PER_DAY`. **Back to SHADOW** on any of: realized loss today beyond `MAX_DAILY_DRAWDOWN_USD`,
+  `MAX_CONSECUTIVE_REVERTS` in a row, gas lost to reverts today ≥ `MAX_DAILY_GAS_USD`, executor gas low, kill switch
+  (`data/live/kill`), `CHRONOS_MODE=shadow`. Money limits hold until the next UTC day; reverts hold 30 minutes and
+  then need fresh shadow wins. In LIVE the shadow test keeps running on everything, so the MODE panel shows
+  simulated $/day next to realized $/day: the gap is what competitors capture.
+* **Every send** is re-checked and re-simulated at that moment; it goes out only if net ≥ your floor after the flash
+  fee, gas and the **priority-fee bid**. Arbitrum One orders each 125 ms round by priority fee, so the executor bids
+  `EXEC_TIP_SHARE_BPS` of the surplus above your floor, never more than a revert could cost inside today's cap.
+  The contract's `minProfit` makes a trade revert rather than lose; a revert costs only its gas. Sizes are the
+  profit-maximising size inside your ladder, capped by `maxLoan` and Aave liquidity: the largest loan is not the most
+  profitable one, because price impact grows with size.
+* Each sent transaction is written to `data/executions.jsonl` before waiting for it; realized profit is verified
+  from its receipt (Arbitrage event of your contract, net of the gas actually paid), never from the engine's own
+  numbers.
+* All limits live in `.env` (`lib/execpolicy.cjs` lists them with bounds); values outside the bounds are refused.
+
+## Agents (inside the engine)
+
+| Agent | Does on its own | Waits for your approval |
+|---|---|---|
+| watchdog | records every problem and when it clears; restarts a stalled engine (max 3 per hour, then alerts you) | — |
+| profit | reports every shadow ↔ live switch. The **profit guard** (`GUARD_MIN_SENDS`, default 5): after that many live sends in a UTC day, a realized net ≤ $0 switches back to shadow until the next day | — |
+| tuner | — | a higher priority-fee share (`EXEC_TIP_SHARE_BPS`) when ≥ 4 live sends today and ≥ half reverted |
+| requirements | reports each failing contract / flash-loan requirement once a day, with the owner call that fixes it | — |
+| diagnosis | AI explanation of a new error (OpenRouter; set `CHRONOS_AGENT_MODEL`). Text only; nothing it says is run | — |
+
+Approvals appear in the portal. The cloud stores only a reference and your yes/no: the change itself is kept on the
+engine, so a decision can only apply something the engine proposed. Only execution-policy settings can be changed,
+each within its bounds; nothing touches keys, addresses, contract code or funds. A change you made yourself in the
+meantime, or a proposal older than 24 h, is not applied. After an approved change the engine restarts to load it.
+
+## Portal data (Supabase)
+
+The engine can copy its records to your Supabase project so the web portal (separate `chronos-portal` package, hosted on Firebase) can show them from any device. It is one-way and never in the way of trading: if the cloud is down, the rows queue (bounded) and retry with backoff.
+
+Nothing to set up: every engine signs its records with its own device key (`~/.chronos/device.key`, never leaves the
+device) and the portal accepts them only from devices you approved under *Devices*. There is no shared secret.
+
+What is synced: profitable opportunities, shadow runs, mode changes, receipt-verified executions (and reverts), a 30-second heartbeat, and only balances a second source confirmed. Requests are HMAC-signed over timestamp + body (60 s window). The signing key and `.env` never leave the device.
+
+## Balances: only externally verified
+Executor, contract, payout wallet and tax reserve balances (ETH and every flash-loanable token) are read at one
+block from your node and confirmed by an independent source: `ARB_RPC_URL_2` (a node from another provider, same
+block, must match exactly) or the Blockscout explorer index. A balance the sources disagree on shows no number.
+
+## Google Cloud (engine + HSM key)
+`bash chronos-console/cloud/gcp-setup.sh PROJECT_ID` in Cloud Shell (steps 3–4 above). It creates the HSM secp256k1 key
+(Google lists HSM key versions at $0.003424658/hour, about $2.50/month), a service account that can only sign with that
+key and read its own secrets, Secret Manager entries (typed hidden; on the VM they live only in RAM), a private network
+with no inbound traffic except IAP SSH, and an e2-small Shielded VM in us-east4 running the engine under systemd with
+your `chronos-settings.env` (refused if it contains anything secret-looking). It prints the executor address; step 5
+does the rest from your phone. Cross-chain price gaps are not flash-loanable (a flash loan must be repaid in the same
+transaction on the same chain), so they are not listed as opportunities.
+
+## chronos deploy
+Deploys `contract/ChronosFlashArb.sol` — your Drive file, unchanged — as built in `contract/ChronosFlashArb.json`
+(solc 0.8.24, OpenZeppelin 5.4.0, viaIR, optimizer 200; the exact bytecode the tests run; its sha256 is checked before
+use). **Not externally audited.** Then, only where still missing: `setOperator(executor)`, `setRouter` for each
+executable venue that passed its on-chain check, `setMaxLoan` per flash-loanable traded asset (your largest
+`SIZE_LADDER_USD` × (1 + `MAX_LOAN_HEADROOM_PCT`, default 20%) at the Aave oracle price; caps you already set are kept),
+and the ETH the executor lacks to reach `EXEC_GAS_TOPUP_ETH` (default 0.005). Every transaction is listed with the
+node's gas estimate and the worst-case cost before you type YES; `--plan` shows that and sends nothing. It refuses a
+contract address that holds no contract, one owned by another wallet, or one that borrows from another pool. Each
+transaction is logged to `data/deployments.jsonl`.
+
+## Finding opportunities
+* **Every cycle, 2 to 4 legs.** Each scan reads every pool's price at one block and walks every loop that starts and
+  ends in a token Aave will flash-loan: A→B→A, A→B→C→A and A→B→C→D→A, across every venue. Your contract runs up to 4.
+* **Free screen, never a hidden profit.** A pool's marginal price (after its fee) is the best rate any trade through it
+  can get; a loop whose prices multiply to less than 1 + the flash fee cannot profit at any size and is dropped before
+  a quote is spent. A test checks this against exact pool math on random pools. Unreadable prices are never dropped.
+* **Flips.** The best loops are also quoted the other way round and borrowed in every other flash-loanable token on
+  them; the quotes decide which direction (if any) pays.
+* **Real quotes decide.** Survivors are quoted by each venue's own quoter at the scan's block, sized inside your
+  ladder, impact-checked per leg, and built into your contract's exact call (every leg has its own floor; the last
+  must repay loan + fee + minProfit).
+* **Fast lane.** Between full scans the engine re-checks the closest loops every `HOT_SCAN_MS` (default 3000 ms) at the
+  newest block; anything approved goes straight to the shadow test and, in LIVE, to the executor.
+* **Wider universe.** Aave's reserves plus up to `CHRONOS_DISCOVER_TOKENS` (default 40) tokens nominated by Blockscout's
+  public list (market cap, traded in the last 24 h) and confirmed on-chain; every venue in the table under
+  [Not verified here](#not-verified-here).
+* **Live block feed.** Set one or more websocket urls (`ARBITRUM_WSS_URL`, plus `ARB_WSS_URL`, `ALCHEMY_WSS_URL`,
+  `ARBITRUM_WSS_URL_2` for redundancy) in `chronos setup`; each is tested live (must answer as chain 42161). The fast lane
+  then runs on every new block: the closest loops plus every loop through a pool whose price just moved.
+* **Before the filters.** The Measure tab counts raw gaps at the screen size and, for every route a filter blocked,
+  which filter and what it would have netted, so you see what is in front of the scanner, not only what passed.
+* **chronos research [hours]** reads every flash loan of the last hours on Arbitrum (Aave, Balancer, Uniswap-style pool
+  flashes) through your node: which contracts, how many legs, which venues (and factories you do not scan yet), gas,
+  and what stayed with them. Saved to `data/research.json`. Read-only.
+* **Indicators (Measure tab).** Cycles checked / allowed by price / within 10 bps; closest loops by edge; widest
+  cross-pool spreads; biggest price moves; gas to beat for 2/3/4 legs; flash fees; Aave and Balancer flash liquidity;
+  flip results. All from the scan's block.
+* **Balancer comparison.** Balancer V2's flash fee (read on-chain: 0 bps on 2026-11-23) and what it can lend are read
+  every scan; each route shows its net through Balancer. Your contract borrows from Aave only, so using Balancer is a
+  contract change for you to approve.
+
+## How the numbers stay real
+* **One block per scan.** Every quote and price in a scan is read at the same block, so a spread can never be
+  manufactured by mixing quotes from different blocks. Calls are batched through Multicall3 (hundreds of calls in a
+  few requests); if batching fails, each call is retried alone at the same block.
+* **Failures are failures.** A reverted, empty or undecodable answer is dropped, never turned into a number.
+* **Net** = what comes back − what was borrowed − Aave flash fee (read from the pool) − gas (live gas price ×
+  `GAS_UNITS_ASSUMED`, scaled per leg for 3-4 legs; the shadow test measures the real gas before anything is sent). Guardrails come only from `.env`; the optimiser tunes size inside your ladder.
+* **Episodes** count each cycle once (both borrow directions of a cycle are the same opportunity). No verdict before
+  10 minutes of data (MEASURING); the $/day figure is an upper bound with zero competition; GO means "worth a shadow
+  test", not "profit is coming".
+* **Profit** counts only from receipts: a confirmed transaction in which *your* contract emitted `Arbitrage` with
+  profit above the gas that transaction paid. Nothing in a summary, log or database can raise it. Policy T1 reserve is
+  30% of that net.
+
+## Fail loudly until profiting
+A red banner sits under the tabs while anything is wrong, and the engine alerts your phone (Termux:API) and/or
+`CHRONOS_WEBHOOK_URL`. With no faults the banner still reads **NOT PROFITING** and names the first unmet stage:
+1 settings and keys · 2 live scanner · 3 net-positive routes · 4 GO verdict · 5 shadow test · 6 reviewed contract live ·
+7 verified on-chain profit. It turns green only at verified profit; once receipts prove profit, unmet checklist items stay unticked but no
+longer block.
+
+## Security
+* **Integrity seal** over every code file, the lockfile, the library bundle and every runtime library installed from
+  it (ethers and each dependency, per the lockfile; symbolic links are recorded, never followed); the dashboard, the
+  engine and the autopilot refuse to run on a mismatch (the engine exits with code 78 so PM2 does not restart it).
+* **Read-only code** after install. Deliberate change: `chronos unlock` → edit → `chronos test` → `chronos seal`.
+* **Signed data**: scan history and the engine's state are HMAC-signed with a per-install key; anything typed or
+  pasted into them is ignored and flagged.
+* **No secrets on screen or in alerts**: node urls and key-like strings are scrubbed from every message; token
+  symbols and file text are stripped of terminal control codes.
+* `.env` writes: backup first (last 5 kept, 600), atomic rename, permissions 600, your lines and comments preserved.
+* One runtime dependency (ethers 6.17.0, pinned, lockfile): `npm audit` 0 vulnerabilities. It ships as
+  `vendor/deps.tgz`, built reproducibly by `vendor/build-deps.sh` (npm ci checks each package against the lockfile's
+  sha512, then only the CommonJS build is kept; licence files stay). Test-only tools are never installed on the phone.
+* Honest limit: someone holding your unlocked phone with a shell can unlock and re-seal. These checks stop accidents
+  and casual tampering, not an attacker who already controls the device.
+
+## Not verified here
+Not run against Arbitrum mainnet, real Cloud KMS or real Google Cloud: the build sandbox reaches none of them.
+* **Engine, shadow test, live executor, chronos deploy**: end to end on a local chain with test contracts standing in
+  for Aave/Uniswap/Multicall3, your real contract bytecode, and a stand-in for Cloud KMS that signs the way KMS does
+  (DER, including high-s signatures).
+* **gcp-setup.sh**: run end to end against a stand-in `gcloud` that records every call; the VM startup script it
+  generates was syntax-checked, not booted.
+* **Supabase**: the deployed `ingest` and `decisions` function code was run under Deno against a stand-in database API;
+  the database permissions (owner-only, no re-deciding, no expired approvals, anonymous blocked) were tested on the
+  live project inside a rolled-back transaction.
+* **On Arbitrum One itself (read through Blockscout)**: PancakeSwap V3 pool, quoter and router agree on one factory, and
+  the router takes the exact swap call your contract sends.
+Factory addresses marked `recall` in `venues.json` are checked on-chain at every start and switched off if wrong.
+Sushi V3, Uniswap V2 and PancakeSwap V2 routers and the Sushi V3 quoter were confirmed on Arbitrum One through
+Blockscout on 2026-11-23. A 3-leg route was run through your real contract bytecode on a local chain. Venues, from
+`venues.json` (the file the scanner reads):
+
+<!-- GENERATED:venues -->
+| Venue | Kind | Your contract can trade it | Router | Factory |
+| --- | --- | --- | --- | --- |
+| `uniswap_v3` | v3 | yes | `0xE592427A0AEce92De3Edee1F18E0157C05861564` | `0x1F98431c8aD98523631AE4a59f267346ea31F984` |
+| `pancake_v3` | v3 | yes | `0x1b81D678ffb9C0263b24A97847620C99d213eB14` | `0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865` |
+| `sushi_v3` | v3 | yes | `0x8A21F6768C1f8075791D08546Dadf6daA0bE820c` | `0x1af415a1EbA07a4986a52B6f2e7dE7003D82231e` |
+| `sushi_v2` | v2 | yes | `0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506` | `0xc35DADB65012eC5796536bD9864eD8773aBc74C4` |
+| `camelot_v2` | v2 | quote only | `0xc873fEcbd354f5A56E00E710B90EF4201db2448d` | `0x6EcCab422D763aC031210895C81787E87B43A652` |
+| `uniswap_v2` | v2 | yes | `0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24` | `0xf1D7CC64Fb4452F05c498126312eBE29f30Fbcf9` |
+| `pancake_v2` | v2 | yes | `0x8cFe327CEc66d1C090Dd72bd0FF11d690C33a2Eb` | `0x02a84c1b3BBD7401a5f7fa98a384EBC70bB5749E` |
+| `curve_stable` | curve | yes, through contract v2.3+ (each pool allowlisted) | — (direct pool swaps) | 4 listed pools |
+
+Every venue is checked on-chain at engine start (factory, router and quoter must agree; for Curve, each pool must hold the coins listed for it); one that fails is not used.
+<!-- /GENERATED:venues -->
+
+## Tests
+    chronos unlock && npm ci      # adds the test tools (ganache, solc: ~100 MB)
+    chronos test                  # every test, including the documentation check
+    node test/mutate.cjs "$PWD"   # breaks one guardrail at a time; every one must fail a test
+    chronos docs                  # regenerate the reference sections of the docs after a change
+    chronos seal --yes            # sealed and read-only again
+
+<!-- GENERATED:tests -->
+**315 tests in 62 files; 269 planted bugs in `test/mutate.cjs`.** Run `chronos test`; run the planted-bug check with `node test/mutate.cjs "$PWD"`.
+
+| Test file | Tests | Covers |
+| --- | --- | --- |
+| `test/wiring.test.cjs` | 5 | No component without an input or an output: every module is used by something and provides something; every |
+| `test/engine.test.cjs` | 14 | Engine math and decisions: flash premium, sizing, guardrails, run parameters, and the synthetic-pool scan pipeline. |
+| `test/chain.test.cjs` | 1 | Exercises lib/chain.cjs (the real ethers code the scanner uses on mainnet) against mock contracts on a local chain, |
+| `test/realcheck.test.cjs` | 5 | Every stand-in has a real counterpart (test/counterparts.json → lib/realcheck.cjs), the contract v2 probe works |
+| `test/v2engine.test.cjs` | 7 | The engine drives contract v2 end to end on a local chain with the real ChronosFlashArbV2 bytecode |
+| `test/mainnet.test.cjs` | 4 | chronos mainnet: the right next step for every state, nothing skipped, nothing repeated, contract v2 offered only |
+| `test/autoupdate.test.cjs` | 3 | Automatic updates: installed on the phone when a newer release is published, never while a trade is in flight, |
+| `test/phone.test.cjs` | 3 | chronos phone: a stopped engine is started, the restart-on-open hook is written once (and updated, never |
+| `test/envkeys.test.cjs` | 3 | Every environment variable the code reads is documented exactly once: your settings (lib/catalog.cjs), the |
+| `test/server.test.cjs` | 6 | Nothing the code sends, reads or writes has nowhere to land: every table and column the engine sends is accepted |
+| `test/visuals.test.cjs` | 4 | The Visuals tab shows real on-chain data only (P0): nothing before the first real scan; every screen names its |
+| `test/alerts.test.cjs` | 4 | Where alerts go by default (your project's alerts function, device-signed), how `off` and your own url win, and |
+| `test/handoff.test.cjs` | 4 | The executor hand-off: the cloud engine offers the address it derived from its KMS key; this phone saves it |
+| `test/insights.test.cjs` | 4 | Path to profit: the closest routes of each scan are uploaded with their full cost breakdown and the one thing that |
+| `test/milestones.test.cjs` | 7 | The road to cash: every milestone verified from its real source, the VP notifying you of each verified step (with |
+| `test/success.test.cjs` | 4 | Building on success: real wins are noticed and told (first route above the floor, closest-ever route, shadow wins, |
+| `test/mirror.test.cjs` | 3 | Every failure mirrored: a failed route's opposite direction (quoted in the same scan) is paired with it; a mirror |
+| `test/indicators.test.cjs` | 6 | The 100 indicators: exactly 50 success and 50 failure, each measured from a real source or null (never a stand-in |
+| `test/keys.test.cjs` | 5 | chronos keys: every wallet address and key in one sitting, in order; what is already on this device imported first |
+| `test/keystore.test.cjs` | 6 | Persistence without plaintext: the owner key kept in the standard Ethereum keystore (scrypt + AES, unlocked by your |
+| `test/keyagent.test.cjs` | 6 | Your executor key on this phone (2.9.11): the encrypted keystore, the key agent (a real detached process started |
+| `test/emailreport.test.cjs` | 3 | The daily report email (2.9.12): steps left from today to $100,000, the road with who acts, the profit ladder with |
+| `test/drivepull.test.cjs` | 3 | The Drive key pull (2.9.12): rclone's error is explained in words with its fix instead of "error"; harmless problems |
+| `test/dataapis.test.cjs` | 2 | 1inch and Etherscan API keys (2.9.13): set at a hidden prompt with chronos set, checked live, never saved when the |
+| `test/witness.test.cjs` | 2 | The independent-witness check (2.9.15): Blockscout first, Etherscan V2 (your key) when Blockscout does not answer. |
+| `test/narrate.test.cjs` | 4 | chronos narrate (2.9.17): the engine's live commentary and the narrator that reads it aloud. Speech is played by |
+| `test/liquidations.test.cjs` | 2 | chronos liquidations (2.9.18): Aave V3 liquidations read through Etherscan API V2, measured, gated. Etherscan is |
+| `test/tune.test.cjs` | 2 | chronos tune small-trades (2.9.19): research change #1 as one approved decision: shown before → after, applied |
+| `test/fan.test.cjs` | 6 | Burst mode (2.9.19, lib/fan.cjs): every scan read spread over all your nodes at once; a rate limit or a slow node |
+| `test/providers.test.cjs` | 18 | Node providers: each plan's documented limits (Infura and SwiftNodes docs, sources in lib/providers.cjs and |
+| `test/vpaudit.test.cjs` | 5 | The VP's audit: your checks, then Blockscout as the independent witness (chain head, your contract, every wallet, |
+| `test/vpbrain.test.cjs` | 5 | The VP's brain, mind, archive and analyst. Real counterparts: chronos verify-real 'ai-agent' (your AI keys and model |
+| `test/team.test.cjs` | 3 | The VP's standing team: seven agents, triggers on real state, allowlisted skills, a report each cycle, the VP's |
+| `test/tempo.test.cjs` | 1 | Tempo: up when a scan measures something to win, down after quiet scans, inside every limit. Real counterpart: the |
+| `test/gas.test.cjs` | 3 | The gas specialist: per route type (lender + pool kinds) from measured shadow gas, the executor's sends left and |
+| `test/chainsignals.test.cjs` | 1 | Chain signals: groups, verdicts and the route prior, checked on two real Arbitrum One transactions of one competitor |
+| `test/relay.test.cjs` | 2 | The price-move relay: the publisher batches moved pools into pool_moves rows (at most every 2 s, 500 pools a row), |
+| `test/settingswatch.test.cjs` | 2 | The synced workspace: a .env changed on another device is applied once, after it settles; identical rewrites and |
+| `test/roles.test.cjs` | 3 | Device roles: the primary works, standbys back it up, exactly one device sends, a silent primary is replaced by |
+| `test/spend.test.cjs` | 4 |  |
+| `test/watchdog.test.cjs` | 4 |  |
+| `test/walletbridge.test.cjs` | 4 | MetaMask signing (lib/walletbridge.cjs): the real page, driven in a real browser (Chromium) where available, with a |
+| `test/releasegate.test.cjs` | 1 | The release gate runs every check in a fixed order and never reports a skipped check as passed; the server record |
+| `test/cycles.test.cjs` | 20 | Cycle finder: the free price screen never hides a profitable cycle (checked against exact constant-product math on |
+| `test/blockfeed.test.cjs` | 4 | Websocket block feed against a real websocket node (a local chain on chain id 42161 serving ws://), plus a wrong-chain |
+| `test/research.test.cjs` | 4 | chronos research: the analysis of real flash-loan transactions, checked on a hand-built receipt whose numbers are |
+| `test/docs.test.cjs` | 3 | Documentation matches the code: every generated section is current, every module says what it is for, the changelog |
+| `test/assist.test.cjs` | 6 | The help agent and the pre-coded resolutions: every problem the agent can find has a guide entry and a remedy; crash |
+| `test/resolver.test.cjs` | 9 | Incident resolver: researched resolutions in order, each verified, never repeated; the AI agent may only pick |
+| `test/company.test.cjs` | 13 | The company: departments report from real state; the VP runs experiments toward profit one at a time, verifies each |
+| `test/batch.test.cjs` | 2 | Batching + block pinning against a local chain. Proves: one scan = one block, batched requests return exactly what |
+| `test/realized.test.cjs` | 3 | Realized profit is read from receipts of YOUR contract (the real Drive ChronosFlashArb bytecode is used here). |
+| `test/execution.test.cjs` | 8 | Shadow test → automatic live execution, end to end, with your real ChronosFlashArb bytecode on a local chain and a |
+| `test/sync.test.cjs` | 8 | Engine to portal sync: device-signed requests, offline queue, retries, and only allowlisted fields leave the device. |
+| `test/agents.test.cjs` | 8 | Agents inside the engine: watchdog restarts, tuner proposals through approvals, and changes applied only within policy. |
+| `test/deploy.test.cjs` | 8 | chronos deploy, end to end on a local test chain (synthetic chain, test only): the real `chronos deploy` code path |
+| `test/payout.test.cjs` | 2 | chronos payout end to end on a local test chain (synthetic chain, test only): your real contract artifact, deployed |
+| `test/device.test.cjs` | 2 | This device's key and private-release downloads (a local stand-in plays the release function; test only). |
+| `test/console.test.cjs` | 20 | Console rendering + policy checks. Synthetic state is used ONLY inside these tests. |
+| `test/setup.test.cjs` | 6 | chronos setup and chronos set: key import, validation, hidden secret entry, and safe .env edits. |
+| `test/engine-service.test.cjs` | 4 | The 24/7 engine end to end, against a local test chain (synthetic data, test only): |
+| `test/autopilot.test.cjs` | 1 | Autopilot end to end in a fake phone home (synthetic test data only): keys pulled from "Drive" (fake rclone), |
+<!-- /GENERATED:tests -->
 
 ---
 
-## 🤖 AI Onboarding System (NEW!)
-
-### Get Started in Minutes with AI Guidance!
-
-First time using Hydra-Termux? Our intelligent onboarding system will guide you through everything:
-
-**✨ Features:**
-- 🎯 **Choose Your Path**: Quick Start, Complete Tutorial, Interactive Practice, or Skip
-- 🤖 **AI Assistant**: Contextual hints and smart suggestions throughout
-- 🎓 **Practice Exercises**: Learn safely with guided hands-on activities
-- 📚 **Legal & Ethical Education**: Understand requirements before you start
-- 🌐 **Web & CLI**: Onboarding available on both interfaces
-
-**Automatic Launch:**
-```bash
-# First time you run hydra.sh, onboarding starts automatically!
-./hydra.sh
-```
-
-**Web Interface:**
-- Opens automatically on first login
-- Interactive 7-step guided tour
-- Visual walkthrough of all features
-- Progress tracking and quick links
-
-**Learn More:** [AI Onboarding Guide](docs/AI_ONBOARDING_GUIDE.md)
-
----
-
-## 🆘 **HAVING PROBLEMS? RUN THIS FIRST:**
-
-```bash
-# One command to diagnose issues:
-bash scripts/system_diagnostics.sh   # Full health check with A-F grade
-bash scripts/auto_fix.sh             # Auto-install hydra
-bash scripts/check_dependencies.sh    # Quick dependency check
-```
-
-This will:
-- ✅ Identify what's wrong with your installation
-- ✅ Automatically fix common issues (like missing hydra)
-- ✅ Provide step-by-step solutions for your specific problem
-- ✅ Guide you to working setup in minutes
-
-**For help, run:**
-```bash
-bash scripts/help.sh
-```
-
----
-
-## ⚠️ **100% REAL ATTACKS - NO MOCK DATA**
-
-**All scripts execute REAL Hydra commands and produce REAL, usable results:**
-- ✅ **Real network connections** - Every attack contacts actual target systems
-- ✅ **Real Hydra execution** - Scripts call genuine Hydra binary, not simulations
-- ✅ **Real credentials** - Found usernames/passwords are verified working credentials
-- ✅ **No dummy data** - All results come directly from target responses
-- ✅ **No fake output** - Success messages only appear for actual breaches
-
-**Proof**: View any script to see direct `hydra` command execution. Test found credentials manually - they will work on the target systems.
-
-**📱 Termux Deployment Guide**: See [docs/TERMUX_DEPLOYMENT.md](docs/TERMUX_DEPLOYMENT.md) for complete step-by-step Android/Termux installation and real-world usage examples.
-
----
-
-## ✨ Features
-
-### 🚀 **NEW: 10000% Protocol Optimization** 
-- **All 8 Attack Scripts Optimized** - 1.25x to 3x faster with intelligent parameters
-- **Thread Optimization** - Protocol-specific threading (8-48 threads)
-- **Timeout Optimization** - 10-45s timeouts based on protocol response times
-- **Priority Usernames** - Success-rate ordered credentials (45% with 'root')
-- **Blank Password Priority** - Try first for 5-50% instant success
-- **35+ Protocol Mappings** - Enhanced target scanner with attack strategies
-- **--tips Flag** - Protocol-specific optimization guidance on all scripts
-- **18KB Attack Intelligence** - Comprehensive optimization profiles
-- **Success Rate Statistics** - Real-world penetration testing data
-- See [docs/OPTIMIZATION_GUIDE.md](docs/OPTIMIZATION_GUIDE.md) for complete details
-
-### 🎯 Pre-Built Attack Scripts (8) - ALL OPTIMIZED
-- **SSH Admin Attack** - 2x faster (32 threads, 15s timeout) - Multi-wordlist with resume + **Auto Reports**
-- **FTP Admin Attack** - 3x faster (48 threads, 10s timeout) - Anonymous priority + **Auto Reports**
-- **Web Admin Attack** - 2x faster (32 threads) - WordPress priority, 13+ admin paths + **Auto Reports**
-- **RDP Admin Attack** - 2x faster (8 threads, 45s timeout) - Lockout prevention + **Auto Reports**
-- **MySQL Admin Attack** - 50% faster (24 threads) - Root blank password priority + **Auto Reports**
-- **PostgreSQL Admin Attack** - 25% faster (20 threads) - Postgres user priority + **Auto Reports**
-- **SMB Admin Attack** - 2x faster (16 threads) - Guest account priority + **Auto Reports**
-- **Multi-Protocol Auto Attack** - Enhanced with 13+ protocol mappings, parallel execution + **Auto Reports**
-
-### 🛠️ Utility Tools - ENHANCED
-- **Wordlist Manager** - Download and organize password lists from SecLists
-- **Wordlist Generator** - Combine, dedupe, sort, and filter wordlists
-- **Target Scanner** - Quick nmap wrapper with 35+ protocol recommendations
-- **Results Viewer** - Filter, export, manage results (now shows 30-day history)
-- **Attack Reports** - 🆕 **NEW!** View detailed reports with prevention recommendations
-
-### 📊 Advanced Features
-- Interactive menu system with 19 options
-- 🆕 **Automatic detailed attack reports with security recommendations**
-- 🆕 **Protocol-specific prevention guides (SSH, FTP, Web, RDP, MySQL, PostgreSQL, SMB)**
-- 🆕 **Export reports to document/share findings and fixes**
-- Real-time progress feedback
-- Comprehensive logging with timestamps
-- JSON results tracking
-- Export to multiple formats (TXT, CSV, JSON, Markdown reports)
-- Configuration management
-- Automatic update system
-- Help documentation built-in
-
-### 🔒 Security Features
-- **VPN Verification** - Multi-method VPN detection before attacks
-- **IP Rotation Tracking** - Monitor and track IP changes (up to 1000 IPs)
-- **Anonymity Enforcement** - Configurable VPN requirements
-- **Connection Audit Trail** - Log all attack sources and VPN status
-- Rate limiting to avoid detection
-- Random delay between attempts
-- Resume support for interrupted attacks
-- Configurable thread count
-- Connection timeout handling
-
-### 📚 Quick Library (NEW!)
-- **12 One-Line-Change Scripts** - Just edit TARGET and run!
-- **Platform Comparison Guide** - Understand differences between protocols
-- **Copy-Paste Ready** - Simplified scripts for instant use
-- **Real Results** - Fully functional, tested attack templates
-
-### 🌐 Full-Stack Web Application (NEW!)
-- **Modern Web Interface** - Professional React-based UI with dark theme
-- **Script Generator** - Generate attack commands with forms (Options 1-8)
-- **Target Scanner** - Scan IPs, domains, emails with protocol detection (Option 11)
-- **Wordlist Management** - Upload, view, and manage wordlists (Option 9)
-- **Custom Wordlist Generator** - Create targeted wordlists (Option 10)
-- **VPN Status Monitoring** - Real-time VPN verification and IP rotation tracking
-- **Real-time Monitoring** - Live attack progress via WebSocket
-- **Attack Orchestration** - Queue and manage multiple concurrent attacks
-- **RESTful API** - Complete backend API with JWT authentication
-- **Dashboard & Analytics** - Visualize statistics and track success rates
-- **Target Management** - Organize and categorize target systems
-- **Results Database** - SQLite persistence for all discovered credentials
-- See [fullstack-app/README.md](fullstack-app/README.md) and [docs/WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md) for complete guide
-
-## 📋 Prerequisites
-
-Before you begin, ensure you have:
-
-- ✅ [Termux](https://f-droid.org/en/packages/com.termux/) installed on your Android device
-- ✅ Stable internet connection
-- ✅ Storage permissions granted to Termux
-- ✅ At least 500MB free storage
-- ✅ **VPN for anonymity (highly recommended)**
-
-## 🚀 Quick Installation
-
-### 🎯 Method 1: Setup Wizard (Recommended for Beginners)
-
-**The easiest way! Interactive guide through setup:**
-
-```bash
-# Clone the repository
-git clone https://github.com/vinnieboy707/Hydra-termux.git
-cd Hydra-termux
-
-# Run the setup wizard (guides you through everything)
-bash scripts/setup_wizard.sh
-```
-
-The wizard will:
-- ✅ Check your system compatibility
-- ✅ Install hydra and dependencies automatically
-- ✅ Verify everything is working
-- ✅ Guide you to your first attack
-
-### 🔧 Method 2: Automatic Installation
-
-**Fast automated setup:**
-
-```bash
-# Clone the repository
-git clone https://github.com/vinnieboy707/Hydra-termux.git
-cd Hydra-termux
-
-# Run the automated installer
-bash install.sh
-```
-
-The installer will:
-- ✓ Update Termux packages
-- ✓ Install all required tools (hydra, nmap, jq, etc.)
-- ✓ Create directory structure
-- ✓ Set permissions automatically
-- ✓ Optionally download wordlists
-- ✓ Verify installation
-
-### 🆘 Installation Problems?
-
-**If installation fails or hydra doesn't work:**
-
-```bash
-# Try automatic repair:
-bash scripts/auto_fix.sh
-
-# Or run diagnostics to see what's wrong:
-bash scripts/system_diagnostics.sh
-
-# Or check what's missing:
-bash scripts/check_dependencies.sh
-```
-
-## 📦 Manual Installation
-
-If you prefer manual installation:
-
-1. **Update Termux packages:**
-   ```bash
-   pkg update && pkg upgrade -y
-   ```
-
-2. **Install required packages:**
-   ```bash
-   pkg install hydra git wget curl openssl nmap termux-api figlet jq -y
-   ```
-
-3. **Clone and setup:**
-   ```bash
-   git clone https://github.com/vinnieboy707/Hydra-termux.git
-   cd Hydra-termux
-   chmod +x hydra.sh install.sh scripts/*.sh
-   ```
-
-4. **Download wordlists (optional):**
-   ```bash
-   bash scripts/download_wordlists.sh --all
-   ```
-
-## 🎯 Usage
-
-### 🚀 Quick Library (Simplest Way!)
-
-**Want the easiest method?** Use our one-line-change scripts:
-
-```bash
-# 2. Edit ONE line (change TARGET)
-# 3. Run it!
-
-```
-
-**Example:**
-```bash
-TARGET="192.168.1.100"  # <-- Change only this
-
-# Run it
-# Done! Results saved automatically
-```
-
-
----
-
-## 🌐 Full-Stack Web Application (NEW!)
-
-For a modern web interface with advanced features, use the full-stack application:
-
-```bash
-# Navigate to the full-stack app directory
-cd fullstack-app
-
-# Run the startup script
-bash start.sh
-
-# Or start manually:
-# Terminal 1 - Backend API
-cd backend && npm start
-
-# Terminal 2 - Frontend UI  
-cd frontend && npm start
-```
-
-**Access the web interface:**
-- Frontend: http://localhost:3001
-- Backend API: http://localhost:3000
-- Default login: admin / admin (change immediately!)
-
-**🔑 Forgot your login?** Run: `./what-is-my-login.sh` or use menu option 20
-
-**Features:**
-- 🎨 Modern dark-themed UI optimized for security professionals
-- 📊 Real-time dashboard with attack statistics
-- ⚔️ Launch and monitor attacks through web interface
-- 🎯 Manage targets with categorization and tagging
-- ✅ View and export discovered credentials
-- 📚 Wordlist management and import
-- 🔐 Secure JWT authentication
-- 📡 WebSocket for live updates
-
-**Full documentation:** [fullstack-app/README.md](fullstack-app/README.md)
-
----
-
-### Starting the Tool
-
-```bash
-./hydra.sh
-```
-
-This launches the interactive menu with all available options.
-
-### Quick Examples
-
-**SSH Attack:**
-```bash
-bash scripts/ssh_admin_attack.sh -t 192.168.1.100
-```
-
-**FTP Attack:**
-```bash
-bash scripts/ftp_admin_attack.sh -t 192.168.1.100 -p 21
-```
-
-**Web Admin Attack:**
-```bash
-bash scripts/web_admin_attack.sh -t example.com -P /admin -s
-```
-
-**Multi-Protocol Auto Attack:**
-```bash
-bash scripts/admin_auto_attack.sh -t 192.168.1.100 -r
-```
-
-**Target Scanning:**
-```bash
-bash scripts/target_scanner.sh -t 192.168.1.100 -s full
-```
-
-**VPN Verification:**
-```bash
-# Check VPN status with detailed diagnostics
-bash scripts/vpn_check.sh -v
-
-# View IP rotation statistics
-source scripts/logger.sh
-get_ip_rotation_stats "ssh_attack"
-```
-
-**View Results:**
-```bash
-bash scripts/results_viewer.sh --all
-bash scripts/results_viewer.sh --protocol ssh
-bash scripts/results_viewer.sh --export results.csv --format csv
-```
-
-**View Attack Reports (NEW!):**
-```bash
-# Via main menu - Option 15
-./hydra.sh
-
-# Direct file access
-ls -lt reports/  # List all reports
-cat reports/attack_report_ssh_20240109_143022.md  # View specific report
-less reports/attack_report_ssh_20240109_143022.md # View with pagination
-```
-
-### Automatic Attack Reports (NEW!)
-
-Every attack automatically generates a comprehensive report including:
-- ✅ **Complete attack details** (timeline, target, credentials found)
-- ✅ **Vulnerability assessment** with CVSS scoring
-- ✅ **Prevention recommendations** tailored to each protocol
-- ✅ **Step-by-step remediation guides** 
-- ✅ **Security best practices** (Fail2Ban, MFA, network restrictions)
-- ✅ **Compliance guidance** (PCI-DSS, HIPAA, SOC 2)
-
-**Example Report Sections:**
-```markdown
-## Prevention & Mitigation Recommendations
-
-### Immediate Actions (Critical Priority)
-1. Change compromised credentials immediately
-2. Implement key-based authentication (SSH)
-3. Enable Multi-Factor Authentication (MFA)
-
-### Short-Term Security Enhancements
-4. Configure Fail2Ban for brute-force protection
-5. Restrict SSH access to specific IPs
-6. Change default service ports
-
-### Long-Term Best Practices
-7. Implement VPN for remote access
-8. Network segmentation and firewalls
-9. Regular security audits and penetration testing
-```
-
-**Reports are saved to:** `reports/attack_report_[protocol]_[timestamp].md`
-
-See **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** for complete documentation.
-
-### All Attack Scripts Support
-
-```bash
--t, --target      Target IP address or hostname (required)
--p, --port        Custom port (optional)
--u, --user-list   Custom username list file (optional)
--w, --word-list   Custom password wordlist file (optional)
--T, --threads     Number of parallel threads (default: 16)
--o, --timeout     Connection timeout in seconds (default: 30)
--v, --verbose     Verbose output
--h, --help        Show help message
-```
-
-## 📚 Documentation
-
-### Getting Started
-- **[AI Onboarding Guide](docs/AI_ONBOARDING_GUIDE.md)** - 🆕 **NEW!** Complete guide to the AI-powered onboarding system
-- **[ATTACK_REPORTS.md](docs/ATTACK_REPORTS.md)** - 🆕 **NEW!** Complete guide to attack reports and prevention recommendations
-- **[WEB_INTERFACE_GUIDE.md](docs/WEB_INTERFACE_GUIDE.md)** - 🌟 **NEW!** Complete web interface feature guide
-- **[CLI_WEB_MAPPING.md](docs/CLI_WEB_MAPPING.md)** - 🌟 **NEW!** Quick reference for CLI to web mapping
-- **[USAGE.md](docs/USAGE.md)** - Detailed usage instructions for all scripts
-- **[EXAMPLES.md](docs/EXAMPLES.md)** - Real-world attack examples and scenarios
-
-### Full-Stack Application
-- **[fullstack-app/README.md](fullstack-app/README.md)** - Complete full-stack guide
-- **[fullstack-app/API_DOCUMENTATION.md](fullstack-app/API_DOCUMENTATION.md)** - REST API reference
-- **[fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md](fullstack-app/COMPLETE_DEPLOYMENT_GUIDE.md)** - 📘 Comprehensive deployment guide
-- **[fullstack-app/SUPABASE_SETUP.md](fullstack-app/SUPABASE_SETUP.md)** - Supabase edge functions & database
-- **[fullstack-app/SECURITY_PROTOCOLS.md](fullstack-app/SECURITY_PROTOCOLS.md)** - Security implementation
-
-### System Status & Implementation
-- **[IMPLEMENTATION_STATUS_COMPLETE.md](IMPLEMENTATION_STATUS_COMPLETE.md)** - 🎯 **10000% Complete Status Report**
-- **[check-system-status.sh](check-system-status.sh)** - Run system health check
-- **[FINAL_IMPLEMENTATION_REPORT.md](FINAL_IMPLEMENTATION_REPORT.md)** - Final implementation report
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
-
-## 🗂️ Project Structure
-
-```
-Hydra-termux/
-├── hydra.sh                    # Main launcher with interactive menu
-├── install.sh                  # Enhanced installation script
-├── need.txt                    # Required packages list
-│   ├── README.md              # Quick reference guide
-│   ├── ssh_quick.sh           # SSH one-liner
-│   ├── ftp_quick.sh           # FTP one-liner
-│   ├── web_quick.sh           # Web one-liner
-│   ├── wordpress_quick.sh     # WordPress one-liner
-│   ├── rdp_quick.sh           # RDP one-liner
-│   ├── mysql_quick.sh         # MySQL one-liner
-│   ├── postgres_quick.sh      # PostgreSQL one-liner
-│   ├── smb_quick.sh           # SMB one-liner
-│   ├── auto_attack_quick.sh   # Auto-attack one-liner
-│   ├── network_quick.sh       # Network scan one-liner
-│   ├── email_quick.sh         # Email attack one-liner
-│   └── username_quick.sh      # Username attack one-liner
-├── config/
-│   ├── hydra.conf             # Main configuration file
-│   ├── admin_usernames.txt    # Default admin usernames
-│   └── admin_passwords.txt    # Default admin passwords
-├── scripts/
-│   ├── logger.sh              # Logging utility (sourced by all scripts)
-│   ├── ssh_admin_attack.sh    # SSH brute-force script
-│   ├── ftp_admin_attack.sh    # FTP brute-force script
-│   ├── web_admin_attack.sh    # Web admin panel attack
-│   ├── rdp_admin_attack.sh    # RDP brute-force script
-│   ├── mysql_admin_attack.sh  # MySQL attack script
-│   ├── postgres_admin_attack.sh # PostgreSQL attack script
-│   ├── smb_admin_attack.sh    # SMB/CIFS attack script
-│   ├── admin_auto_attack.sh   # Multi-protocol auto attack
-│   ├── download_wordlists.sh  # Wordlist download manager
-│   ├── wordlist_generator.sh  # Custom wordlist generator
-│   ├── target_scanner.sh      # Target reconnaissance tool
-│   └── results_viewer.sh      # Results management tool
-├── docs/
-│   ├── USAGE.md               # Detailed usage guide
-│   └── EXAMPLES.md            # Real-world examples
-├── logs/                       # Attack logs and results (auto-created)
-├── results/                    # Scan results and reports (auto-created)
-└── wordlists/                  # Password wordlists (auto-created)
-```
-
-## 🔧 Configuration
-
-Edit `config/hydra.conf` to customize:
-
-```ini
-[GENERAL]
-default_threads=16
-timeout=30
-verbose=true
-output_format=json
-log_directory=~/hydra-logs
-
-[SECURITY]
-vpn_check=true              # Verify VPN connection before attacks
-vpn_enforce=false           # Block attacks if VPN not detected (true/false)
-track_ip_rotation=true      # Track IP address changes for anonymity monitoring
-min_ip_rotation=0           # Minimum unique IPs per hour (0 = no requirement)
-rate_limit=true
-max_attempts=1000
-random_delay=true
-
-[WORDLISTS]
-default_passwords=~/wordlists/common_passwords.txt
-admin_passwords=~/wordlists/admin_passwords.txt
-usernames=~/wordlists/admin_usernames.txt
-```
-
-## 🌐 Supported Protocols (40+)
-
-Hydra supports these protocols through the attack scripts:
-
-**Network Services:** SSH, FTP, FTPS, Telnet, RDP, VNC, RLogin, RSH
-
-**Web Services:** HTTP, HTTPS, HTTP-GET, HTTP-POST, HTTP-PROXY, HTTPS-GET, HTTPS-POST
-
-**Databases:** MySQL, PostgreSQL, MS-SQL, Oracle, MongoDB, Redis
-
-**Mail Services:** SMTP, SMTPS, POP3, POP3S, IMAP, IMAPS
-
-**File Sharing:** SMB, NFS, AFP
-
-**Other:** LDAP, SNMP, SIP, ICQ, IRC, XMPP, and more
-
-## 🔍 Troubleshooting
-
-### 🚨 **HYDRA NOT WORKING? RUN THIS ONE COMMAND:**
-
-```bash
-bash scripts/help.sh
-```
-
-This interactive help tool will:
-- Diagnose your specific issue
-- Provide tailored solutions
-- Auto-fix common problems
-- Guide you step-by-step
-
-**Or use specific diagnostic tools:**
-
-```bash
-# Full system health check (recommended):
-bash scripts/system_diagnostics.sh
-
-# Automatic hydra installation:
-bash scripts/auto_fix.sh
-
-# Quick dependency check:
-bash scripts/check_dependencies.sh
-
-# Interactive help center:
-bash scripts/help.sh
-```
-
-### ❌ **"Command not found: hydra"** (CRITICAL)
-
-This is the **#1 most common issue**. Without hydra, **NOTHING will work**.
-
-**Fastest Fix:**
-```bash
-bash scripts/help.sh
-# Select option 1 when prompted
-```
-
-**Manual Fix:**
-```bash
-# On Termux:
-pkg update && pkg install hydra -y
-
-# On Debian/Ubuntu:
-sudo apt update && sudo apt install hydra -y
-
-# Or use automatic fixer:
-bash scripts/auto_fix.sh
-```
-
-**Verify it worked:**
-```bash
-hydra -h
-# Should show hydra help message
-```
-
-**Still not working?** See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for detailed solutions.
-
-### 🔧 **Quick Fixes for Common Issues**
-
-| Problem | Quick Fix |
-|---------|-----------|
-| "Permission denied" | `chmod +x hydra.sh install.sh scripts/*.sh` |
-| "Package not found" | `pkg update && pkg upgrade` |
-| Scripts won't run | `cd Hydra-termux` (ensure you're in project directory) |
-| No results showing | `cat logs/hydra_$(date +%Y%m%d).log` |
-| Out of memory | Close other apps, use `-T 4` (fewer threads) |
-| "jq: not found" | `pkg install jq -y` (required for results) |
-| Very slow | Use WiFi, reduce threads: `-T 8` |
-
-### 🆘 **Still Having Issues?**
-
-**Run these diagnostic commands in order:**
-
-1. **System Health Check:**
-   ```bash
-   bash scripts/system_diagnostics.sh
-   ```
-   Shows detailed system status with health score
-
-2. **Automatic Repair:**
-   ```bash
-   bash scripts/auto_fix.sh
-   ```
-   Attempts to automatically install hydra
-
-3. **Dependency Check:**
-   ```bash
-   bash scripts/check_dependencies.sh
-   ```
-   Lists what's missing with installation instructions
-
-4. **Read Full Guide:**
-   ```bash
-   cat docs/TROUBLESHOOTING.md
-   # Or open in browser/editor
-   ```
-
-### 📚 **Detailed Troubleshooting Documentation**
-
-For comprehensive troubleshooting, see:
-- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - Complete troubleshooting guide
-- **[docs/TERMUX_DEPLOYMENT.md](docs/TERMUX_DEPLOYMENT.md)** - Termux-specific issues
-- **[GitHub Issues](https://github.com/vinnieboy707/Hydra-termux/issues)** - Community help
-
-### "Permission denied" error
-```bash
-chmod +x hydra.sh install.sh scripts/*.sh
-```
-
-### "Package not found" error
-```bash
-pkg update
-pkg upgrade
-```
-
-### Script won't run
-Make sure you're in the correct directory:
-```bash
-cd Hydra-termux
-ls -la
-```
-
-### "Script not found" after choosing a menu option
-- Update to the latest version (symlink-safe launcher with improved path resolution, works even when `hydra.sh` is called via a symlink):
-  - If you cloned the repo: `cd Hydra-termux && git pull`
-  - If you downloaded manually: re-download the latest `hydra.sh` and `scripts/` folder from the repository
-- Ensure `hydra.sh` and the `scripts/` folder stay together (run from the project directory)
-
-### No results showing
-Check if attacks were successful:
-```bash
-cat logs/hydra_$(date +%Y%m%d).log
-```
-
-### Out of memory errors
-- Close other apps to free memory
-- Reduce thread count: use `-T 4` instead of default 16
-- Use WiFi instead of mobile data
-
-## 💡 Performance Tips
-
-1. **Use WiFi** for better speed and stability
-2. **Close other apps** to free up RAM
-3. **Keep Termux in foreground** to prevent Android from killing it
-4. **Use smaller wordlists** for faster testing
-5. **Reduce threads** on slow connections (`-T 8` instead of 16)
-6. **Enable verbose mode** (`-v`) only when debugging
-7. **Use quick scan** before full scan to save time
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## ⚠️ Legal Disclaimer
-
-**IMPORTANT - READ CAREFULLY:**
-
-This tool is provided for **educational and authorized security testing purposes ONLY**.
-
-### Legal Requirements
-
-- ✓ **ONLY** use on systems you own or have explicit written permission to test
-- ✓ Obtain proper authorization before conducting security assessments
-- ✓ Comply with all applicable laws and regulations
-- ✓ Document all testing activities and obtain consent
-
-### Illegal Activities
-
-Unauthorized access to computer systems is **ILLEGAL** under:
-- Computer Fraud and Abuse Act (CFAA) - United States
-- Computer Misuse Act - United Kingdom
-- Cybercrime laws in various jurisdictions worldwide
-
-Violators may face:
-- Criminal prosecution
-- Significant fines
-- Imprisonment
-- Civil liability
-
-### Disclaimer
-
-The developers and contributors:
-- ❌ Do NOT encourage or condone illegal activities
-- ❌ Assume NO responsibility for misuse
-- ❌ Are NOT liable for any damages or legal consequences
-- ✓ Provide this tool for legitimate security research ONLY
-
-**BY USING THIS SOFTWARE, YOU AGREE TO:**
-1. Use it only on authorized systems
-2. Accept full responsibility for your actions
-3. Comply with all applicable laws
-4. Not hold the developers liable for misuse
-
-**USE AT YOUR OWN RISK.**
-
-## 🙏 Credits
-
-- **Original Project:** [cyrushar/Hydra-Termux](https://github.com/cyrushar/Hydra-Termux)
-- **Enhanced by:** vinnieboy707
-- **Hydra Tool:** THC-Hydra team
-- **Wordlists:** [SecLists](https://github.com/danielmiessler/SecLists) by Daniel Miessler
-
-## 📞 Support
-
-If you encounter issues:
-
-1. Check the [Troubleshooting](#-troubleshooting) section
-2. Review [docs/USAGE.md](docs/USAGE.md) for detailed instructions
-3. Search existing [Issues](https://github.com/vinnieboy707/Hydra-termux/issues)
-4. Open a new issue with:
-   - Clear description of the problem
-   - Steps to reproduce
-   - Your environment (Termux version, Android version)
-   - Relevant logs or screenshots
-
-## 🌟 Star History
-
-If you find this project useful, please consider giving it a star! ⭐
-
----
-
-<div align="center">
-
-**Made with ❤️ for the Termux and Security Research Community**
-
-[⬆ Back to Top](#-hydra-termux-ultimate-edition)
-
-</div>
-
----
-
-## 💻 Git Bash Support (Windows)
-
-**Full compatibility with Git Bash on Windows 10/11!**
-
-### Quick Start on Windows
-```bash
-# 1. Clone in Git Bash
-git clone https://github.com/vinnieboy707/Hydra-termux.git
-cd Hydra-termux
-
-# 2. Make executable
-chmod +x hydra.sh install.sh scripts/*.sh Library/*.sh
-
-# 3. Launch
-./hydra.sh
-```
-
-### Verified Compatible
-✅ Git Bash (MINGW64)  
-✅ All 43 menu options  
-✅ Color output & emojis  
-✅ Full path resolution  
-✅ All combo attacks  
-
-See [GIT_BASH_SETUP.md](GIT_BASH_SETUP.md) for complete Windows setup guide.
-
-### Verify Your Installation
-```bash
-# Run automatic wiring check
-./scripts/verify_wiring.sh
-```
-
+<!-- GENERATED:nav -->
+**Project home** · [Docs home](docs/README.md) · [Company](docs/COMPANY.md) · [Architecture](docs/ARCHITECTURE.md) · [Configuration](docs/CONFIGURATION.md) · [Commands](docs/COMMANDS.md) · [Operations](docs/OPERATIONS.md) · [Security](docs/SECURITY.md) · [Testing](docs/TESTING.md) · [Releasing](docs/RELEASING.md) · [Server API](docs/API.md) · [Changelog](CHANGELOG.md)
+<!-- /GENERATED:nav -->

@@ -1,0 +1,15 @@
+{
+  "allowedEvmChainIds": [42161],
+  "solanaGenesisHash": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
+  "minNetProfitUsd": 1.0,
+  "minNetToGasRatio": 2.0,
+  "profitHaircutBps": 2000,
+  "maxGasPriceGwei": 0.5,
+  "maxGasCostUsd": 3,
+  "maxLoanUsd": 5000,
+  "maxSlippageBps": 30,
+  "maxQuoteAgeMs": 1500,
+  "maxDailyLossUsd": 25,
+  "maxConsecutiveReverts": 5,
+  "cooldownMinutes": 30
+}

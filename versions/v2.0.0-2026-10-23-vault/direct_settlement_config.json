@@ -1,0 +1,20 @@
+{
+  "mode": "PRODUCTION_DIRECT_SETTLEMENT",
+  "gateway": "Chronos Direct Bank & Crypto Rail",
+  "payout_method": "Direct ACH / Wire / Arbitrum L2 Stablecoin Transfer",
+  "destination_bank": {
+    "bank_name": "Primary Commercial Bank",
+    "account_holder_name": "Primary Account Holder",
+    "routing_number": "CONFIGURED",
+    "account_number": "CONFIGURED",
+    "account_type": "CHECKING"
+  },
+  "destination_crypto": {
+    "network": "Ethereum Mainnet",
+    "token": "ETH",
+    "wallet_address": "0xB2B33E9464c060aF8e6B95eaF77FE3954e7E13A0"
+  },
+  "auto_settle_threshold_usd": 100.00,
+  "payout_frequency": "INSTANT_ON_THRESHOLD",
+  "status": "ACTIVE_PRODUCTION_SETTLEMENT"
+}

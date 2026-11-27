@@ -1,0 +1,8 @@
+{
+  "lastUpdated": "2026-10-08T00:00:00.000Z",
+  "registeredFailures": [],
+  "preventativeRules": [
+    "PredictiveSimulator Ghost Scenarios mandatory for parameter changes",
+    "HAL 0-3 tagging mandatory for logging"
+  ]
+}
